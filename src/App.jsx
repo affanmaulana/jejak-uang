@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from "react";
 import {
-  AreaChart,
+  ComposedChart,
   Area,
+  Line,
+  ReferenceLine,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -245,6 +247,8 @@ export default function WealthTracker() {
     gold: 0,
   });
 
+  const [fireTarget, setFireTarget] = useState(1000000000); // Default 5 Miliar
+
   // Per-aset kontribusi bulanan (gambar B — diisi di kartu masing-masing)
   const [monthlyContribs, setMonthlyContribs] = useState({
     cash: 0,
@@ -265,7 +269,7 @@ export default function WealthTracker() {
 
   const handleInput = (id, e) => {
     const cls = ASSET_CLASSES.find((c) => c.id === id);
-    const max = cls.isUSD ? 1000000 : 10000000000;
+    const max = cls.isUSD ? 100000 : 1000000000;
     setAssets((prev) => ({
       ...prev,
       [id]: Math.min(Number(e.target.value.replace(/\D/g, "")), max),
@@ -275,7 +279,7 @@ export default function WealthTracker() {
   const handleStep = (id, dir) => {
     const cls = ASSET_CLASSES.find((c) => c.id === id);
     const step = cls.isUSD ? 100 : 1000000;
-    const max = cls.isUSD ? 1000000 : 10000000000;
+    const max = cls.isUSD ? 100000 : 1000000000;
     setAssets((prev) => ({
       ...prev,
       [id]: Math.max(0, Math.min((prev[id] || 0) + step * dir, max)),
@@ -718,7 +722,7 @@ export default function WealthTracker() {
                 const pct =
                   totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
                 const netR = afterTaxReturn(cls).toFixed(1);
-                const max = cls.isUSD ? 1000000 : 10000000000;
+                const max = cls.isUSD ? 100000 : 1000000000;
                 const step = cls.isUSD ? 100 : 1000000;
                 const mc = monthlyContribs[cls.id] || 0;
 
@@ -888,7 +892,7 @@ export default function WealthTracker() {
                       }}
                     >
                       <span>0</span>
-                      <span>{cls.isUSD ? "$1M" : "10M"}</span>
+                      <span>{cls.isUSD ? "$100K" : "1M"}</span>
                     </div>
 
                     {/* ── KONTRIBUSI BULANAN ── */}
@@ -1148,6 +1152,38 @@ export default function WealthTracker() {
                     Non-aktif = proyeksi menggunakan return bruto sebelum pajak
                   </div>
                 </div>
+                {/* ---> LETAKKAN KODE DI SINI, SEBAGAI ELEMEN KE-4 <--- */}
+                <div>
+                  <label
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#475569",
+                      textTransform: "uppercase",
+                      letterSpacing: ".08em",
+                      display: "block",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Target Kekayaan (FIRE)
+                  </label>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    <input
+                      type="text"
+                      className="ifield-sm"
+                      style={{ paddingLeft: 10, paddingRight: 10 }}
+                      value={new Intl.NumberFormat("id-ID").format(fireTarget)}
+                      onChange={(e) =>
+                        setFireTarget(Number(e.target.value.replace(/\D/g, "")))
+                      }
+                    />
+                  </div>
+                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
+                    Garis acuan saat proyeksi menyentuh target.
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1186,28 +1222,25 @@ export default function WealthTracker() {
               </div>
 
               <ResponsiveContainer width="100%" height={320}>
-                <AreaChart
+                <ComposedChart
                   data={chartData}
-                  margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+                  margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
                 >
                   <defs>
-                    {[
-                      ["portfolio", "#16a34a"],
-                      ["real", "#2563eb"],
-                      ["inflation", "#ef4444"],
-                    ].map(([k, c]) => (
-                      <linearGradient
-                        key={k}
-                        id={`lg_${k}`}
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop offset="5%" stopColor={c} stopOpacity={0.15} />
-                        <stop offset="95%" stopColor={c} stopOpacity={0} />
-                      </linearGradient>
-                    ))}
+                    <linearGradient
+                      id="lg_portfolio"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#16a34a"
+                        stopOpacity={0.15}
+                      />
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                    </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -1248,25 +1281,36 @@ export default function WealthTracker() {
                     strokeWidth={2.5}
                     fill="url(#lg_portfolio)"
                   />
-                  <Area
+                  <Line
                     type="monotone"
                     dataKey="real"
-                    name="Nilai Riil (daya beli)"
+                    name="Nilai Riil (Daya Beli)"
                     stroke="#2563eb"
-                    strokeWidth={2}
-                    strokeDasharray="6 3"
-                    fill="url(#lg_real)"
+                    strokeWidth={3}
+                    dot={false}
                   />
-                  <Area
+                  <Line
                     type="monotone"
                     dataKey="inflation"
                     name="Garis Inflasi"
                     stroke="#ef4444"
-                    strokeWidth={1.5}
+                    strokeWidth={2}
                     strokeDasharray="4 4"
-                    fill="url(#lg_inflation)"
+                    dot={false}
                   />
-                </AreaChart>
+                  <ReferenceLine
+                    y={fireTarget}
+                    label={{
+                      position: "top",
+                      value: "Target FIRE",
+                      fill: "#8b5cf6",
+                      fontSize: 11,
+                      fontWeight: "bold",
+                    }}
+                    stroke="#8b5cf6"
+                    strokeDasharray="3 3"
+                  />
+                </ComposedChart>
               </ResponsiveContainer>
 
               {/* Legenda penjelasan */}
