@@ -437,9 +437,9 @@ export default function WealthTracker() {
         .card  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; }
         .card2 { background:#f1f5f9; border:1.5px solid #e2e8f0; border-radius:12px; }
         .stat  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px 16px; }
-        .ifield { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:9px 80px 9px 34px; color:#0f172a; font-family:'DM Mono',monospace; font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
+        .ifield { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:9px 80px 9px 34px; color:#0f172a; font-family:'DM Sans',monospace; font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
         .ifield:focus { border-color:#3b82f6; background:#fff; }
-        .ifield-sm { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:7px 60px 7px 30px; color:#0f172a; font-family:'DM Mono',monospace; font-size:12px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
+        .ifield-sm { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:7px 60px 7px 30px; color:#0f172a; font-family:'DM Sans',monospace; font-size:12px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
         .ifield-sm:focus { border-color:#6366f1; background:#fff; }
         .stepbtn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:#f1f5f9; border:1.5px solid #e2e8f0; color:#64748b; border-radius:6px; cursor:pointer; font-size:15px; transition:all .15s; }
         .stepbtn:hover { background:#e2e8f0; color:#0f172a; border-color:#cbd5e1; }
@@ -515,7 +515,7 @@ export default function WealthTracker() {
               style={{
                 fontSize: 28,
                 fontWeight: 800,
-                fontFamily: "DM Mono",
+                fontFamily: "DM Sans",
                 color: "#16a34a",
               }}
             >
@@ -587,7 +587,7 @@ export default function WealthTracker() {
                 style={{
                   fontSize: 17,
                   fontWeight: 800,
-                  fontFamily: "DM Mono",
+                  fontFamily: "DM Sans",
                   color: s.color,
                 }}
               >
@@ -769,7 +769,7 @@ export default function WealthTracker() {
                       </div>
                       <div
                         style={{
-                          fontFamily: "DM Mono",
+                          fontFamily: "DM Sans",
                           fontWeight: 800,
                           fontSize: 16,
                           color: cls.color,
@@ -817,7 +817,7 @@ export default function WealthTracker() {
                           transform: "translateY(-50%)",
                           color: "#94a3b8",
                           fontSize: 12,
-                          fontFamily: "DM Mono",
+                          fontFamily: "DM Sans",
                         }}
                       >
                         {cls.isUSD ? "$" : "Rp"}
@@ -888,7 +888,7 @@ export default function WealthTracker() {
                         fontSize: 9,
                         color: "#cbd5e1",
                         marginTop: 3,
-                        fontFamily: "DM Mono",
+                        fontFamily: "DM Sans",
                       }}
                     >
                       <span>0</span>
@@ -909,7 +909,7 @@ export default function WealthTracker() {
                             transform: "translateY(-50%)",
                             color: "#94a3b8",
                             fontSize: 11,
-                            fontFamily: "DM Mono",
+                            fontFamily: "DM Sans",
                           }}
                         >
                           {cls.isUSD ? "$" : "Rp"}
@@ -971,7 +971,7 @@ export default function WealthTracker() {
                         <span
                           style={{
                             fontWeight: 700,
-                            fontFamily: "DM Mono",
+                            fontFamily: "DM Sans",
                             color: "#475569",
                           }}
                         >
@@ -983,7 +983,7 @@ export default function WealthTracker() {
                         <span
                           style={{
                             fontWeight: 700,
-                            fontFamily: "DM Mono",
+                            fontFamily: "DM Sans",
                             color: "#16a34a",
                           }}
                         >
@@ -996,7 +996,7 @@ export default function WealthTracker() {
                           <span
                             style={{
                               fontWeight: 700,
-                              fontFamily: "DM Mono",
+                              fontFamily: "DM Sans",
                               color: "#d97706",
                             }}
                           >
@@ -1074,7 +1074,7 @@ export default function WealthTracker() {
                     />
                     <span
                       style={{
-                        fontFamily: "DM Mono",
+                        fontFamily: "DM Sans",
                         fontWeight: 800,
                         fontSize: 16,
                         color: "#ef4444",
@@ -1104,7 +1104,7 @@ export default function WealthTracker() {
                   </label>
                   <div
                     style={{
-                      fontFamily: "DM Mono",
+                      fontFamily: "DM Sans",
                       fontSize: 20,
                       fontWeight: 800,
                       color: "#7c3aed",
@@ -1430,7 +1430,7 @@ export default function WealthTracker() {
                           </div>
                           <div
                             style={{
-                              fontFamily: "DM Mono",
+                              fontFamily: "DM Sans",
                               fontSize: 15,
                               fontWeight: 800,
                               color: s.color,
@@ -1534,7 +1534,7 @@ export default function WealthTracker() {
                         >
                           <span
                             style={{
-                              fontFamily: "DM Mono",
+                              fontFamily: "DM Sans",
                               fontSize: 12,
                               color: "#94a3b8",
                             }}
@@ -1543,7 +1543,7 @@ export default function WealthTracker() {
                           </span>
                           <span
                             style={{
-                              fontFamily: "DM Mono",
+                              fontFamily: "DM Sans",
                               fontSize: 14,
                               fontWeight: 800,
                               color: d.color,
@@ -1660,7 +1660,7 @@ export default function WealthTracker() {
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Mono",
+                        fontFamily: "DM Sans",
                         fontSize: 18,
                         fontWeight: 800,
                         color: s.color,
