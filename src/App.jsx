@@ -725,6 +725,8 @@ export default function WealthTracker() {
                 const max = cls.isUSD ? 100000 : 1000000000;
                 const step = cls.isUSD ? 100 : 1000000;
                 const mc = monthlyContribs[cls.id] || 0;
+                const contribMax = cls.isUSD ? 1000 : 10000000;
+                const contribStep = cls.isUSD ? 10 : 50000;
 
                 return (
                   <div
@@ -951,6 +953,42 @@ export default function WealthTracker() {
                           </button>
                         </div>
                       </div>
+                      {/* ---> TAMBAHKAN KODE SLIDER DI BAWAH INI <--- */}
+                      <input
+                        type="range"
+                        min={0}
+                        max={contribMax}
+                        step={contribStep}
+                        value={mc}
+                        onChange={(e) =>
+                          setMonthlyContribs((prev) => ({
+                            ...prev,
+                            [cls.id]: Number(e.target.value),
+                          }))
+                        }
+                        style={{
+                          width: "100%",
+                          marginTop: 12, // Memberi jarak dari input text di atasnya
+                          accentColor: cls.color,
+                          background: `linear-gradient(to right,${cls.color} ${
+                            (mc / contribMax) * 100
+                          }%,#e2e8f0 0%)`,
+                        }}
+                      />
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: 9,
+                          color: "#cbd5e1",
+                          marginTop: 3,
+                          fontFamily: "DM Sans",
+                        }}
+                      >
+                        <span>0</span>
+                        <span>{cls.isUSD ? "$1K" : "10 Jt"}</span>
+                      </div>
+                      {/* ---> BATAS KODE SLIDER <--- */}
                     </div>
 
                     {/* Return info */}
