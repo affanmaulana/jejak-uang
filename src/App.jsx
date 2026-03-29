@@ -434,7 +434,7 @@ export default function WealthTracker() {
         ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
         input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
-        .card  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; }
+        .card  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; overflow: hidden; }
         .card2 { background:#f1f5f9; border:1.5px solid #e2e8f0; border-radius:12px; }
         .stat  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px 16px; }
         .ifield { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:9px 80px 9px 34px; color:#0f172a; font-family:'DM Sans',monospace; font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
@@ -450,7 +450,7 @@ export default function WealthTracker() {
         .tab.on { background:#2563eb; color:#fff; box-shadow:0 2px 8px rgba(37,99,235,.22); }
         .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid #e2e8f0; background:#fff; color:#475569; cursor:pointer; transition:all .2s; text-align:left; width:100%; }
         .tmplbtn:hover { border-color:#3b82f6; color:#1e40af; background:#eff6ff; }
-        .glow-bar { position:absolute; top:0; left:0; right:0; height:3px; border-radius:16px 16px 0 0; }
+        .glow-bar { position:absolute; top:0; left:0; right:0; height:6px; border-radius:16px 16px 0 0; }
         .warn { background:#fef2f2; border:1.5px solid #fecaca; border-radius:10px; padding:12px 16px; font-size:13px; color:#dc2626; display:flex; align-items:center; gap:10px; }
         .ok   { background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; padding:12px 16px; font-size:13px; color:#16a34a; display:flex; align-items:center; gap:10px; }
         .note { background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:12px 14px; font-size:11.5px; color:#1d4ed8; margin-top:10px; line-height:1.65; }
