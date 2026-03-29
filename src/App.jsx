@@ -278,7 +278,7 @@ export default function WealthTracker() {
 
   const handleStep = (id, dir) => {
     const cls = ASSET_CLASSES.find((c) => c.id === id);
-    const step = cls.isUSD ? 100 : 1000000;
+    const step = cls.isUSD ? 50 : 50000;
     const max = cls.isUSD ? 100000 : 1000000000;
     setAssets((prev) => ({
       ...prev,
@@ -294,7 +294,8 @@ export default function WealthTracker() {
   };
 
   const handleContribStep = (id, dir) => {
-    const step = id === "usd" ? 10 : 100000;
+    const cls = ASSET_CLASSES.find((c) => c.id === id);
+    const step = cls.isUSD ? 50 : 50000;
     setMonthlyContribs((prev) => ({
       ...prev,
       [id]: Math.max(0, (prev[id] || 0) + step * dir),
@@ -723,7 +724,7 @@ export default function WealthTracker() {
                   totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
                 const netR = afterTaxReturn(cls).toFixed(1);
                 const max = cls.isUSD ? 100000 : 1000000000;
-                const step = cls.isUSD ? 100 : 1000000;
+                const step = cls.isUSD ? 50 : 50000;
                 const mc = monthlyContribs[cls.id] || 0;
                 const contribMax = cls.isUSD ? 1000 : 10000000;
                 const contribStep = cls.isUSD ? 10 : 50000;
