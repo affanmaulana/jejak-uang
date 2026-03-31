@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import {
   ComposedChart,
   Area,
@@ -2091,6 +2092,7 @@ export default function WealthTracker() {
           angka tengah fisik & digital). Konsultasikan keputusan investasi Anda
           dengan penasihat keuangan berlisensi.
         </div>
+        <Analytics />
       </div>
     </div>
   );
