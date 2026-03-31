@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import {
   ComposedChart,
@@ -130,84 +130,6 @@ const ASSET_CLASSES = [
 
 const PROJECTION_YEARS = 10;
 
-const TEMPLATES = [
-  {
-    id: "mysnapshot",
-    label: "📸 Setup Saya",
-    desc: "Tingkat risiko & return user",
-    values: {
-      cash: 2000000,
-      bankDigital: 10430000,
-      rdpu: 12500000,
-      rdo: 30000000,
-      saham: 10000000,
-      sp500: 30000000,
-      usd: 300,
-      gold: 0,
-    },
-  },
-  {
-    id: "conservative",
-    label: "🛡️ Konservatif",
-    desc: "Prioritas keamanan & likuiditas",
-    values: {
-      cash: 40000000,
-      bankDigital: 30000000,
-      rdpu: 20000000,
-      rdo: 10000000,
-      saham: 0,
-      sp500: 0,
-      usd: 0,
-      gold: 0,
-    },
-  },
-  {
-    id: "moderate",
-    label: "⚖️ Moderat",
-    desc: "Keseimbangan risiko & return",
-    values: {
-      cash: 15000000,
-      bankDigital: 10000000,
-      rdpu: 15000000,
-      rdo: 20000000,
-      saham: 15000000,
-      sp500: 25000000,
-      usd: 0,
-      gold: 0,
-    },
-  },
-  {
-    id: "aggressive",
-    label: "🔥 Agresif",
-    desc: "Maksimalkan pertumbuhan jangka panjang",
-    values: {
-      cash: 5000000,
-      bankDigital: 5000000,
-      rdpu: 0,
-      rdo: 10000000,
-      saham: 35000000,
-      sp500: 45000000,
-      usd: 0,
-      gold: 0,
-    },
-  },
-  {
-    id: "global",
-    label: "🌐 Global Hedge",
-    desc: "Diversifikasi mata uang & geografi",
-    values: {
-      cash: 10000000,
-      bankDigital: 10000000,
-      rdpu: 10000000,
-      rdo: 20000000,
-      saham: 10000000,
-      sp500: 30000000,
-      usd: 591,
-      gold: 0,
-    },
-  },
-];
-
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 const formatIDR = (v) =>
@@ -265,6 +187,80 @@ export default function WealthTracker() {
   const [inflationRate, setInflationRate] = useState(5.0);
   const [showAfterTax, setShowAfterTax] = useState(true);
   const [activeTab, setActiveTab] = useState("input");
+  // ── State Custom Templates (LocalStorage) ──
+  const [userTemplates, setUserTemplates] = useState(() => {
+    try {
+      const saved = localStorage.getItem("wealth_templates");
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [templateNameInput, setTemplateNameInput] = useState("");
+  // INJEKSI STATE AKTIF
+  const [activeTemplateId, setActiveTemplateId] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem("wealth_templates", JSON.stringify(userTemplates));
+  }, [userTemplates]);
+
+  const saveNewTemplate = () => {
+    const trimmedName = templateNameInput.trim();
+    if (!trimmedName) return alert("Nama template wajib diisi.");
+    if (
+      userTemplates.some(
+        (t) => t.name.toLowerCase() === trimmedName.toLowerCase()
+      )
+    ) {
+      return alert("Nama template sudah digunakan.");
+    }
+
+    const newTemplate = {
+      id: crypto.randomUUID(),
+      name: trimmedName,
+      assets: { ...assets },
+      contribs: { ...monthlyContribs },
+      fireTarget: fireTarget,
+      updatedAt: new Date().toISOString(),
+    };
+    setUserTemplates((prev) => [...prev, newTemplate]);
+    setTemplateNameInput("");
+    setActiveTemplateId(newTemplate.id); // SET AKTIF SAAT CREATE
+  };
+
+  const updateExistingTemplate = (id, e) => {
+    e.stopPropagation();
+    if (!confirm("Update template ini dengan angka di layar saat ini?")) return;
+
+    setUserTemplates((prev) =>
+      prev.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            assets: { ...assets },
+            contribs: { ...monthlyContribs },
+            fireTarget: fireTarget,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return t;
+      })
+    );
+  };
+
+  const loadUserTemplate = (t) => {
+    setAssets((prev) => ({ ...prev, ...t.assets }));
+    setMonthlyContribs((prev) => ({ ...prev, ...(t.contribs || {}) }));
+    if (t.fireTarget) setFireTarget(t.fireTarget);
+    setActiveTemplateId(t.id); // SET AKTIF SAAT DILOAD
+  };
+
+  const deleteTemplate = (id, e) => {
+    e.stopPropagation();
+    if (!confirm("Hapus template ini secara permanen?")) return;
+    setUserTemplates((prev) => prev.filter((t) => t.id !== id));
+    if (activeTemplateId === id) setActiveTemplateId(null); // RESET JIKA YG DIHAPUS ADALAH TEMPLATE AKTIF
+  };
 
   // ── State Dana Darurat ──
   const [monthlyExpense, setMonthlyExpense] = useState(3000000);
@@ -486,6 +482,7 @@ export default function WealthTracker() {
         input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
         .card  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; overflow: hidden; }
         .card2 { background:#f1f5f9; border:1.5px solid #e2e8f0; border-radius:12px; }
+        .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
         .stat  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px 16px; }
         .ifield { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:9px 80px 9px 34px; color:#0f172a; font-family:'DM Sans',monospace; font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
         .ifield:focus { border-color:#3b82f6; background:#fff; }
@@ -696,7 +693,7 @@ export default function WealthTracker() {
         ══════════════════════════════════════════════ */}
         {activeTab === "input" && (
           <div>
-            {/* Templates */}
+            {/* Manajemen Template Custom - Horizontal Design */}
             <div className="card" style={{ padding: 16, marginBottom: 14 }}>
               <div
                 style={{
@@ -705,34 +702,151 @@ export default function WealthTracker() {
                   color: "#94a3b8",
                   textTransform: "uppercase",
                   letterSpacing: ".1em",
-                  marginBottom: 10,
+                  marginBottom: 12,
                 }}
               >
-                Template Cepat
+                Template Tersimpan (Lokal)
               </div>
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))",
-                  gap: 8,
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 10,
+                  alignItems: "stretch",
                 }}
               >
-                {TEMPLATES.map((t) => (
-                  <button
+                {userTemplates.map((t) => (
+                  <div
                     key={t.id}
-                    className="tmplbtn"
-                    onClick={() => applyTemplate(t)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "8px 12px",
+                      gap: 12,
+                      cursor: "pointer",
+                      border:
+                        activeTemplateId === t.id
+                          ? "1.5px solid #3b82f6"
+                          : "1.5px solid #e2e8f0",
+                      backgroundColor:
+                        activeTemplateId === t.id ? "#eff6ff" : "#fff",
+                      borderRadius: 10,
+                      transition: "all 0.2s",
+                    }}
+                    onClick={() => loadUserTemplate(t)}
+                    onMouseOver={(e) => {
+                      if (activeTemplateId !== t.id)
+                        e.currentTarget.style.borderColor = "#3b82f6";
+                    }}
+                    onMouseOut={(e) => {
+                      if (activeTemplateId !== t.id)
+                        e.currentTarget.style.borderColor = "#e2e8f0";
+                    }}
                   >
                     <div
-                      style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        minWidth: 100,
+                      }}
                     >
-                      {t.label}
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: "#0f172a",
+                        }}
+                      >
+                        {t.name}
+                      </span>
+                      <span style={{ fontSize: 10, color: "#94a3b8" }}>
+                        Update:{" "}
+                        {new Date(t.updatedAt).toLocaleDateString("id-ID")}
+                      </span>
                     </div>
-                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                      {t.desc}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 4,
+                        borderLeft: "1.5px solid #f1f5f9",
+                        paddingLeft: 10,
+                      }}
+                    >
+                      <button
+                        onClick={(e) => updateExistingTemplate(t.id, e)}
+                        style={{
+                          background: "#f1f5f9",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "4px 6px",
+                          cursor: "pointer",
+                          fontSize: 13,
+                        }}
+                        title="Timpa template ini"
+                      >
+                        🔄
+                      </button>
+                      <button
+                        onClick={(e) => deleteTemplate(t.id, e)}
+                        style={{
+                          background: "#fef2f2",
+                          color: "#ef4444",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "4px 6px",
+                          cursor: "pointer",
+                          fontSize: 14,
+                          fontWeight: "bold",
+                        }}
+                        title="Hapus"
+                      >
+                        ×
+                      </button>
                     </div>
-                  </button>
+                  </div>
                 ))}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "#f8fafc",
+                    padding: 6,
+                    borderRadius: 10,
+                    border: "1.5px dashed #cbd5e1",
+                  }}
+                >
+                  <input
+                    type="text"
+                    style={{
+                      width: 140,
+                      padding: "8px 12px",
+                      background: "transparent",
+                      border: "none",
+                      outline: "none",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: "#0f172a",
+                    }}
+                    placeholder="Nama template..."
+                    value={templateNameInput}
+                    onChange={(e) => setTemplateNameInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveNewTemplate();
+                    }}
+                  />
+                  <button
+                    className="tab on"
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: 8,
+                      height: "100%",
+                    }}
+                    onClick={saveNewTemplate}
+                  >
+                    + Add
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -798,7 +912,8 @@ export default function WealthTracker() {
                         marginBottom: 10,
                       }}
                     >
-                      <div>
+                      {/* TAMBAHKAN flex: 1 dan paddingRight DI SINI */}
+                      <div style={{ flex: 1, paddingRight: 12 }}>
                         <div
                           style={{
                             fontWeight: 700,
@@ -819,13 +934,15 @@ export default function WealthTracker() {
                           {cls.description}
                         </div>
                       </div>
+                      {/* TAMBAHKAN minWidth dan textAlign DI SINI */}
                       <div
                         style={{
                           fontFamily: "DM Sans",
                           fontWeight: 800,
                           fontSize: 16,
                           color: cls.color,
-                          marginLeft: 8,
+                          minWidth: "55px",
+                          textAlign: "right",
                         }}
                       >
                         {pct}%
@@ -1996,9 +2113,8 @@ export default function WealthTracker() {
               {/* Card Lapis 1: Cash/Bank */}
               <div
                 className="card"
-                style={{ padding: "16px 20px", position: "relative" }}
+                style={{ padding: "16px 20px", borderTop: "6px solid #3b82f6" }}
               >
-                <div className="glow-bar" style={{ background: "#3b82f6" }} />
                 <div
                   style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
                 >
@@ -2023,9 +2139,8 @@ export default function WealthTracker() {
               {/* Card Lapis 2: Bank Digital */}
               <div
                 className="card"
-                style={{ padding: "16px 20px", position: "relative" }}
+                style={{ padding: "16px 20px", borderTop: "6px solid #06b6d4" }}
               >
-                <div className="glow-bar" style={{ background: "#06b6d4" }} />
                 <div
                   style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
                 >
@@ -2051,9 +2166,8 @@ export default function WealthTracker() {
               {/* Card Lapis 3: RDPU */}
               <div
                 className="card"
-                style={{ padding: "16px 20px", position: "relative" }}
+                style={{ padding: "16px 20px", borderTop: "6px solid #10b981" }}
               >
-                <div className="glow-bar" style={{ background: "#10b981" }} />
                 <div
                   style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
                 >
