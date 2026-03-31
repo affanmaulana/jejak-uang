@@ -221,6 +221,9 @@ export default function WealthTracker() {
       assets: { ...assets },
       contribs: { ...monthlyContribs },
       fireTarget: fireTarget,
+      monthlyExpense: monthlyExpense,
+      targetMonths: targetMonths,
+      includeEmergencyInTotal: includeEmergencyInTotal,
       updatedAt: new Date().toISOString(),
     };
     setUserTemplates((prev) => [...prev, newTemplate]);
@@ -240,6 +243,9 @@ export default function WealthTracker() {
             assets: { ...assets },
             contribs: { ...monthlyContribs },
             fireTarget: fireTarget,
+            monthlyExpense: monthlyExpense,
+            targetMonths: targetMonths,
+            includeEmergencyInTotal: includeEmergencyInTotal,
             updatedAt: new Date().toISOString(),
           };
         }
@@ -252,7 +258,14 @@ export default function WealthTracker() {
     setAssets((prev) => ({ ...prev, ...t.assets }));
     setMonthlyContribs((prev) => ({ ...prev, ...(t.contribs || {}) }));
     if (t.fireTarget) setFireTarget(t.fireTarget);
-    setActiveTemplateId(t.id); // SET AKTIF SAAT DILOAD
+
+    // PENGAMAN BACKWARD COMPATIBILITY: Hanya set state jika nilainya terdefinisi di cache
+    if (t.monthlyExpense !== undefined) setMonthlyExpense(t.monthlyExpense);
+    if (t.targetMonths !== undefined) setTargetMonths(t.targetMonths);
+    if (t.includeEmergencyInTotal !== undefined)
+      setIncludeEmergencyInTotal(t.includeEmergencyInTotal);
+
+    setActiveTemplateId(t.id);
   };
 
   const deleteTemplate = (id, e) => {
