@@ -1066,39 +1066,6 @@ export default function WealthTracker() {
                     </div>
 
                     {/* Slider */}
-                    <input
-                      type="range"
-                      min={0}
-                      max={max}
-                      step={step}
-                      value={raw}
-                      onChange={(e) =>
-                        setAssets((prev) => ({
-                          ...prev,
-                          [cls.id]: Number(e.target.value),
-                        }))
-                      }
-                      style={{
-                        width: "100%",
-                        accentColor: cls.color,
-                        background: `linear-gradient(to right,${cls.color} ${
-                          (raw / max) * 100
-                        }%,#e2e8f0 0%)`,
-                      }}
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontSize: 9,
-                        color: "#cbd5e1",
-                        marginTop: 3,
-                        fontFamily: "DM Sans",
-                      }}
-                    >
-                      <span>0</span>
-                      <span>{cls.isUSD ? "$100K" : "1M"}</span>
-                    </div>
 
                     {/* ── KONTRIBUSI BULANAN ── */}
                     <div className="contrib-row">
@@ -1157,40 +1124,7 @@ export default function WealthTracker() {
                         </div>
                       </div>
                       {/* ---> TAMBAHKAN KODE SLIDER DI BAWAH INI <--- */}
-                      <input
-                        type="range"
-                        min={0}
-                        max={contribMax}
-                        step={contribStep}
-                        value={mc}
-                        onChange={(e) =>
-                          setMonthlyContribs((prev) => ({
-                            ...prev,
-                            [cls.id]: Number(e.target.value),
-                          }))
-                        }
-                        style={{
-                          width: "100%",
-                          marginTop: 12, // Memberi jarak dari input text di atasnya
-                          accentColor: cls.color,
-                          background: `linear-gradient(to right,${cls.color} ${
-                            (mc / contribMax) * 100
-                          }%,#e2e8f0 0%)`,
-                        }}
-                      />
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          fontSize: 9,
-                          color: "#cbd5e1",
-                          marginTop: 3,
-                          fontFamily: "DM Sans",
-                        }}
-                      >
-                        <span>0</span>
-                        <span>{cls.isUSD ? "$1K" : "10 Jt"}</span>
-                      </div>
+
                       {/* ---> BATAS KODE SLIDER <--- */}
                     </div>
 
