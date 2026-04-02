@@ -156,6 +156,25 @@ const afterTaxReturn = (cls) => {
   return cls.return * (1 - cls.taxRate);
 };
 
+// ─── DATA MIGRATION PIPELINE ──────────────────────────────────────────────────
+const CURRENT_SCHEMA_VERSION = 1;
+
+const migrateTemplates = (templates) => {
+  return templates.map((t) => {
+    let updated = { ...t };
+
+    if (!updated.version || updated.version < 1) {
+      updated.monthlyExpense = updated.monthlyExpense ?? 3000000;
+      updated.targetMonths = updated.targetMonths ?? 6;
+      updated.includeEmergencyInTotal =
+        updated.includeEmergencyInTotal ?? false;
+      updated.version = 1;
+    }
+
+    return updated;
+  });
+};
+
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export default function WealthTracker() {
@@ -191,8 +210,15 @@ export default function WealthTracker() {
   const [userTemplates, setUserTemplates] = useState(() => {
     try {
       const saved = localStorage.getItem("wealth_templates");
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+
+      const parsed = JSON.parse(saved);
+      const migrated = migrateTemplates(parsed);
+
+      localStorage.setItem("wealth_templates", JSON.stringify(migrated));
+      return migrated;
     } catch (e) {
+      console.error("Data template rusak, direset ke kosong.");
       return [];
     }
   });
@@ -224,6 +250,7 @@ export default function WealthTracker() {
       monthlyExpense: monthlyExpense,
       targetMonths: targetMonths,
       includeEmergencyInTotal: includeEmergencyInTotal,
+      version: CURRENT_SCHEMA_VERSION, // INJEKSI VERSI BARU
       updatedAt: new Date().toISOString(),
     };
     setUserTemplates((prev) => [...prev, newTemplate]);
@@ -257,14 +284,10 @@ export default function WealthTracker() {
   const loadUserTemplate = (t) => {
     setAssets((prev) => ({ ...prev, ...t.assets }));
     setMonthlyContribs((prev) => ({ ...prev, ...(t.contribs || {}) }));
-    if (t.fireTarget) setFireTarget(t.fireTarget);
-
-    // PENGAMAN BACKWARD COMPATIBILITY: Hanya set state jika nilainya terdefinisi di cache
-    if (t.monthlyExpense !== undefined) setMonthlyExpense(t.monthlyExpense);
-    if (t.targetMonths !== undefined) setTargetMonths(t.targetMonths);
-    if (t.includeEmergencyInTotal !== undefined)
-      setIncludeEmergencyInTotal(t.includeEmergencyInTotal);
-
+    setFireTarget(t.fireTarget);
+    setMonthlyExpense(t.monthlyExpense);
+    setTargetMonths(t.targetMonths);
+    setIncludeEmergencyInTotal(t.includeEmergencyInTotal);
     setActiveTemplateId(t.id);
   };
 
