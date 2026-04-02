@@ -232,7 +232,7 @@ export default function WealthTracker() {
 
   const saveNewTemplate = () => {
     const trimmedName = templateNameInput.trim();
-    if (!trimmedName) return alert("Nama template wajib diisi.");
+    if (!trimmedName) return alert("Nama Profile wajib diisi.");
     if (
       userTemplates.some(
         (t) => t.name.toLowerCase() === trimmedName.toLowerCase()
@@ -741,7 +741,7 @@ export default function WealthTracker() {
                   marginBottom: 12,
                 }}
               >
-                Template Tersimpan (Lokal)
+                Profile Alokasi Kamu
               </div>
               <div
                 style={{
@@ -864,7 +864,7 @@ export default function WealthTracker() {
                       fontWeight: 600,
                       color: "#0f172a",
                     }}
-                    placeholder="Nama template..."
+                    placeholder="Nama Profile..."
                     value={templateNameInput}
                     onChange={(e) => setTemplateNameInput(e.target.value)}
                     onKeyDown={(e) => {
