@@ -160,13 +160,13 @@ const afterTaxReturn = (cls) => {
 
 export default function WealthTracker() {
   const [assets, setAssets] = useState({
-    cash: 2000000,
-    bankDigital: 10430000,
-    rdpu: 12500000,
-    rdo: 30000000,
-    saham: 10000000,
-    sp500: 30000000,
-    usd: 300,
+    cash: 0,
+    bankDigital: 0,
+    rdpu: 0,
+    rdo: 0,
+    saham: 0,
+    sp500: 0,
+    usd: 0,
     gold: 0,
   });
 
