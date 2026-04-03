@@ -632,7 +632,8 @@ export default function WealthTracker() {
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:var(--color-border-input); border-radius:4px; }
         input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+        input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
         .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; }
         .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
@@ -681,7 +682,7 @@ export default function WealthTracker() {
     align-items:center;
     justify-content:center;
     position:fixed;
-    bottom:88px;
+    bottom:80px;
     right:20px;
     z-index:1000;
     width:auto;
@@ -832,7 +833,7 @@ export default function WealthTracker() {
             >
               {formatCompact(totalAssets)}
             </div>
-            <div style={{ fontSize: 11, color: tokens.colors.border.input, marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: tokens.colors.text.secondary, marginTop: 2 }}>
               {formatIDR(totalAssets)}
             </div>
           </div>
