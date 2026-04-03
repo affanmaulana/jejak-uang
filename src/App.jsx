@@ -301,6 +301,7 @@ export default function WealthTracker() {
 
   const [rawInputs, setRawInputs] = useState({});
   const [rawContribs, setRawContribs] = useState({});
+  const [rawExpense, setRawExpense] = useState("");
 
   const [inflationRate, setInflationRate] = useState(5.0);
   const [showAfterTax, setShowAfterTax] = useState(true);
@@ -1424,6 +1425,9 @@ export default function WealthTracker() {
                           </button>
                         </div>
                       </div>
+                      <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4, letterSpacing: ".01em" }}>
+                        Bisa operasi matematika (+ dan -)
+                      </div>
 
                       {/* ── KONTRIBUSI BULANAN ── */}
                       <div className="contrib-row">
@@ -2500,13 +2504,26 @@ export default function WealthTracker() {
                           type="text"
                           className="ifield"
                           value={
-                            monthlyExpense === 0
-                              ? ""
-                              : new Intl.NumberFormat("id-ID").format(
-                                monthlyExpense
-                              )
+                            rawExpense !== ""
+                              ? rawExpense
+                              : monthlyExpense === 0
+                                ? ""
+                                : new Intl.NumberFormat("id-ID").format(monthlyExpense)
                           }
-                          onChange={handleExpenseInput}
+                          onChange={(e) => {
+                            const formatted = formatWhileTyping(e.target.value);
+                            setRawExpense(formatted);
+                          }}
+                          onBlur={(e) => {
+                            const result = parseExpression(e.target.value);
+                            if (result !== null) {
+                              setMonthlyExpense(Math.min(result, 1000000000));
+                            }
+                            setRawExpense("");
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") e.target.blur();
+                          }}
                           placeholder="0"
                         />
                         <div
@@ -2533,8 +2550,8 @@ export default function WealthTracker() {
                           </button>
                         </div>
                       </div>
-                      <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 6 }}>
-                        Kelipatan Rp 50.000
+                      <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4, letterSpacing: ".01em" }}>
+                        Bisa operasi matematika (+ dan -)
                       </div>
                     </div>
 
