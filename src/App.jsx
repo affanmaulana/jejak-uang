@@ -614,7 +614,7 @@ export default function WealthTracker() {
     cursor:pointer;
     font-size:16px;
     font-family: 'DM Sans', sans-serif;
-    fontWeight: 700;
+    font-weight: 600;
     color:#fff;
     transition:transform .15s;
     box-shadow:0 12px 32px rgba(0,0,0,.08);
@@ -633,7 +633,14 @@ background:rgba(255, 255, 255, 0.9); /* Sedikit transparan */
     gap:4px;
 box-shadow:0 12px 32px rgba(0,0,0,.08);
   }
-  .tab-bar-sticky .tab { flex:1; text-align:center; font-size:11px; padding:10px 4px; border-radius: 16px; }
+  .tab-bar-sticky .tab { 
+    flex:1; 
+    text-align:center; 
+    font-size:14px; /* Naik dari 11px ke 13px */
+    font-weight: 700; /* Ditebalkan */
+    padding:12px 4px; /* Padding atas-bawah ditambah biar bar-nya makin tebal */
+    border-radius: 16px; 
+  }
   .mobile-bottom-spacer { height:80px; }
 }
 @media (min-width:769px) { .tab-bar-sticky { display:none !important; } .mobile-bottom-spacer { display:none; } }
@@ -2668,7 +2675,7 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
             disabled={activeAssetIds.length >= ASSET_CLASSES.length}
             title="Tambah Instrumen"
           >
-            + Instrumen baru
+            + Instrumen Baru
           </button>
         )}
 
