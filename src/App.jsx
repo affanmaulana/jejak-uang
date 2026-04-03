@@ -1377,6 +1377,7 @@ export default function WealthTracker() {
                         </span>
                         <input
                           type="text"
+                          inputMode="numeric"
                           className="ifield"
                           value={rawInputs[cls.id] !== undefined
                             ? rawInputs[cls.id]
@@ -1446,6 +1447,7 @@ export default function WealthTracker() {
                           </span>
                           <input
                             type="text"
+                            inputMode="numeric"
                             className="ifield-sm"
                             value={rawContribs[cls.id] !== undefined
                               ? rawContribs[cls.id]
@@ -2498,6 +2500,7 @@ export default function WealthTracker() {
                         </span>
                         <input
                           type="text"
+                          inputMode="numeric"
                           className="ifield"
                           value={
                             monthlyExpense === 0
@@ -2794,6 +2797,17 @@ export default function WealthTracker() {
               </p>
               <div style={{ display: "flex", gap: "8px", width: "100%" }}>
                 <button
+                  onClick={closeModal}
+                  style={{
+                    flex: 1,
+                    padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                    background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                  }}
+                >
+                  Batal
+                </button>
+                <button
                   onClick={() => {
                     if (modalAction.type === "delete") {
                       setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
@@ -2823,17 +2837,6 @@ export default function WealthTracker() {
                   }}
                 >
                   {modalAction.type === "delete" ? "Hapus" : "Ya, Update"}
-                </button>
-                <button
-                  onClick={closeModal}
-                  style={{
-                    flex: 1,
-                    padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
-                    background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
-                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                  }}
-                >
-                  Batal
                 </button>
               </div>
             </div>
