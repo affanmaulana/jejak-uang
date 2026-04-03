@@ -1377,7 +1377,6 @@ export default function WealthTracker() {
                         </span>
                         <input
                           type="text"
-                          inputMode="numeric"
                           className="ifield"
                           value={rawInputs[cls.id] !== undefined
                             ? rawInputs[cls.id]
@@ -1447,7 +1446,6 @@ export default function WealthTracker() {
                           </span>
                           <input
                             type="text"
-                            inputMode="numeric"
                             className="ifield-sm"
                             value={rawContribs[cls.id] !== undefined
                               ? rawContribs[cls.id]
@@ -2500,7 +2498,6 @@ export default function WealthTracker() {
                         </span>
                         <input
                           type="text"
-                          inputMode="numeric"
                           className="ifield"
                           value={
                             monthlyExpense === 0
