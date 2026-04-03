@@ -1787,41 +1787,7 @@ export default function WealthTracker() {
                     per aset.
                   </div>
                 </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: "#475569",
-                      textTransform: "uppercase",
-                      letterSpacing: ".08em",
-                      display: "block",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Mode Return
-                  </label>
-                  <label
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      cursor: "pointer",
-                      fontSize: 13,
-                      color: "#475569",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={showAfterTax}
-                      onChange={(e) => setShowAfterTax(e.target.checked)}
-                    />
-                    After-tax (rekomendasi: aktif)
-                  </label>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
-                    Non-aktif = proyeksi menggunakan return bruto sebelum pajak
-                  </div>
-                </div>
+
                 {/* ---> LETAKKAN KODE DI SINI, SEBAGAI ELEMEN KE-4 <--- */}
                 <div>
                   <label
@@ -2348,314 +2314,319 @@ export default function WealthTracker() {
         {/* ══════════════════════════════════════════════
             MODUL DANA DARURAT (DEFENSIF)
         ══════════════════════════════════════════════ */}
-        <hr
-          style={{
-            border: 0,
-            borderTop: "1.5px dashed #cbd5e1",
-            margin: "32px 0",
-          }}
-        />
-
-        <div style={{ marginBottom: 24 }}>
-          {/* PARENT HEADER: RATA KANAN-KIRI (Flex Space-Between) */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-              flexWrap: "wrap",
-              gap: 12,
-            }}
-          >
-            <h2
+        {activeTab === "input" && (
+          <>
+            <hr
               style={{
-                fontSize: 18,
-                fontWeight: 800,
-                color: "#0f172a",
-                margin: 0,
+                border: 0,
+                borderTop: "1.5px dashed #cbd5e1",
+                margin: "32px 0",
               }}
-            >
-              Dana Darurat
-            </h2>
+            />
 
-            {/* TOGGLE PENGGABUNGAN ASET */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                cursor: "pointer",
-              }}
-            >
-              <input
-                type="checkbox"
-                id="toggleEmergency"
-                checked={includeEmergencyInTotal}
-                onChange={(e) => setIncludeEmergencyInTotal(e.target.checked)}
-                style={{
-                  width: 15,
-                  height: 15,
-                  accentColor: "#6366f1",
-                  cursor: "pointer",
-                  margin: 0,
-                }}
-              />
-              <label
-                htmlFor="toggleEmergency"
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "#475569",
-                  cursor: "pointer",
-                  fontFamily: "DM Sans",
-                }}
-              >
-                Gabungkan Target ke Total Aset & Proyeksi
-              </label>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* BARIS 1: INPUT KALKULATOR (1x3 Span) */}
-            <div className="card" style={{ padding: 20 }}>
+            <div style={{ marginBottom: 24 }}>
+              {/* PARENT HEADER: RATA KANAN-KIRI (Flex Space-Between) */}
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
-                  gap: 20,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                  flexWrap: "wrap",
+                  gap: 12,
                 }}
               >
-                {/* Kolom 1: Pengeluaran Bulanan */}
-                <div>
-                  <div className="cl">Pengeluaran Bulanan</div>
-                  <div style={{ position: "relative", marginTop: 4 }}>
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: 14,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#94a3b8",
-                        fontSize: 13,
-                        fontFamily: "DM Sans",
-                      }}
-                    >
-                      Rp
-                    </span>
-                    <input
-                      type="text"
-                      className="ifield"
-                      value={
-                        monthlyExpense === 0
-                          ? ""
-                          : new Intl.NumberFormat("id-ID").format(
-                            monthlyExpense
-                          )
-                      }
-                      onChange={handleExpenseInput}
-                      placeholder="0"
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: 6,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        display: "flex",
-                        gap: 4,
-                      }}
-                    >
-                      <button
-                        className="stepbtn"
-                        onClick={() => handleExpenseStep(-1)}
-                      >
-                        −
-                      </button>
-                      <button
-                        className="stepbtn"
-                        onClick={() => handleExpenseStep(1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 6 }}>
-                    Kelipatan Rp 50.000
-                  </div>
-                </div>
+                <h2
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 800,
+                    color: "#0f172a",
+                    margin: 0,
+                  }}
+                >
+                  Dana Darurat
+                </h2>
 
-                {/* Kolom 2: Slider Target */}
+                {/* TOGGLE PENGGABUNGAN ASET */}
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
                     alignItems: "center",
-                    justifyContent: "center",
+                    gap: 8,
+                    cursor: "pointer",
                   }}
                 >
-                  <div
-                    className="cl"
-                    style={{ width: "100%", textAlign: "center" }}
-                  >
-                    Target Dana Darurat
-                  </div>
-                  <div
+                  <input
+                    type="checkbox"
+                    id="toggleEmergency"
+                    checked={includeEmergencyInTotal}
+                    onChange={(e) => setIncludeEmergencyInTotal(e.target.checked)}
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 14,
-                      width: "100%",
-                      marginTop: 12,
+                      width: 15,
+                      height: 15,
+                      accentColor: "#6366f1",
+                      cursor: "pointer",
+                      margin: 0,
+                    }}
+                  />
+                  <label
+                    htmlFor="toggleEmergency"
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#475569",
+                      cursor: "pointer",
+                      fontFamily: "DM Sans",
                     }}
                   >
-                    <input
-                      type="range"
-                      min={3}
-                      max={12}
-                      step={1}
-                      value={targetMonths}
-                      onChange={(e) => setTargetMonths(Number(e.target.value))}
+                    Gabungkan Target ke Total Aset & Proyeksi
+                  </label>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {/* BARIS 1: INPUT KALKULATOR (1x3 Span) */}
+                <div className="card" style={{ padding: 20 }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
+                      gap: 20,
+                    }}
+                  >
+                    {/* Kolom 1: Pengeluaran Bulanan */}
+                    <div>
+                      <div className="cl">Pengeluaran Bulanan</div>
+                      <div style={{ position: "relative", marginTop: 4 }}>
+                        <span
+                          style={{
+                            position: "absolute",
+                            left: 14,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#94a3b8",
+                            fontSize: 13,
+                            fontFamily: "DM Sans",
+                          }}
+                        >
+                          Rp
+                        </span>
+                        <input
+                          type="text"
+                          className="ifield"
+                          value={
+                            monthlyExpense === 0
+                              ? ""
+                              : new Intl.NumberFormat("id-ID").format(
+                                monthlyExpense
+                              )
+                          }
+                          onChange={handleExpenseInput}
+                          placeholder="0"
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: 6,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            display: "flex",
+                            gap: 4,
+                          }}
+                        >
+                          <button
+                            className="stepbtn"
+                            onClick={() => handleExpenseStep(-1)}
+                          >
+                            −
+                          </button>
+                          <button
+                            className="stepbtn"
+                            onClick={() => handleExpenseStep(1)}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 6 }}>
+                        Kelipatan Rp 50.000
+                      </div>
+                    </div>
+
+                    {/* Kolom 2: Slider Target */}
+                    <div
                       style={{
-                        flex: 1,
-                        accentColor: "#6366f1",
-                        background: `linear-gradient(to right,#6366f1 ${((targetMonths - 3) / 9) * 100
-                          }%,#e2e8f0 0%)`,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                    />
-                    <span
+                    >
+                      <div
+                        className="cl"
+                        style={{ width: "100%", textAlign: "center" }}
+                      >
+                        Target Dana Darurat
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 14,
+                          width: "100%",
+                          marginTop: 12,
+                        }}
+                      >
+                        <input
+                          type="range"
+                          min={3}
+                          max={12}
+                          step={1}
+                          value={targetMonths}
+                          onChange={(e) => setTargetMonths(Number(e.target.value))}
+                          style={{
+                            flex: 1,
+                            accentColor: "#6366f1",
+                            background: `linear-gradient(to right,#6366f1 ${((targetMonths - 3) / 9) * 100
+                              }%,#e2e8f0 0%)`,
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontFamily: "DM Sans",
+                            fontSize: 16,
+                            fontWeight: 800,
+                            color: "#6366f1",
+                            minWidth: 55,
+                            textAlign: "right",
+                          }}
+                        >
+                          {targetMonths} Bln
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Kolom 3: Total Kebutuhan (Rata Kanan) */}
+                    <div
                       style={{
-                        fontFamily: "DM Sans",
-                        fontSize: 16,
-                        fontWeight: 800,
-                        color: "#6366f1",
-                        minWidth: 55,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-end",
                         textAlign: "right",
                       }}
                     >
-                      {targetMonths} Bln
-                    </span>
+                      <div className="cl">Total Kebutuhan</div>
+                      <div
+                        style={{
+                          fontFamily: "DM Sans",
+                          fontSize: 26,
+                          fontWeight: 800,
+                          color: "#0f172a",
+                          marginTop: 4,
+                        }}
+                      >
+                        {formatCompact(monthlyExpense * targetMonths)}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+                        {formatIDR(monthlyExpense * targetMonths)}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Kolom 3: Total Kebutuhan (Rata Kanan) */}
+                {/* BARIS 2: TIERING CARDS (Non-editable) */}
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    textAlign: "right",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+                    gap: 12,
                   }}
                 >
-                  <div className="cl">Total Kebutuhan</div>
+                  {/* Card Lapis 1: Cash/Bank */}
                   <div
-                    style={{
-                      fontFamily: "DM Sans",
-                      fontSize: 26,
-                      fontWeight: 800,
-                      color: "#0f172a",
-                      marginTop: 4,
-                    }}
+                    className="card"
+                    style={{ padding: "16px 20px", borderTop: "6px solid #3b82f6" }}
                   >
-                    {formatCompact(monthlyExpense * targetMonths)}
+                    <div
+                      style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
+                    >
+                      Lapis 1 ({t1Months} Bulan) - Cash / Bank
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "DM Sans",
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: "#0f172a",
+                        margin: "6px 0",
+                      }}
+                    >
+                      {formatIDR(monthlyExpense * t1Months)}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                      Untuk likuiditas instan H-0. Hindari instrumen fluktuatif.
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
-                    {formatIDR(monthlyExpense * targetMonths)}
+
+                  {/* Card Lapis 2: Bank Digital */}
+                  <div
+                    className="card"
+                    style={{ padding: "16px 20px", borderTop: "6px solid #06b6d4" }}
+                  >
+                    <div
+                      style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
+                    >
+                      Lapis 2 ({t2Months} Bulan) - Bank Digital
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "DM Sans",
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: "#0f172a",
+                        margin: "6px 0",
+                      }}
+                    >
+                      {formatIDR(monthlyExpense * t2Months)}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                      Likuiditas tinggi dengan yield lebih baik dari bank
+                      konvensional.
+                    </div>
+                  </div>
+
+                  {/* Card Lapis 3: RDPU */}
+                  <div
+                    className="card"
+                    style={{ padding: "16px 20px", borderTop: "6px solid #10b981" }}
+                  >
+                    <div
+                      style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
+                    >
+                      Lapis 3 ({t3Months} Bulan) - RDPU
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "DM Sans",
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: "#0f172a",
+                        margin: "6px 0",
+                      }}
+                    >
+                      {formatIDR(monthlyExpense * t3Months)}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                      Pelindung nilai dari inflasi. Pencairan memakan waktu 1-3 hari
+                      kerja.
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* BARIS 2: TIERING CARDS (Non-editable) */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-                gap: 12,
-              }}
-            >
-              {/* Card Lapis 1: Cash/Bank */}
-              <div
-                className="card"
-                style={{ padding: "16px 20px", borderTop: "6px solid #3b82f6" }}
-              >
-                <div
-                  style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
-                >
-                  Lapis 1 ({t1Months} Bulan) - Cash / Bank
-                </div>
-                <div
-                  style={{
-                    fontFamily: "DM Sans",
-                    fontSize: 20,
-                    fontWeight: 800,
-                    color: "#0f172a",
-                    margin: "6px 0",
-                  }}
-                >
-                  {formatIDR(monthlyExpense * t1Months)}
-                </div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                  Untuk likuiditas instan H-0. Hindari instrumen fluktuatif.
-                </div>
-              </div>
-
-              {/* Card Lapis 2: Bank Digital */}
-              <div
-                className="card"
-                style={{ padding: "16px 20px", borderTop: "6px solid #06b6d4" }}
-              >
-                <div
-                  style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
-                >
-                  Lapis 2 ({t2Months} Bulan) - Bank Digital
-                </div>
-                <div
-                  style={{
-                    fontFamily: "DM Sans",
-                    fontSize: 20,
-                    fontWeight: 800,
-                    color: "#0f172a",
-                    margin: "6px 0",
-                  }}
-                >
-                  {formatIDR(monthlyExpense * t2Months)}
-                </div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                  Likuiditas tinggi dengan yield lebih baik dari bank
-                  konvensional.
-                </div>
-              </div>
-
-              {/* Card Lapis 3: RDPU */}
-              <div
-                className="card"
-                style={{ padding: "16px 20px", borderTop: "6px solid #10b981" }}
-              >
-                <div
-                  style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
-                >
-                  Lapis 3 ({t3Months} Bulan) - RDPU
-                </div>
-                <div
-                  style={{
-                    fontFamily: "DM Sans",
-                    fontSize: 20,
-                    fontWeight: 800,
-                    color: "#0f172a",
-                    margin: "6px 0",
-                  }}
-                >
-                  {formatIDR(monthlyExpense * t3Months)}
-                </div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                  Pelindung nilai dari inflasi. Pencairan memakan waktu 1-3 hari
-                  kerja.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
 
         <div className="mobile-bottom-spacer" />
 
