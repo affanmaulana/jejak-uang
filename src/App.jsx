@@ -536,9 +536,9 @@ export default function WealthTracker() {
       weightedGross: parseFloat(gross.toFixed(2)),
       weightedNet: parseFloat(net.toFixed(2)),
       equityPct: parseFloat(equity.toFixed(1)),
-      realReturn: parseFloat((net - inflationRate).toFixed(2)),
+      realReturn: parseFloat(((showAfterTax ? net : gross) - inflationRate).toFixed(2)),
     };
-  }, [effectiveAssets, totalAssets, inflationRate]); // <-- UBAH DI SINI
+  }, [effectiveAssets, totalAssets, inflationRate, showAfterTax]); // <-- UBAH DI SINI
 
   // Proyeksi: setiap aset dihitung terpisah (FV dengan kontribusi per aset)
   const chartData = useMemo(() => {
@@ -670,7 +670,7 @@ export default function WealthTracker() {
         .ok   { background: ${tokens.colors.semantic.successBg}; border:1.5px solid ${tokens.colors.semantic.successBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
         .note { background: ${tokens.colors.surface.active}; border:1.5px solid ${tokens.colors.border.subtle}; border-radius:10px; padding:12px 14px; font-size:11.5px; color: ${tokens.colors.text.secondary}; margin-top:10px; line-height:1.65; }
         .pgbar { background:var(--color-border-subtle); border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
-        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-top:20px; }
+        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-top:20px; margin-bottom:120px; }
         .contrib-row { border-top:1px solid var(--color-surface-input); margin-top:10px; padding-top:10px; }
         .cl { font-size:10px; font-weight:700; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
@@ -736,7 +736,7 @@ export default function WealthTracker() {
     padding:12px 4px;
     border-radius: 16px; 
   }
-  .mobile-bottom-spacer { height:80px; }
+  .mobile-bottom-spacer { height:4px; }
 }
 @media (min-width:769px) { .tab-bar-sticky { display:none !important; } .mobile-bottom-spacer { display:none; } }
       `}</style>
@@ -835,7 +835,7 @@ export default function WealthTracker() {
                 fontSize: 28,
                 fontWeight: 800,
                 fontFamily: tokens.typography.fontFamily,
-                color: tokens.colors.semantic.success,
+                color: tokens.colors.text.primary,
               }}
             >
               {formatCompact(totalAssets)}
@@ -853,7 +853,7 @@ export default function WealthTracker() {
               label: showAfterTax ? "Return After-Tax" : "Return Bruto",
               value: `${showAfterTax ? stats.weightedNet : stats.weightedGross}%`,
               sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
-              color: tokens.colors.semantic.brand,
+              color: tokens.colors.semantic.success,
               tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
             },
             {
@@ -887,9 +887,16 @@ export default function WealthTracker() {
                   marginBottom: 5,
                 }}
               >
-                {s.tip
-                  ? <Tooltip text={s.tip}>{s.label}</Tooltip>
-                  : s.label}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  {s.label}
+                  {s.tip && (
+                    <span title={s.tip} style={{ cursor: "help", display: "inline-flex" }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                      </svg>
+                    </span>
+                  )}
+                </span>
               </div>
               <div
                 style={{
@@ -953,7 +960,7 @@ export default function WealthTracker() {
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    minWidth: 100,
+                    width: 80,
                   }}
                 >
                   <span
@@ -961,12 +968,15 @@ export default function WealthTracker() {
                       fontSize: 13,
                       fontWeight: 700,
                       color: tokens.colors.text.primary,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
+                    title={t.name}
                   >
                     {t.name}
                   </span>
                   <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
-                    {" "}
                     {new Date(t.updatedAt).toLocaleDateString("id-ID")}
                   </span>
                 </div>
@@ -986,11 +996,15 @@ export default function WealthTracker() {
                       borderRadius: 6,
                       padding: "4px 6px",
                       cursor: "pointer",
-                      fontSize: 13,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                     title="Timpa template ini"
                   >
-                    🔄
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16, color: tokens.colors.text.secondary }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
                   </button>
                   <button
                     onClick={(e) => deleteTemplate(t.id, e)}
@@ -1001,12 +1015,15 @@ export default function WealthTracker() {
                       borderRadius: 6,
                       padding: "4px 6px",
                       cursor: "pointer",
-                      fontSize: 14,
-                      fontWeight: "bold",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                     title="Hapus"
                   >
-                    ×
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -1097,9 +1114,9 @@ export default function WealthTracker() {
           }}
         >
           {[
-            ["input", "⚙️ Input Aset"],
-            ["projection", "📈 Proyeksi"],
-            ["allocation", "🥧 Alokasi"],
+            ["input", "Input Aset"],
+            ["projection", "Proyeksi"],
+            ["allocation", "Alokasi"],
           ].map(([id, lbl]) => (
             <button
               key={id}
@@ -2727,9 +2744,9 @@ export default function WealthTracker() {
         {/* ── MOBILE STICKY TAB BAR ── */}
         <div className="tab-bar-sticky" style={{ background: tokens.colors.surface.card, borderTop: `1.5px solid ${tokens.colors.border.subtle}` }}>
           {[
-            ["input", "⚙️", "Input"],
-            ["projection", "📈", "Proyeksi"],
-            ["allocation", "🥧", "Alokasi"],
+            ["input", "", "Input"],
+            ["projection", "", "Proyeksi"],
+            ["allocation", "", "Alokasi"],
           ].map(([id, icon, lbl]) => (
             <button
               key={id}
