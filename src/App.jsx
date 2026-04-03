@@ -54,6 +54,7 @@ const tokens = {
       sp500: '#3B82F6',
       usd: '#10B981',
       gold: '#EAB308',
+      rdSaham: '#fb7185',
     },
   },
   typography: {
@@ -118,6 +119,19 @@ const ASSET_CLASSES = [
     liquidity: "T+2",
     risk: "Rendah–Sedang",
     description: "Reksa dana obligasi. Return lebih tinggi, sedikit fluktuasi.",
+  },
+  {
+    id: "rdSaham",
+    name: "Reksadana Saham",
+    return: 11.0,
+    color: tokens.colors.dataViz.rdSaham,
+    isEquity: true,
+    isUSD: false,
+    taxRate: 0,
+    liquidity: "T+3",
+    risk: "Tinggi",
+    description:
+      "Kumpulan saham pilihan yang dikelola oleh Manajer Investasi profesional. Diversifikasi tinggi, potensi return jangka panjang.",
   },
   {
     id: "saham",
@@ -267,6 +281,7 @@ export default function WealthTracker() {
     sp500: 0,
     usd: 0,
     gold: 0,
+    rdSaham: 0,
   });
 
   const [fireTarget, setFireTarget] = useState(1000000000); // Default 5 Miliar
@@ -281,6 +296,7 @@ export default function WealthTracker() {
     sp500: 0,
     usd: 0,
     gold: 0,
+    rdSaham: 0,
   });
 
   const [rawInputs, setRawInputs] = useState({});
@@ -673,8 +689,8 @@ export default function WealthTracker() {
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
 .fab { display:none; }
 @media (max-width:768px) {
-  .header-title { font-size:18px !important; }
-  .header-sub { font-size:11px !important; }
+  .header-title { font-size:24px !important; }
+  .header-sub { font-size:12px !important; }
   .desktop-only { display: none !important; }
   .fab {
     display:flex;
@@ -728,31 +744,22 @@ export default function WealthTracker() {
       <div style={{ maxWidth: 980, margin: "0 auto" }}>
         {/* ── HEADER ── */}
         <div style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              ...tokens.typography.eyebrow,
-              color: tokens.colors.semantic.brand,
-              marginBottom: 6,
-            }}
-          >
-            ● JEJAK HARTA V1.0
-          </div>
           <h1
             className="header-title"
             style={{
-              fontSize: 26,
+              fontSize: 32,
               fontWeight: 800,
               margin: 0,
               letterSpacing: "-0.01em",
               color: tokens.colors.text.primary,
             }}
           >
-            Peta Alokasi Hartamu
+            Jejak Harta
           </h1>
           <p
             className="header-sub"
             style={{
-              fontSize: 13,
+              fontSize: 16,
               color: tokens.colors.text.tertiary,
               marginTop: 5,
               marginBottom: 0,
