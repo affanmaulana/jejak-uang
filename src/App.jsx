@@ -2784,18 +2784,15 @@ export default function WealthTracker() {
                 boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
                 width: "100%",
                 maxWidth: "360px",
-                padding: "24px",
+                padding: "12px",
                 textAlign: "center"
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ fontSize: "40px", marginBottom: "12px" }}>
-                {modalAction.type === "delete" ? "🗑️" : "🔄"}
-              </div>
-              <p style={{ fontSize: "14px", fontWeight: 600, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+              <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
                 {modalAction.title}
               </p>
-              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <div style={{ display: "flex", gap: "8px", width: "100%" }}>
                 <button
                   onClick={() => {
                     if (modalAction.type === "delete") {
@@ -2818,20 +2815,21 @@ export default function WealthTracker() {
                     closeModal();
                   }}
                   style={{
-                    padding: "9px 22px", borderRadius: "8px", border: "none",
+                    flex: 1,
+                    padding: "12px 0", borderRadius: "8px", border: "none",
                     background: modalAction.type === "delete" ? tokens.colors.semantic.danger : tokens.colors.semantic.brand,
-                    color: "#fff", fontWeight: 700, fontSize: "13px",
-                    cursor: "pointer", fontFamily: tokens.typography.fontFamily,
-                    boxShadow: modalAction.type === "delete" ? `0 4px 12px ${tokens.colors.semantic.danger}35` : `0 4px 12px rgba(15,23,42,.2)`
+                    color: "#fff", fontWeight: 700, fontSize: "14px",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
                   }}
                 >
-                  {modalAction.type === "delete" ? "🗑️ Hapus" : "🔄 Ya, Update"}
+                  {modalAction.type === "delete" ? "Hapus" : "Ya, Update"}
                 </button>
                 <button
                   onClick={closeModal}
                   style={{
-                    padding: "9px 22px", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
-                    background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "13px",
+                    flex: 1,
+                    padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                    background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
                     cursor: "pointer", fontFamily: tokens.typography.fontFamily
                   }}
                 >
