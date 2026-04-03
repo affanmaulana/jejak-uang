@@ -622,7 +622,7 @@ export default function WealthTracker() {
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
     position:fixed;
-bottom:20px; left:16px; right:16px;
+bottom:8px; left:16px; right:16px;
     z-index:999;
 background:rgba(255, 255, 255, 0.9); /* Sedikit transparan */
     backdrop-filter: blur(12px); /* Efek kaca (Glassmorphism) modern */
