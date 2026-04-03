@@ -594,6 +594,49 @@ export default function WealthTracker() {
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
 @media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
+.fab { display:none; }
+@media (max-width:768px) {
+.desktop-only { display: none !important; }
+  .fab {
+    display:flex;
+    padding:8px 16px;
+    align-items:center;
+    justify-content:center;
+    position:fixed;
+    bottom:88px;
+    right:20px;
+    z-index:1000;
+    width:auto;
+    height:auto;
+    border-radius:999px;
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    border:none;
+    cursor:pointer;
+    font-size:16px;
+    font-family: 'DM Sans', sans-serif;
+    fontWeight: 700;
+    color:#fff;
+    transition:transform .15s;
+    box-shadow:0 12px 32px rgba(0,0,0,.08);
+  }
+  .fab:active { transform:scale(0.93); }
+  .tab-bar-sticky {
+    position:fixed;
+bottom:20px; left:16px; right:16px;
+    z-index:999;
+background:rgba(255, 255, 255, 0.9); /* Sedikit transparan */
+    backdrop-filter: blur(12px); /* Efek kaca (Glassmorphism) modern */
+    border:1.5px solid rgba(226, 232, 240, 0.8); /* Border tipis keliling */
+    border-radius:24px; /* Bentuk kapsul (Pill) */
+    display:flex;
+    padding:8px;
+    gap:4px;
+box-shadow:0 12px 32px rgba(0,0,0,.08);
+  }
+  .tab-bar-sticky .tab { flex:1; text-align:center; font-size:11px; padding:10px 4px; border-radius: 16px; }
+  .mobile-bottom-spacer { height:80px; }
+}
+@media (min-width:769px) { .tab-bar-sticky { display:none !important; } .mobile-bottom-spacer { display:none; } }
       `}</style>
 
       <div style={{ maxWidth: 980, margin: "0 auto" }}>
@@ -674,34 +717,38 @@ export default function WealthTracker() {
           {[
             {
               label: showAfterTax ? "Return After-Tax" : "Return Bruto",
-              value: `${showAfterTax ? stats.weightedNet : stats.weightedGross
-                }%`,
+              value: `${showAfterTax ? stats.weightedNet : stats.weightedGross}%`,
               sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
               color: "#2563eb",
+              tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
             },
             {
               label: "Return Riil",
               value: `${stats.realReturn >= 0 ? "+" : ""}${stats.realReturn}%`,
               sub: `vs inflasi ${inflationRate}%/thn`,
               color: stats.realReturn >= 0 ? "#16a34a" : "#dc2626",
+              tip: "Return setelah dikurangi inflasi. Angka positif berarti daya beli kamu tumbuh nyata.",
             },
             {
               label: "Equity Exposure",
               value: `${stats.equityPct}%`,
               sub: riskInfo.label,
               color: riskInfo.color,
+              tip: "Persentase portofolio di aset berisiko tinggi (saham). Makin tinggi, makin volatil nilainya.",
             },
             {
               label: "Kontribusi/Bln",
               value: formatCompact(totalMonthlyContrib),
               sub: "semua aset digabung",
               color: "#7c3aed",
+              tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
             },
             {
               label: "Stress Test (Bear)",
               value: formatCompact(worstCase),
               sub: "Ekuitas −30% crash scenario",
               color: "#d97706",
+              tip: "Simulasi crash pasar: semua aset ekuitas turun 30% sekaligus. Ini nilai portofoliomu di skenario terburuk.",
             },
           ].map((s, i) => (
             <div key={i} className="stat">
@@ -715,7 +762,9 @@ export default function WealthTracker() {
                   marginBottom: 5,
                 }}
               >
-                {s.label}
+                {s.tip
+                  ? <Tooltip text={s.tip}>{s.label}</Tooltip>
+                  : s.label}
               </div>
               <div
                 style={{
@@ -935,8 +984,9 @@ export default function WealthTracker() {
 
         {/* ── TABS ── */}
         <div
+          className="desktop-only"
           style={{
-            display: "flex",
+            display: "flex", /* KEMBALIKAN INI */
             gap: 4,
             marginBottom: 18,
             background: "#f1f5f9",
@@ -1005,11 +1055,12 @@ export default function WealthTracker() {
               <button
                 onClick={() => setIsModalOpen(true)}
                 disabled={activeAssetIds.length >= ASSET_CLASSES.length}
+                className="desktop-only"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  padding: "10px 20px",
+                  padding: "8px 16px",
                   borderRadius: 999,
                   border: "none",
                   fontWeight: 700,
@@ -2593,6 +2644,8 @@ export default function WealthTracker() {
           </div>
         </div>
 
+        <div className="mobile-bottom-spacer" />
+
         {/* ── DISCLAIMER ── */}
         <div className="disc">
           <strong>⚠️ Disclaimer:</strong> Kalkulator ini bersifat edukatif dan
@@ -2606,6 +2659,36 @@ export default function WealthTracker() {
           angka tengah fisik & digital). Konsultasikan keputusan investasi Anda
           dengan penasihat keuangan berlisensi.
         </div>
+
+        {/* ── MOBILE FAB ── */}
+        {activeTab === "input" && (
+          <button
+            className="fab"
+            onClick={() => setIsModalOpen(true)}
+            disabled={activeAssetIds.length >= ASSET_CLASSES.length}
+            title="Tambah Instrumen"
+          >
+            + Instrumen baru
+          </button>
+        )}
+
+        {/* ── MOBILE STICKY TAB BAR ── */}
+        <div className="tab-bar-sticky">
+          {[
+            ["input", "⚙️", "Input"],
+            ["projection", "📈", "Proyeksi"],
+            ["allocation", "🥧", "Alokasi"],
+          ].map(([id, icon, lbl]) => (
+            <button
+              key={id}
+              className={`tab ${activeTab === id ? "on" : ""}`}
+              onClick={() => setActiveTab(id)}
+            >
+              {icon} {lbl}
+            </button>
+          ))}
+        </div>
+
         <Analytics />
 
         {/* ── CONFIRM DIALOG MODAL ── */}
