@@ -569,7 +569,7 @@ export default function WealthTracker() {
         .card  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; overflow: hidden; }
         .card2 { background:#f1f5f9; border:1.5px solid #e2e8f0; border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
-        .stat  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px 16px; }
+        .stat  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px 16px; flex-shrink:0; min-width:148px; }
         .ifield { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:9px 80px 9px 34px; color:#0f172a; font-family:'DM Sans',monospace; font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
         .ifield:focus { border-color:#3b82f6; background:#fff; }
         .ifield-sm { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:7px 60px 7px 30px; color:#0f172a; font-family:'DM Sans',monospace; font-size:12px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
@@ -592,11 +592,23 @@ export default function WealthTracker() {
         .cl { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+/* ── Stat scroll strip ── */
+        .stat-strip { display:flex; flex-direction:row; gap:10px; overflow-x:auto; margin: 0 -16px 20px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .stat-strip::-webkit-scrollbar { display:none; }
+        /* ── Profile row (naked) ── */
+        .profile-row { display:flex; flex-wrap:nowrap; gap:10px; overflow-x:auto; margin: 0 -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .profile-row::-webkit-scrollbar { display:none; }
+        /* ── iOS-style toggle ── */
+        .ios-toggle-wrap { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+        .ios-track { position:relative; width:38px; height:22px; border-radius:11px; transition:background .25s; flex-shrink:0; }
+        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .25s; }
 @media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
 .fab { display:none; }
 @media (max-width:768px) {
-.desktop-only { display: none !important; }
+  .header-title { font-size:18px !important; }
+  .header-sub { font-size:11px !important; }
+  .desktop-only { display: none !important; }
   .fab {
     display:flex;
     padding:8px 16px;
@@ -622,23 +634,23 @@ export default function WealthTracker() {
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
     position:fixed;
-bottom:8px; left:16px; right:16px;
+    bottom:8px; left:16px; right:16px;
     z-index:999;
-background:rgba(255, 255, 255, 0.9); /* Sedikit transparan */
-    backdrop-filter: blur(12px); /* Efek kaca (Glassmorphism) modern */
-    border:1.5px solid rgba(226, 232, 240, 0.8); /* Border tipis keliling */
-    border-radius:24px; /* Bentuk kapsul (Pill) */
+    background:rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border:1.5px solid rgba(226, 232, 240, 0.8);
+    border-radius:24px;
     display:flex;
     padding:8px;
     gap:4px;
-box-shadow:0 12px 32px rgba(0,0,0,.08);
+    box-shadow:0 12px 32px rgba(0,0,0,.08);
   }
   .tab-bar-sticky .tab { 
     flex:1; 
     text-align:center; 
-    font-size:14px; /* Naik dari 11px ke 13px */
-    font-weight: 700; /* Ditebalkan */
-    padding:12px 4px; /* Padding atas-bawah ditambah biar bar-nya makin tebal */
+    font-size:14px;
+    font-weight: 700;
+    padding:12px 4px;
     border-radius: 16px; 
   }
   .mobile-bottom-spacer { height:80px; }
@@ -648,50 +660,100 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
 
       <div style={{ maxWidth: 980, margin: "0 auto" }}>
         {/* ── HEADER ── */}
+        <div style={{ marginBottom: 20 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: ".15em",
+              color: "#2563eb",
+              textTransform: "uppercase",
+              marginBottom: 6,
+            }}
+          >
+            ● JEJAK HARTA V1.0
+          </div>
+          <h1
+            className="header-title"
+            style={{
+              fontSize: 26,
+              fontWeight: 800,
+              margin: 0,
+              color: "#0f172a",
+            }}
+          >
+            Peta Alokasi Hartamu
+          </h1>
+          <p
+            className="header-sub"
+            style={{
+              fontSize: 13,
+              color: "#94a3b8",
+              marginTop: 5,
+              marginBottom: 0,
+            }}
+          >
+            Return riil · Pajak · Kontribusi per aset · Stress test
+          </p>
+        </div>
+
+        {/* ── GLOBAL DASHBOARD CONTROLLER ── */}
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            gap: 16,
-            alignItems: "flex-end",
+            alignItems: "center",
             justifyContent: "space-between",
+            gap: 12,
             marginBottom: 20,
+            flexWrap: "wrap",
           }}
         >
-          <div>
+          {/* LEFT: Real Return status + After-Tax toggle */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Real Return status pill */}
             <div
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: ".15em",
-                color: "#2563eb",
-                textTransform: "uppercase",
-                marginBottom: 6,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "5px 12px",
+                borderRadius: 999,
+                background: stats.realReturn >= 0 ? "#f0fdf4" : "#fef2f2",
+                border: `1.5px solid ${stats.realReturn >= 0 ? "#bbf7d0" : "#fecaca"}`,
+                width: "fit-content",
               }}
             >
-              ● JEJAK HARTA V1.0
+              <span style={{ fontSize: 13 }}>{stats.realReturn >= 0 ? "✅" : "⚠️"}</span>
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: stats.realReturn >= 0 ? "#16a34a" : "#dc2626",
+                }}
+              >
+                {stats.realReturn >= 0 ? "+" : ""}{stats.realReturn}% vs inflasi {inflationRate}%/thn
+              </span>
             </div>
-            <h1
-              style={{
-                fontSize: 26,
-                fontWeight: 800,
-                margin: 0,
-                color: "#0f172a",
-              }}
-            >
-              Peta Alokasi Hartamu
-            </h1>
-            <p
-              style={{
-                fontSize: 13,
-                color: "#94a3b8",
-                marginTop: 5,
-                marginBottom: 0,
-              }}
-            >
-              Return riil · Pajak · Kontribusi per aset · Stress test
-            </p>
+            {/* After-Tax iOS toggle */}
+            <label className="ios-toggle-wrap">
+              <div
+                className="ios-track"
+                style={{ background: showAfterTax ? "#2563eb" : "#cbd5e1" }}
+                onClick={() => setShowAfterTax((v) => !v)}
+              >
+                <div
+                  className="ios-thumb"
+                  style={{ transform: showAfterTax ? "translateX(16px)" : "translateX(0)" }}
+                />
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#475569", cursor: "pointer" }}
+                onClick={() => setShowAfterTax((v) => !v)}
+              >
+                After-tax
+              </span>
+            </label>
           </div>
+          {/* RIGHT: Total Aset */}
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>
               Total Aset (IDR)
@@ -712,15 +774,8 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
           </div>
         </div>
 
-        {/* ── SUMMARY STATS ── */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(148px,1fr))",
-            gap: 10,
-            marginBottom: 16,
-          }}
-        >
+        {/* ── SUMMARY STATS — horizontal scroll strip ── */}
+        <div className="stat-strip">
           {[
             {
               label: showAfterTax ? "Return After-Tax" : "Return Bruto",
@@ -728,13 +783,6 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
               sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
               color: "#2563eb",
               tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
-            },
-            {
-              label: "Return Riil",
-              value: `${stats.realReturn >= 0 ? "+" : ""}${stats.realReturn}%`,
-              sub: `vs inflasi ${inflationRate}%/thn`,
-              color: stats.realReturn >= 0 ? "#16a34a" : "#dc2626",
-              tip: "Return setelah dikurangi inflasi. Angka positif berarti daya beli kamu tumbuh nyata.",
             },
             {
               label: "Equity Exposure",
@@ -790,22 +838,8 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
           ))}
         </div>
 
-        {/* ── ALERT ── */}
-        {totalAssets > 0 &&
-          (stats.realReturn < 0 ? (
-            <div className="warn" style={{ marginBottom: 14 }}>
-              ⚠️ Return riil negatif ({stats.realReturn}%). Kekayaan Anda
-              menyusut secara riil terhadap inflasi.
-            </div>
-          ) : (
-            <div className="ok" style={{ marginBottom: 14 }}>
-              ✅ Return riil positif (+{stats.realReturn}%). Kekayaan Anda
-              tumbuh melampaui inflasi {inflationRate}%/tahun.
-            </div>
-          ))}
-
-        {/* ── PROFILE ALOKASI KAMU (global, selalu tampil) ── */}
-        <div className="card" style={{ padding: 16, marginBottom: 14 }}>
+        {/* ── PROFILE ALOKASI KAMU (naked, selalu tampil) ── */}
+        <div style={{ marginBottom: 14 }}>
           <div
             style={{
               fontSize: 11,
@@ -813,21 +847,12 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
               color: "#94a3b8",
               textTransform: "uppercase",
               letterSpacing: ".1em",
-              marginBottom: 12,
+              marginBottom: 20,
             }}
           >
             Profile Alokasi Kamu
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "nowrap",
-              gap: 10,
-              alignItems: "stretch",
-              overflowX: "auto",
-              paddingBottom: 4,
-            }}
-          >
+          <div className="profile-row">
             {userTemplates.map((t) => (
               <div
                 key={t.id}
@@ -1023,25 +1048,6 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
         ══════════════════════════════════════════════ */}
         {activeTab === "input" && (
           <div>
-            <div className="note" style={{ marginBottom: 14 }}>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  cursor: "pointer",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={showAfterTax}
-                  onChange={(e) => setShowAfterTax(e.target.checked)}
-                />
-                <strong>Proyeksi dengan return after-tax</strong>{" "}
-                (rekomendasi:aktif) &nbsp;·&nbsp; PPh: Deposito/RD 20% · RD
-                Obligasi 10% · Saham ~3%
-              </label>
-            </div>
 
             {/* ── OPTION 2: TOP MODAL — Action Header ── */}
             <div
@@ -2370,7 +2376,7 @@ box-shadow:0 12px 32px rgba(0,0,0,.08);
                 margin: 0,
               }}
             >
-              Kalkulator Dana Darurat
+              Dana Darurat
             </h2>
 
             {/* TOGGLE PENGGABUNGAN ASET */}
