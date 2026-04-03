@@ -922,7 +922,7 @@ export default function WealthTracker() {
               ...tokens.typography.eyebrow,
               fontSize: 11,
               color: tokens.colors.text.tertiary,
-              marginBottom: 20,
+              marginBottom: 10,
             }}
           >
             Profil Alokasi Kamu
@@ -1142,7 +1142,7 @@ export default function WealthTracker() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: 12,
-                marginBottom: 14,
+                marginBottom: 10,
               }}
             >
               <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
