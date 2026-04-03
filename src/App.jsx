@@ -147,6 +147,34 @@ const formatCompact = (v) => {
   return `Rp ${Math.round(v)}`;
 };
 
+const parseExpression = (str) => {
+  // Strip semua karakter selain angka, titik, koma, spasi, +, -
+  const cleaned = str.replace(/[^\d+\-.,\s]/g, "").trim();
+  if (!cleaned) return null;
+  // Tokenize: pisahkan jadi angka dan operator, awali dengan + implisit
+  const tokens = cleaned.match(/[+\-]?[\d.,\s]+/g);
+  if (!tokens) return null;
+  const result = tokens.reduce((sum, token) => {
+    const num = Number(token.replace(/[.,\s]/g, ""));
+    return isNaN(num) ? sum : sum + num;
+  }, 0);
+  return result >= 0 ? result : null;
+};
+
+const formatWhileTyping = (str) => {
+  if (!str) return "";
+  // Split by + atau -, tapi pertahankan operatornya sebagai separator
+  const parts = str.split(/([+\-])/);
+  return parts.map((part) => {
+    // Kalau part adalah operator, kembalikan apa adanya
+    if (part === "+" || part === "-") return part;
+    // Kalau angka: strip non-digit dulu, lalu format
+    const digits = part.replace(/\D/g, "");
+    if (!digits) return part; // jaga spasi/string kosong
+    return new Intl.NumberFormat("id-ID").format(Number(digits));
+  }).join("");
+};
+
 const afterTaxReturn = (cls) => {
   if (cls.id === "saham") return cls.return * 0.97;
   // Emas: kurangi biaya efektif tahunan 1.5% langsung dari return
@@ -202,6 +230,9 @@ export default function WealthTracker() {
     usd: 0,
     gold: 0,
   });
+
+  const [rawInputs, setRawInputs] = useState({});
+  const [rawContribs, setRawContribs] = useState({});
 
   const [inflationRate, setInflationRate] = useState(5.0);
   const [showAfterTax, setShowAfterTax] = useState(true);
@@ -560,6 +591,9 @@ export default function WealthTracker() {
         .contrib-row { border-top:1px solid #f1f5f9; margin-top:10px; padding-top:10px; }
         .cl { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+        .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+@media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
+@media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
       `}</style>
 
       <div style={{ maxWidth: 980, margin: "0 auto" }}>
@@ -1061,7 +1095,7 @@ export default function WealthTracker() {
               </div>
             ) : (
               /* ── ACTIVE ASSET CARDS GRID ── */
-              <div className="flex flex-wrap justify-start gap-6" style={{ gap: "12px" }}>
+              <div className="asset-grid">
                 {ASSET_CLASSES.filter((cls) => activeAssetIds.includes(cls.id)).map((cls) => {
                   const raw = assets[cls.id] || 0;
                   const idr = cls.isUSD ? raw * USD_RATE : raw;
@@ -1073,7 +1107,7 @@ export default function WealthTracker() {
                   return (
                     <div
                       key={cls.id}
-                      className="card w-full max-w-[310px]"
+                      className="card"
                       style={{
                         padding: 16,
                         borderTop: `6px solid ${cls.color}`,
@@ -1195,14 +1229,26 @@ export default function WealthTracker() {
                         <input
                           type="text"
                           className="ifield"
-                          value={
-                            raw === 0
-                              ? ""
-                              : new Intl.NumberFormat(
-                                cls.isUSD ? "en-US" : "id-ID"
-                              ).format(raw)
+                          value={rawInputs[cls.id] !== undefined
+                            ? rawInputs[cls.id]
+                            : raw === 0 ? "" : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(raw)
                           }
-                          onChange={(e) => handleInput(cls.id, e)}
+                          onChange={(e) => {
+                            const formatted = formatWhileTyping(e.target.value);
+                            setRawInputs((prev) => ({ ...prev, [cls.id]: formatted }));
+                          }}
+                          onBlur={(e) => {
+                            const result = parseExpression(e.target.value);
+                            if (result !== null) {
+                              const cls2 = ASSET_CLASSES.find((c) => c.id === cls.id);
+                              const max = cls2.isUSD ? 100000 : 1000000000;
+                              setAssets((prev) => ({ ...prev, [cls.id]: Math.min(result, max) }));
+                            }
+                            setRawInputs((prev) => { const n = { ...prev }; delete n[cls.id]; return n; });
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") e.target.blur();
+                          }}
                           placeholder="0"
                         />
                         <div
@@ -1252,15 +1298,25 @@ export default function WealthTracker() {
                           <input
                             type="text"
                             className="ifield-sm"
-                            value={
-                              mc === 0
-                                ? ""
-                                : new Intl.NumberFormat(
-                                  cls.isUSD ? "en-US" : "id-ID"
-                                ).format(mc)
+                            value={rawContribs[cls.id] !== undefined
+                              ? rawContribs[cls.id]
+                              : mc === 0 ? "" : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(mc)
                             }
-                            onChange={(e) => handleContribInput(cls.id, e)}
-                            placeholder="0 (opsional)"
+                            onChange={(e) => {
+                              const formatted = formatWhileTyping(e.target.value);
+                              setRawContribs((prev) => ({ ...prev, [cls.id]: formatted }));
+                            }}
+                            onBlur={(e) => {
+                              const result = parseExpression(e.target.value);
+                              if (result !== null) {
+                                setMonthlyContribs((prev) => ({ ...prev, [cls.id]: Math.min(result, 100000000) }));
+                              }
+                              setRawContribs((prev) => { const n = { ...prev }; delete n[cls.id]; return n; });
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.target.blur();
+                            }}
+                            placeholder="0"
                           />
                           <div
                             style={{
