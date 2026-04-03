@@ -16,12 +16,64 @@ import {
 
 const USD_RATE = 16900;
 
+// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
+const tokens = {
+  colors: {
+    surface: {
+      app: '#F8FAFC',
+      card: '#FFFFFF',
+      input: '#F1F5F9',
+      active: '#E2E8F0',
+    },
+    border: {
+      subtle: '#E2E8F0',
+      input: '#CBD5E1',
+      active: '#0F172A',
+    },
+    text: {
+      primary: '#0F172A',
+      secondary: '#475569',
+      tertiary: '#94A3B8',
+    },
+    semantic: {
+      success: '#10B981',
+      danger: '#EF4444',
+      warning: '#F59E0B',
+      brand: '#0F172A',
+      successBg: '#F0FDF4',
+      dangerBg: '#FEF2F2',
+      successBorder: '#BBF7D0',
+      dangerBorder: '#FECACA',
+    },
+    dataViz: {
+      cash: '#14B8A6',
+      digitalBank: '#0EA5E9',
+      rdpu: '#8B5CF6',
+      bonds: '#6366F1',
+      localStocks: '#F43F5E',
+      sp500: '#3B82F6',
+      usd: '#10B981',
+      gold: '#EAB308',
+    },
+  },
+  typography: {
+    fontFamily: "'Plus Jakarta Sans', 'DM Sans', 'Segoe UI', sans-serif",
+    display: { fontSize: '48px', fontWeight: 700, lineHeight: '1.1', letterSpacing: '-0.02em' },
+    h1: { fontSize: '32px', fontWeight: 700, lineHeight: '1.2', letterSpacing: '-0.01em' },
+    h2: { fontSize: '24px', fontWeight: 600, lineHeight: '1.3', letterSpacing: '0' },
+    eyebrow: { fontSize: '12px', fontWeight: 700, lineHeight: '1.4', letterSpacing: '0.05em', textTransform: 'uppercase' },
+    bodyRegular: { fontSize: '16px', fontWeight: 400, lineHeight: '1.5', letterSpacing: '0' },
+    bodyBold: { fontSize: '16px', fontWeight: 600, lineHeight: '1.5', letterSpacing: '0' },
+    interactive: { fontSize: '14px', fontWeight: 600, lineHeight: '1.2', letterSpacing: '0' },
+  },
+};
+
 const ASSET_CLASSES = [
   {
     id: "cash",
     name: "Cash / Bank",
     return: 1.0,
-    color: "#3b82f6",
+    color: tokens.colors.dataViz.cash,
     isEquity: false,
     isUSD: false,
     taxRate: 0.2,
@@ -34,7 +86,7 @@ const ASSET_CLASSES = [
     id: "bankDigital",
     name: "Bank Digital",
     return: 4.0,
-    color: "#06b6d4",
+    color: tokens.colors.dataViz.digitalBank,
     isEquity: false,
     isUSD: false,
     taxRate: 0.2,
@@ -47,7 +99,7 @@ const ASSET_CLASSES = [
     id: "rdpu",
     name: "Reksadana Pasar Uang",
     return: 5.1,
-    color: "#10b981",
+    color: tokens.colors.dataViz.rdpu,
     isEquity: false,
     isUSD: false,
     taxRate: 0.1,
@@ -59,7 +111,7 @@ const ASSET_CLASSES = [
     id: "rdo",
     name: "Reksadana Obligasi",
     return: 6.5,
-    color: "#6366f1",
+    color: tokens.colors.dataViz.bonds,
     isEquity: false,
     isUSD: false,
     taxRate: 0.1,
@@ -71,7 +123,7 @@ const ASSET_CLASSES = [
     id: "saham",
     name: "Saham IDX",
     return: 12.0,
-    color: "#f59e0b",
+    color: tokens.colors.dataViz.localStocks,
     isEquity: true,
     isUSD: false,
     taxRate: 0.001,
@@ -84,7 +136,7 @@ const ASSET_CLASSES = [
     id: "sp500",
     name: "S&P 500 (VOO)",
     return: 10.5,
-    color: "#8b5cf6",
+    color: tokens.colors.dataViz.sp500,
     isEquity: true,
     isUSD: false,
     taxRate: 0.1,
@@ -97,7 +149,7 @@ const ASSET_CLASSES = [
     id: "usd",
     name: "Valas USD",
     return: 3.5,
-    color: "#059669",
+    color: tokens.colors.dataViz.usd,
     isEquity: false,
     isUSD: true,
     taxRate: 0,
@@ -116,7 +168,7 @@ const ASSET_CLASSES = [
     // - Biaya penyimpanan/admin digital ~0.10%/thn
     // Total biaya efektif tahunan: ~1.65% → dibulatkan 1.5% (taxRate ~0.167 dari return 9%)
     // Implementasi: afterTaxReturn mengurangi langsung 1.5% dari return
-    color: "#eab308",
+    color: tokens.colors.dataViz.gold,
     isEquity: false,
     isUSD: false,
     taxRate: 0, // dihandle khusus di afterTaxReturn (bukan persentase dari return)
@@ -152,9 +204,9 @@ const parseExpression = (str) => {
   const cleaned = str.replace(/[^\d+\-.,\s]/g, "").trim();
   if (!cleaned) return null;
   // Tokenize: pisahkan jadi angka dan operator, awali dengan + implisit
-  const tokens = cleaned.match(/[+\-]?[\d.,\s]+/g);
-  if (!tokens) return null;
-  const result = tokens.reduce((sum, token) => {
+  const tokenMatches = cleaned.match(/[+\-]?[\d.,\s]+/g);
+  if (!tokenMatches) return null;
+  const result = tokenMatches.reduce((sum, token) => {
     const num = Number(token.replace(/[.,\s]/g, ""));
     return isNaN(num) ? sum : sum + num;
   }, 0);
@@ -540,11 +592,11 @@ export default function WealthTracker() {
   }, [effectiveAssets, totalAssets]); // <-- UBAH DI SINI
 
   const getRiskInfo = (eq) => {
-    if (eq < 20) return { label: "Sangat Konservatif", color: "#3b82f6" };
-    if (eq < 40) return { label: "Konservatif", color: "#10b981" };
-    if (eq < 60) return { label: "Moderat", color: "#f59e0b" };
+    if (eq < 20) return { label: "Sangat Konservatif", color: tokens.colors.semantic.brand };
+    if (eq < 40) return { label: "Konservatif", color: tokens.colors.semantic.success };
+    if (eq < 60) return { label: "Moderat", color: tokens.colors.semantic.warning };
     if (eq < 80) return { label: "Agresif", color: "#f97316" };
-    return { label: "Sangat Agresif", color: "#ef4444" };
+    return { label: "Sangat Agresif", color: tokens.colors.semantic.danger };
   };
   const riskInfo = getRiskInfo(stats.equityPct);
 
@@ -552,44 +604,58 @@ export default function WealthTracker() {
   return (
     <div
       style={{
-        fontFamily: "'DM Sans','Segoe UI',sans-serif",
+        fontFamily: tokens.typography.fontFamily,
         minHeight: "100vh",
-        background: "#f8fafc",
-        color: "#0f172a",
+        background: tokens.colors.surface.app,
+        color: tokens.colors.text.primary,
         padding: "24px 16px",
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500;600&display=swap');
         * { box-sizing:border-box; }
+        :root {
+          --color-surface-app: ${tokens.colors.surface.app};
+          --color-surface-card: ${tokens.colors.surface.card};
+          --color-surface-input: ${tokens.colors.surface.input};
+          --color-border-subtle: ${tokens.colors.border.subtle};
+          --color-border-input: ${tokens.colors.border.input};
+          --color-border-active: ${tokens.colors.border.active};
+          --color-text-primary: ${tokens.colors.text.primary};
+          --color-text-secondary: ${tokens.colors.text.secondary};
+          --color-text-tertiary: ${tokens.colors.text.tertiary};
+          --color-brand: ${tokens.colors.semantic.brand};
+          --color-success: ${tokens.colors.semantic.success};
+          --color-danger: ${tokens.colors.semantic.danger};
+          --font-family: ${tokens.typography.fontFamily};
+        }
         ::-webkit-scrollbar { width:4px; }
-        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
+        ::-webkit-scrollbar-thumb { background:var(--color-border-input); border-radius:4px; }
         input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
-        .card  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:16px; overflow: hidden; }
-        .card2 { background:#f1f5f9; border:1.5px solid #e2e8f0; border-radius:12px; }
+        .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; }
+        .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
-        .stat  { background:#ffffff; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px 16px; flex-shrink:0; min-width:148px; }
-        .ifield { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:9px 80px 9px 34px; color:#0f172a; font-family:'DM Sans',monospace; font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
-        .ifield:focus { border-color:#3b82f6; background:#fff; }
-        .ifield-sm { width:100%; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:7px 60px 7px 30px; color:#0f172a; font-family:'DM Sans',monospace; font-size:12px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
-        .ifield-sm:focus { border-color:#6366f1; background:#fff; }
-        .stepbtn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:#f1f5f9; border:1.5px solid #e2e8f0; color:#64748b; border-radius:6px; cursor:pointer; font-size:15px; transition:all .15s; }
-        .stepbtn:hover { background:#e2e8f0; color:#0f172a; border-color:#cbd5e1; }
-        .stepbtn-sm { width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:#f1f5f9; border:1.5px solid #e2e8f0; color:#64748b; border-radius:5px; cursor:pointer; font-size:13px; transition:all .15s; }
-        .stepbtn-sm:hover { background:#e2e8f0; color:#0f172a; }
-        .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; border:none; transition:all .2s; background:transparent; color:#94a3b8; }
-        .tab:hover { color:#475569; }
-        .tab.on { background:#2563eb; color:#fff; box-shadow:0 2px 8px rgba(37,99,235,.22); }
-        .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid #e2e8f0; background:#fff; color:#475569; cursor:pointer; transition:all .2s; text-align:left; width:100%; }
-        .tmplbtn:hover { border-color:#3b82f6; color:#1e40af; background:#eff6ff; }
-        .warn { background:#fef2f2; border:1.5px solid #fecaca; border-radius:10px; padding:12px 16px; font-size:13px; color:#dc2626; display:flex; align-items:center; gap:10px; }
-        .ok   { background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; padding:12px 16px; font-size:13px; color:#16a34a; display:flex; align-items:center; gap:10px; }
-        .note { background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:12px 14px; font-size:11.5px; color:#1d4ed8; margin-top:10px; line-height:1.65; }
-        .pgbar { background:#e2e8f0; border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
-        .disc  { background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:16px; font-size:11px; color:#94a3b8; line-height:1.7; margin-top:20px; }
-        .contrib-row { border-top:1px solid #f1f5f9; margin-top:10px; padding-top:10px; }
-        .cl { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
+        .stat  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:14px 16px; flex-shrink:0; min-width:148px; }
+        .ifield { width:100%; background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:8px; padding:9px 80px 9px 34px; color:var(--color-text-primary); font-family:var(--font-family); font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
+        .ifield:focus { border-color:var(--color-border-active); background:var(--color-surface-card); }
+        .ifield-sm { width:100%; background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:8px; padding:7px 60px 7px 30px; color:var(--color-text-primary); font-family:var(--font-family); font-size:12px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
+        .stepbtn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:6px; cursor:pointer; font-size:15px; transition:all .15s; }
+        .stepbtn:hover { background:var(--color-border-subtle); color:var(--color-text-primary); border-color:var(--color-border-input); }
+        .stepbtn-sm { width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:5px; cursor:pointer; font-size:13px; transition:all .15s; }
+        .stepbtn-sm:hover { background:var(--color-border-subtle); color:var(--color-text-primary); }
+        .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); }
+        .tab:hover { color:var(--color-text-secondary); }
+        .tab.on { background:var(--color-brand); color: ${tokens.colors.surface.card}; box-shadow:0 4px 12px rgba(15,23,42,.15); }
+        .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
+        .tmplbtn:hover { border-color:var(--color-border-active); color: ${tokens.colors.semantic.brand}; background: ${tokens.colors.surface.active}; }
+        .warn { background: ${tokens.colors.semantic.dangerBg}; border:1.5px solid ${tokens.colors.semantic.dangerBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-danger); display:flex; align-items:center; gap:10px; }
+        .ok   { background: ${tokens.colors.semantic.successBg}; border:1.5px solid ${tokens.colors.semantic.successBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
+        .note { background: ${tokens.colors.surface.active}; border:1.5px solid ${tokens.colors.border.subtle}; border-radius:10px; padding:12px 14px; font-size:11.5px; color: ${tokens.colors.text.secondary}; margin-top:10px; line-height:1.65; }
+        .pgbar { background:var(--color-border-subtle); border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
+        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-top:20px; }
+        .contrib-row { border-top:1px solid var(--color-surface-input); margin-top:10px; padding-top:10px; }
+        .cl { font-size:10px; font-weight:700; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
 /* ── Stat scroll strip ── */
@@ -601,7 +667,7 @@ export default function WealthTracker() {
         /* ── iOS-style toggle ── */
         .ios-toggle-wrap { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
         .ios-track { position:relative; width:38px; height:22px; border-radius:11px; transition:background .25s; flex-shrink:0; }
-        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .25s; }
+        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:${tokens.colors.surface.card}; box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .25s; }
 @media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
 .fab { display:none; }
@@ -611,7 +677,7 @@ export default function WealthTracker() {
   .desktop-only { display: none !important; }
   .fab {
     display:flex;
-    padding:8px 16px;
+    padding:10px 24px 12px;
     align-items:center;
     justify-content:center;
     position:fixed;
@@ -621,29 +687,29 @@ export default function WealthTracker() {
     width:auto;
     height:auto;
     border-radius:999px;
-    background:linear-gradient(135deg,#2563eb,#4f46e5);
-    border:none;
+    background: #0f172a;
+    border: none;
     cursor:pointer;
     font-size:16px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-family);
     font-weight: 600;
-    color:#fff;
+    color: #fff;
     transition:transform .15s;
-    box-shadow:0 12px 32px rgba(0,0,0,.08);
+    box-shadow: 0 8px 24px rgba(15,23,42,.2);
   }
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
     position:fixed;
     bottom:8px; left:16px; right:16px;
     z-index:999;
-    background:rgba(255, 255, 255, 0.9);
+    background: #fff;
     backdrop-filter: blur(12px);
-    border:1.5px solid rgba(226, 232, 240, 0.8);
-    border-radius:24px;
+    border: 1.5px solid ${tokens.colors.border.subtle};
+    border-radius: 24px;
     display:flex;
     padding:8px;
     gap:4px;
-    box-shadow:0 12px 32px rgba(0,0,0,.08);
+    box-shadow: 0 8px 24px rgba(15,23,42,.1);
   }
   .tab-bar-sticky .tab { 
     flex:1; 
@@ -663,11 +729,8 @@ export default function WealthTracker() {
         <div style={{ marginBottom: 20 }}>
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: ".15em",
-              color: "#2563eb",
-              textTransform: "uppercase",
+              ...tokens.typography.eyebrow,
+              color: tokens.colors.semantic.brand,
               marginBottom: 6,
             }}
           >
@@ -679,7 +742,8 @@ export default function WealthTracker() {
               fontSize: 26,
               fontWeight: 800,
               margin: 0,
-              color: "#0f172a",
+              letterSpacing: "-0.01em",
+              color: tokens.colors.text.primary,
             }}
           >
             Peta Alokasi Hartamu
@@ -688,7 +752,7 @@ export default function WealthTracker() {
             className="header-sub"
             style={{
               fontSize: 13,
-              color: "#94a3b8",
+              color: tokens.colors.text.tertiary,
               marginTop: 5,
               marginBottom: 0,
             }}
@@ -718,8 +782,8 @@ export default function WealthTracker() {
                 gap: 6,
                 padding: "5px 12px",
                 borderRadius: 999,
-                background: stats.realReturn >= 0 ? "#f0fdf4" : "#fef2f2",
-                border: `1.5px solid ${stats.realReturn >= 0 ? "#bbf7d0" : "#fecaca"}`,
+                background: stats.realReturn >= 0 ? tokens.colors.semantic.successBg : tokens.colors.semantic.dangerBg,
+                border: `1.5px solid ${stats.realReturn >= 0 ? tokens.colors.semantic.successBorder : tokens.colors.semantic.dangerBorder}`,
                 width: "fit-content",
               }}
             >
@@ -728,7 +792,7 @@ export default function WealthTracker() {
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: stats.realReturn >= 0 ? "#16a34a" : "#dc2626",
+                  color: stats.realReturn >= 0 ? tokens.colors.semantic.success : tokens.colors.semantic.danger,
                 }}
               >
                 {stats.realReturn >= 0 ? "+" : ""}{stats.realReturn}% vs inflasi {inflationRate}%/thn
@@ -738,7 +802,7 @@ export default function WealthTracker() {
             <label className="ios-toggle-wrap">
               <div
                 className="ios-track"
-                style={{ background: showAfterTax ? "#2563eb" : "#cbd5e1" }}
+                style={{ background: showAfterTax ? tokens.colors.semantic.brand : tokens.colors.border.input }}
                 onClick={() => setShowAfterTax((v) => !v)}
               >
                 <div
@@ -746,7 +810,7 @@ export default function WealthTracker() {
                   style={{ transform: showAfterTax ? "translateX(16px)" : "translateX(0)" }}
                 />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#475569", cursor: "pointer" }}
+              <span style={{ fontSize: 12, fontWeight: 600, color: tokens.colors.text.secondary, cursor: "pointer" }}
                 onClick={() => setShowAfterTax((v) => !v)}
               >
                 After-tax
@@ -755,20 +819,20 @@ export default function WealthTracker() {
           </div>
           {/* RIGHT: Total Aset */}
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>
+            <div style={{ ...tokens.typography.eyebrow, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
               Total Aset (IDR)
             </div>
             <div
               style={{
                 fontSize: 28,
                 fontWeight: 800,
-                fontFamily: "DM Sans",
-                color: "#16a34a",
+                fontFamily: tokens.typography.fontFamily,
+                color: tokens.colors.semantic.success,
               }}
             >
               {formatCompact(totalAssets)}
             </div>
-            <div style={{ fontSize: 11, color: "#cbd5e1", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: tokens.colors.border.input, marginTop: 2 }}>
               {formatIDR(totalAssets)}
             </div>
           </div>
@@ -781,7 +845,7 @@ export default function WealthTracker() {
               label: showAfterTax ? "Return After-Tax" : "Return Bruto",
               value: `${showAfterTax ? stats.weightedNet : stats.weightedGross}%`,
               sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
-              color: "#2563eb",
+              color: tokens.colors.semantic.brand,
               tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
             },
             {
@@ -795,25 +859,23 @@ export default function WealthTracker() {
               label: "Kontribusi/Bln",
               value: formatCompact(totalMonthlyContrib),
               sub: "semua aset digabung",
-              color: "#7c3aed",
+              color: tokens.colors.dataViz.rdpu,
               tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
             },
             {
               label: "Stress Test (Bear)",
               value: formatCompact(worstCase),
               sub: "Ekuitas −30% crash scenario",
-              color: "#d97706",
+              color: tokens.colors.semantic.warning,
               tip: "Simulasi crash pasar: semua aset ekuitas turun 30% sekaligus. Ini nilai portofoliomu di skenario terburuk.",
             },
           ].map((s, i) => (
             <div key={i} className="stat">
               <div
                 style={{
+                  ...tokens.typography.eyebrow,
                   fontSize: 10,
-                  fontWeight: 700,
-                  color: "#94a3b8",
-                  textTransform: "uppercase",
-                  letterSpacing: ".08em",
+                  color: tokens.colors.text.tertiary,
                   marginBottom: 5,
                 }}
               >
@@ -825,13 +887,13 @@ export default function WealthTracker() {
                 style={{
                   fontSize: 17,
                   fontWeight: 800,
-                  fontFamily: "DM Sans",
+                  fontFamily: tokens.typography.fontFamily,
                   color: s.color,
                 }}
               >
                 {s.value}
               </div>
-              <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 3 }}>
+              <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 3 }}>
                 {s.sub}
               </div>
             </div>
@@ -842,11 +904,9 @@ export default function WealthTracker() {
         <div style={{ marginBottom: 14 }}>
           <div
             style={{
+              ...tokens.typography.eyebrow,
               fontSize: 11,
-              fontWeight: 700,
-              color: "#94a3b8",
-              textTransform: "uppercase",
-              letterSpacing: ".1em",
+              color: tokens.colors.text.tertiary,
               marginBottom: 20,
             }}
           >
@@ -864,21 +924,21 @@ export default function WealthTracker() {
                   cursor: "pointer",
                   border:
                     activeTemplateId === t.id
-                      ? "1.5px solid #3b82f6"
-                      : "1.5px solid #e2e8f0",
+                      ? `1.5px solid ${tokens.colors.border.active}`
+                      : `1.5px solid ${tokens.colors.border.subtle}`,
                   backgroundColor:
-                    activeTemplateId === t.id ? "#eff6ff" : "#fff",
+                    activeTemplateId === t.id ? tokens.colors.surface.card : tokens.colors.surface.card,
                   borderRadius: 10,
                   transition: "all 0.2s",
                 }}
                 onClick={() => loadUserTemplate(t)}
                 onMouseOver={(e) => {
                   if (activeTemplateId !== t.id)
-                    e.currentTarget.style.borderColor = "#3b82f6";
+                    e.currentTarget.style.borderColor = tokens.colors.border.active;
                 }}
                 onMouseOut={(e) => {
                   if (activeTemplateId !== t.id)
-                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.borderColor = tokens.colors.border.subtle;
                 }}
               >
                 <div
@@ -892,12 +952,12 @@ export default function WealthTracker() {
                     style={{
                       fontSize: 13,
                       fontWeight: 700,
-                      color: "#0f172a",
+                      color: tokens.colors.text.primary,
                     }}
                   >
                     {t.name}
                   </span>
-                  <span style={{ fontSize: 10, color: "#94a3b8" }}>
+                  <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
                     {" "}
                     {new Date(t.updatedAt).toLocaleDateString("id-ID")}
                   </span>
@@ -906,14 +966,14 @@ export default function WealthTracker() {
                   style={{
                     display: "flex",
                     gap: 4,
-                    borderLeft: "1.5px solid #f1f5f9",
+                    borderLeft: `1.5px solid ${tokens.colors.surface.input}`,
                     paddingLeft: 10,
                   }}
                 >
                   <button
                     onClick={(e) => updateExistingTemplate(t.id, e)}
                     style={{
-                      background: "#f1f5f9",
+                      background: tokens.colors.surface.input,
                       border: "none",
                       borderRadius: 6,
                       padding: "4px 6px",
@@ -927,8 +987,8 @@ export default function WealthTracker() {
                   <button
                     onClick={(e) => deleteTemplate(t.id, e)}
                     style={{
-                      background: "#fef2f2",
-                      color: "#ef4444",
+                      background: tokens.colors.semantic.dangerBg,
+                      color: tokens.colors.semantic.danger,
                       border: "none",
                       borderRadius: 6,
                       padding: "4px 6px",
@@ -949,10 +1009,10 @@ export default function WealthTracker() {
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
-                  background: "#f8fafc",
+                  background: tokens.colors.surface.app,
                   padding: 6,
                   borderRadius: 10,
-                  border: "1.5px dashed #cbd5e1",
+                  border: `1.5px dashed ${tokens.colors.border.input}`,
                   flexShrink: 0,
                 }}
               >
@@ -966,7 +1026,7 @@ export default function WealthTracker() {
                     outline: "none",
                     fontSize: 12,
                     fontWeight: 600,
-                    color: "#0f172a",
+                    color: tokens.colors.text.primary,
                   }}
                   placeholder="Nama Profile..."
                   value={templateNameInput}
@@ -996,9 +1056,9 @@ export default function WealthTracker() {
                   gap: 6,
                   padding: "8px 14px",
                   borderRadius: 10,
-                  border: "1.5px solid #e2e8f0",
-                  background: "#f8fafc",
-                  color: "#94a3b8",
+                  border: `1.5px solid ${tokens.colors.border.subtle}`,
+                  background: tokens.colors.surface.app,
+                  color: tokens.colors.text.tertiary,
                   fontSize: 12,
                   fontWeight: 600,
                   flexShrink: 0,
@@ -1018,11 +1078,11 @@ export default function WealthTracker() {
         <div
           className="desktop-only"
           style={{
-            display: "flex", /* KEMBALIKAN INI */
+            display: "flex",
             gap: 4,
             marginBottom: 18,
-            background: "#f1f5f9",
-            border: "1.5px solid #e2e8f0",
+            background: tokens.colors.surface.input,
+            border: `1.5px solid ${tokens.colors.border.subtle}`,
             borderRadius: 10,
             padding: 4,
             width: "fit-content",
@@ -1060,7 +1120,7 @@ export default function WealthTracker() {
                 marginBottom: 14,
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
                 {activeAssetIds.length > 0
                   ? `${activeAssetIds.length} instrumen aktif`
                   : "Belum ada instrumen dipilih"}
@@ -1079,9 +1139,9 @@ export default function WealthTracker() {
                   fontWeight: 700,
                   fontSize: 13,
                   cursor: activeAssetIds.length >= ASSET_CLASSES.length ? "not-allowed" : "pointer",
-                  background: activeAssetIds.length >= ASSET_CLASSES.length ? "#f1f5f9" : "linear-gradient(135deg,#2563eb,#4f46e5)",
-                  color: activeAssetIds.length >= ASSET_CLASSES.length ? "#94a3b8" : "#fff",
-                  boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : "0 4px 14px rgba(37,99,235,.35)",
+                  background: activeAssetIds.length >= ASSET_CLASSES.length ? tokens.colors.surface.input : tokens.colors.semantic.brand,
+                  color: activeAssetIds.length >= ASSET_CLASSES.length ? tokens.colors.text.tertiary : tokens.colors.surface.card,
+                  boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : "0 4px 12px rgba(15,23,42,.15)",
                   transition: "all .2s",
                   fontFamily: "'DM Sans',sans-serif",
                 }}
@@ -1100,26 +1160,26 @@ export default function WealthTracker() {
                   alignItems: "center",
                   justifyContent: "center",
                   minHeight: 320,
-                  background: "linear-gradient(135deg,#f8fafc 0%,#eff6ff 100%)",
-                  border: "2px dashed #bfdbfe",
+                  background: tokens.colors.surface.card,
+                  border: `2px dashed ${tokens.colors.border.subtle}`,
                   borderRadius: 20,
                   padding: "48px 24px",
                   textAlign: "center",
                 }}
               >
-                <div style={{ fontSize: 48, marginBottom: 16 }}>🏦</div>
+                <div style={{ fontSize: 48, marginBottom: 16, filter: "grayscale(1)", opacity: 0.7 }}>🏦</div>
                 <div
                   style={{
                     fontSize: 22,
                     fontWeight: 800,
-                    color: "#1e3a8a",
+                    color: tokens.colors.text.primary,
                     marginBottom: 8,
                     lineHeight: 1.35,
                   }}
                 >
                   Harta yang tak tercatat,
                   <br />
-                  <span style={{ color: "#2563eb" }}>adalah harta yang tak terjaga.</span>
+                  <span style={{ color: tokens.colors.text.tertiary }}>adalah harta yang tak terjaga.</span>
                 </div>
                 <div
                   style={{
@@ -1144,9 +1204,9 @@ export default function WealthTracker() {
                     fontWeight: 800,
                     fontSize: 14,
                     cursor: "pointer",
-                    background: "linear-gradient(135deg,#2563eb,#4f46e5)",
+                    background: tokens.colors.semantic.brand,
                     color: "#fff",
-                    boxShadow: "0 6px 20px rgba(37,99,235,.40)",
+                    boxShadow: "0 8px 24px rgba(15,23,42,.15)",
                     fontFamily: "'DM Sans',sans-serif",
                     transition: "transform .15s",
                   }}
@@ -1193,7 +1253,7 @@ export default function WealthTracker() {
                             style={{
                               fontWeight: 700,
                               fontSize: 14,
-                              color: "#0f172a",
+                              color: tokens.colors.text.primary,
                             }}
                           >
                             {cls.name}
@@ -1201,7 +1261,7 @@ export default function WealthTracker() {
                           <div
                             style={{
                               fontSize: 11,
-                              color: "#94a3b8",
+                              color: tokens.colors.text.tertiary,
                               marginTop: 2,
                               lineHeight: 1.4,
                             }}
@@ -1219,7 +1279,7 @@ export default function WealthTracker() {
                         >
                           <span
                             style={{
-                              fontFamily: "DM Sans",
+                              fontFamily: tokens.typography.fontFamily,
                               fontWeight: 800,
                               fontSize: 16,
                               color: cls.color,
@@ -1238,7 +1298,7 @@ export default function WealthTracker() {
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              color: "#94a3b8",
+                              color: tokens.colors.text.tertiary,
                               lineHeight: 1,
                               fontSize: 20,
                             }}
@@ -1268,7 +1328,7 @@ export default function WealthTracker() {
                         </span>
                         <span
                           className="tag"
-                          style={{ background: "#f1f5f9", color: "#64748b" }}
+                          style={{ background: tokens.colors.surface.input, color: tokens.colors.text.secondary }}
                         >
                           Risiko: {cls.risk}
                         </span>
@@ -1283,9 +1343,9 @@ export default function WealthTracker() {
                             left: 10,
                             top: "50%",
                             transform: "translateY(-50%)",
-                            color: "#94a3b8",
+                            color: tokens.colors.text.tertiary,
                             fontSize: 12,
-                            fontFamily: "DM Sans",
+                            fontFamily: tokens.typography.fontFamily,
                           }}
                         >
                           {cls.isUSD ? "$" : "Rp"}
@@ -1417,29 +1477,29 @@ export default function WealthTracker() {
                           flexWrap: "wrap",
                           gap: 6,
                           fontSize: 11,
-                          borderTop: "1px solid #f1f5f9",
+                          borderTop: `1px solid ${tokens.colors.surface.input}`,
                           paddingTop: 8,
                         }}
                       >
                         <span>
-                          <span style={{ color: "#94a3b8" }}>Gross: </span>
+                          <span style={{ color: tokens.colors.text.tertiary }}>Gross: </span>
                           <span
                             style={{
                               fontWeight: 700,
-                              fontFamily: "DM Sans",
-                              color: "#475569",
+                              fontFamily: tokens.typography.fontFamily,
+                              color: tokens.colors.text.secondary,
                             }}
                           >
                             {cls.return}%
                           </span>
                         </span>
                         <span>
-                          <span style={{ color: "#94a3b8" }}>After-Tax: </span>
+                          <span style={{ color: tokens.colors.text.tertiary }}>After-Tax: </span>
                           <span
                             style={{
                               fontWeight: 700,
-                              fontFamily: "DM Sans",
-                              color: "#16a34a",
+                              fontFamily: tokens.typography.fontFamily,
+                              color: tokens.colors.semantic.success,
                             }}
                           >
                             {netR}%
@@ -1447,12 +1507,12 @@ export default function WealthTracker() {
                         </span>
                         {cls.isUSD && idr > 0 && (
                           <span>
-                            <span style={{ color: "#94a3b8" }}>≈ </span>
+                            <span style={{ color: tokens.colors.text.tertiary }}>≈ </span>
                             <span
                               style={{
                                 fontWeight: 700,
-                                fontFamily: "DM Sans",
-                                color: "#d97706",
+                                fontFamily: tokens.typography.fontFamily,
+                                color: tokens.colors.semantic.warning,
                               }}
                             >
                               {formatCompact(idr)}
@@ -1485,7 +1545,7 @@ export default function WealthTracker() {
                 <div
                   onClick={(e) => e.stopPropagation()}
                   style={{
-                    background: "#fff",
+                    background: tokens.colors.surface.card,
                     borderRadius: 20,
                     boxShadow: "0 24px 80px rgba(0,0,0,.22)",
                     width: "100%",
@@ -1500,11 +1560,11 @@ export default function WealthTracker() {
                   <div
                     style={{
                       padding: "20px 24px",
-                      borderBottom: "1.5px solid #f1f5f9",
+                      borderBottom: `1.5px solid ${tokens.colors.surface.input}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      background: "#fff",
+                      background: tokens.colors.surface.card,
                       flexShrink: 0,
                     }}
                   >
@@ -1513,13 +1573,13 @@ export default function WealthTracker() {
                         style={{
                           fontWeight: 800,
                           fontSize: 18,
-                          color: "#0f172a",
+                          color: tokens.colors.text.primary,
                           marginBottom: 3,
                         }}
                       >
                         📦 Katalog Instrumen Investasi
                       </div>
-                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                      <div style={{ fontSize: 12, color: tokens.colors.text.tertiary }}>
                         Pilih instrumen untuk ditambahkan ke simulasi portofoliomu.
                       </div>
                     </div>
@@ -1529,9 +1589,9 @@ export default function WealthTracker() {
                         width: 34,
                         height: 34,
                         borderRadius: "50%",
-                        border: "1.5px solid #e2e8f0",
-                        background: "#f8fafc",
-                        color: "#64748b",
+                        border: `1.5px solid ${tokens.colors.border.subtle}`,
+                        background: tokens.colors.surface.app,
+                        color: tokens.colors.text.secondary,
                         fontSize: 16,
                         cursor: "pointer",
                         display: "flex",
@@ -1540,14 +1600,14 @@ export default function WealthTracker() {
                         transition: "all .15s",
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.background = "#fef2f2";
-                        e.currentTarget.style.color = "#ef4444";
-                        e.currentTarget.style.borderColor = "#fca5a5";
+                        e.currentTarget.style.background = tokens.colors.semantic.dangerBg;
+                        e.currentTarget.style.color = tokens.colors.semantic.danger;
+                        e.currentTarget.style.borderColor = tokens.colors.semantic.dangerBorder;
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.background = "#f8fafc";
-                        e.currentTarget.style.color = "#64748b";
-                        e.currentTarget.style.borderColor = "#e2e8f0";
+                        e.currentTarget.style.background = tokens.colors.surface.app;
+                        e.currentTarget.style.color = tokens.colors.text.secondary;
+                        e.currentTarget.style.borderColor = tokens.colors.border.subtle;
                       }}
                     >
                       ✕
@@ -1559,7 +1619,7 @@ export default function WealthTracker() {
                     style={{
                       padding: 20,
                       overflowY: "auto",
-                      background: "#f8fafc",
+                      background: tokens.colors.surface.app,
                       flexGrow: 1,
                     }}
                   >
@@ -1575,8 +1635,8 @@ export default function WealthTracker() {
                           key={cls.id}
                           onClick={() => addAsset(cls.id)}
                           style={{
-                            background: "#fff",
-                            border: "1.5px solid #e2e8f0",
+                            background: tokens.colors.surface.card,
+                            border: `1.5px solid ${tokens.colors.border.subtle}`,
                             borderTop: `4px solid ${cls.color}`,
                             borderRadius: 14,
                             padding: "14px 16px",
@@ -1589,7 +1649,7 @@ export default function WealthTracker() {
                             e.currentTarget.style.transform = "translateY(-2px)";
                           }}
                           onMouseOut={(e) => {
-                            e.currentTarget.style.borderColor = "#e2e8f0";
+                            e.currentTarget.style.borderColor = tokens.colors.border.subtle;
                             e.currentTarget.style.boxShadow = "none";
                             e.currentTarget.style.transform = "translateY(0)";
                             e.currentTarget.style.borderTopColor = cls.color;
@@ -1607,7 +1667,7 @@ export default function WealthTracker() {
                               style={{
                                 fontWeight: 700,
                                 fontSize: 13,
-                                color: "#0f172a",
+                                color: tokens.colors.text.primary,
                               }}
                             >
                               {cls.name}
@@ -1633,7 +1693,7 @@ export default function WealthTracker() {
                           <div
                             style={{
                               fontSize: 11,
-                              color: "#94a3b8",
+                              color: tokens.colors.text.tertiary,
                               lineHeight: 1.45,
                               marginBottom: 10,
                             }}
@@ -1649,13 +1709,13 @@ export default function WealthTracker() {
                             </span>
                             <span
                               className="tag"
-                              style={{ background: "#f1f5f9", color: "#475569" }}
+                              style={{ background: tokens.colors.surface.input, color: tokens.colors.text.secondary }}
                             >
                               {cls.risk}
                             </span>
                             <span
                               className="tag"
-                              style={{ background: "#f0fdf4", color: "#16a34a" }}
+                              style={{ background: tokens.colors.semantic.successBg, color: tokens.colors.semantic.success }}
                             >
                               {cls.return}% gross
                             </span>
@@ -1668,7 +1728,7 @@ export default function WealthTracker() {
                             gridColumn: "1/-1",
                             textAlign: "center",
                             padding: 40,
-                            color: "#94a3b8",
+                            color: tokens.colors.text.tertiary,
                             fontSize: 13,
                           }}
                         >
@@ -1694,7 +1754,7 @@ export default function WealthTracker() {
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: "#94a3b8",
+                  color: tokens.colors.text.tertiary,
                   textTransform: "uppercase",
                   letterSpacing: ".1em",
                   marginBottom: 12,
@@ -1714,7 +1774,7 @@ export default function WealthTracker() {
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
-                      color: "#475569",
+                      color: tokens.colors.text.secondary,
                       textTransform: "uppercase",
                       letterSpacing: ".08em",
                       display: "block",
@@ -1737,24 +1797,24 @@ export default function WealthTracker() {
                       }
                       style={{
                         flex: 1,
-                        accentColor: "#ef4444",
-                        background: `linear-gradient(to right,#ef4444 ${((inflationRate - 1) / 14) * 100
-                          }%,#e2e8f0 0%)`,
+                        accentColor: tokens.colors.semantic.danger,
+                        background: `linear-gradient(to right,${tokens.colors.semantic.danger} ${((inflationRate - 1) / 14) * 100
+                          }%,${tokens.colors.border.subtle} 0%)`,
                       }}
                     />
                     <span
                       style={{
-                        fontFamily: "DM Sans",
+                        fontFamily: tokens.typography.fontFamily,
                         fontWeight: 800,
                         fontSize: 16,
-                        color: "#ef4444",
+                        color: tokens.colors.semantic.danger,
                         minWidth: 42,
                       }}
                     >
                       {inflationRate}%
                     </span>
                   </div>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
+                  <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
                     Historis Indonesia: 2–8%/tahun
                   </div>
                 </div>
@@ -1763,7 +1823,7 @@ export default function WealthTracker() {
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
-                      color: "#475569",
+                      color: tokens.colors.text.secondary,
                       textTransform: "uppercase",
                       letterSpacing: ".08em",
                       display: "block",
@@ -1774,15 +1834,15 @@ export default function WealthTracker() {
                   </label>
                   <div
                     style={{
-                      fontFamily: "DM Sans",
+                      fontFamily: tokens.typography.fontFamily,
                       fontSize: 20,
                       fontWeight: 800,
-                      color: "#7c3aed",
+                      color: tokens.colors.dataViz.rdpu,
                     }}
                   >
                     {formatCompact(totalMonthlyContrib)}
                   </div>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
+                  <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
                     Isi di tab "Input Aset" → tiap kartu aset. Proyeksi dihitung
                     per aset.
                   </div>
@@ -1794,7 +1854,7 @@ export default function WealthTracker() {
                     style={{
                       fontSize: 11,
                       fontWeight: 700,
-                      color: "#475569",
+                      color: tokens.colors.text.secondary,
                       textTransform: "uppercase",
                       letterSpacing: ".08em",
                       display: "block",
@@ -1816,7 +1876,7 @@ export default function WealthTracker() {
                       }
                     />
                   </div>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4 }}>
+                  <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
                     Garis acuan saat proyeksi menyentuh target.
                   </div>
                 </div>
@@ -1840,7 +1900,7 @@ export default function WealthTracker() {
                       fontSize: 16,
                       fontWeight: 800,
                       margin: 0,
-                      color: "#0f172a",
+                      color: tokens.colors.text.primary,
                     }}
                   >
                     Proyeksi 10 Tahun
@@ -1848,7 +1908,7 @@ export default function WealthTracker() {
                   <p
                     style={{
                       fontSize: 12,
-                      color: "#94a3b8",
+                      color: tokens.colors.text.tertiary,
                       margin: "4px 0 0",
                     }}
                   >
@@ -1872,27 +1932,27 @@ export default function WealthTracker() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="#16a34a"
+                        stopColor={tokens.colors.semantic.success}
                         stopOpacity={0.15}
                       />
-                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                      <stop offset="95%" stopColor={tokens.colors.semantic.success} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="#f1f5f9"
+                    stroke={tokens.colors.surface.input}
                     vertical={false}
                   />
                   <XAxis
                     dataKey="year"
-                    stroke="#cbd5e1"
+                    stroke={tokens.colors.border.input}
                     fontSize={11}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis
                     tickFormatter={formatCompact}
-                    stroke="#cbd5e1"
+                    stroke={tokens.colors.border.input}
                     fontSize={11}
                     tickLine={false}
                     axisLine={false}
@@ -1901,19 +1961,19 @@ export default function WealthTracker() {
                   <Tooltip
                     formatter={(v, name) => [formatIDR(v), name]}
                     contentStyle={{
-                      background: "#fff",
-                      border: "1.5px solid #e2e8f0",
+                      background: tokens.colors.surface.card,
+                      border: `1.5px solid ${tokens.colors.border.subtle}`,
                       borderRadius: 10,
-                      color: "#0f172a",
+                      color: tokens.colors.text.primary,
                       fontSize: 13,
                     }}
-                    labelStyle={{ color: "#94a3b8", fontSize: 11 }}
+                    labelStyle={{ color: tokens.colors.text.tertiary, fontSize: 11 }}
                   />
                   <Area
                     type="monotone"
                     dataKey="portfolio"
                     name="Portofolio Nominal"
-                    stroke="#16a34a"
+                    stroke={tokens.colors.semantic.success}
                     strokeWidth={2.5}
                     fill="url(#lg_portfolio)"
                   />
@@ -1921,7 +1981,7 @@ export default function WealthTracker() {
                     type="monotone"
                     dataKey="real"
                     name="Nilai Riil (Daya Beli)"
-                    stroke="#2563eb"
+                    stroke={tokens.colors.semantic.brand}
                     strokeWidth={3}
                     dot={false}
                   />
@@ -1929,7 +1989,7 @@ export default function WealthTracker() {
                     type="monotone"
                     dataKey="inflation"
                     name="Garis Inflasi"
-                    stroke="#ef4444"
+                    stroke={tokens.colors.semantic.danger}
                     strokeWidth={2}
                     strokeDasharray="4 4"
                     dot={false}
@@ -1939,11 +1999,11 @@ export default function WealthTracker() {
                     label={{
                       position: "top",
                       value: "Target",
-                      fill: "#8b5cf6",
+                      fill: tokens.colors.dataViz.rdpu,
                       fontSize: 11,
                       fontWeight: "bold",
                     }}
-                    stroke="#8b5cf6"
+                    stroke={tokens.colors.dataViz.rdpu}
                     strokeDasharray="3 3"
                   />
                 </ComposedChart>
@@ -1960,17 +2020,17 @@ export default function WealthTracker() {
               >
                 {[
                   {
-                    color: "#16a34a",
+                    color: tokens.colors.semantic.success,
                     label: "Portofolio Nominal",
                     desc: "Nilai rupiah portofolio di masa depan (belum dikoreksi inflasi).",
                   },
                   {
-                    color: "#2563eb",
+                    color: tokens.colors.semantic.brand,
                     label: "Nilai Riil (Daya Beli)",
                     desc: 'Setara "uang sekarang". Ini yang benar-benar bisa kamu beli di masa depan.',
                   },
                   {
-                    color: "#ef4444",
+                    color: tokens.colors.semantic.danger,
                     label: "Garis Inflasi",
                     desc: "Jika aset cuma mengikuti inflasi — tidak tumbuh, tidak menyusut secara riil.",
                   },
@@ -2010,7 +2070,7 @@ export default function WealthTracker() {
                     <div
                       style={{
                         fontSize: 11,
-                        color: "#64748b",
+                        color: tokens.colors.text.secondary,
                         lineHeight: 1.5,
                       }}
                     >
@@ -2037,17 +2097,17 @@ export default function WealthTracker() {
                         {
                           label: "Nominal (Thn 10)",
                           value: formatCompact(last.portfolio),
-                          color: "#16a34a",
+                          color: tokens.colors.semantic.success,
                         },
                         {
                           label: "Nilai Riil (Thn 10)",
                           value: formatCompact(last.real),
-                          color: "#2563eb",
+                          color: tokens.colors.semantic.brand,
                         },
                         {
                           label: "Garis Inflasi (Thn 10)",
                           value: formatCompact(last.inflation),
-                          color: "#ef4444",
+                          color: tokens.colors.semantic.danger,
                         },
                       ].map((s, i) => (
                         <div
@@ -2058,7 +2118,7 @@ export default function WealthTracker() {
                           <div
                             style={{
                               fontSize: 10,
-                              color: "#94a3b8",
+                              color: tokens.colors.text.tertiary,
                               marginBottom: 4,
                             }}
                           >
@@ -2066,7 +2126,7 @@ export default function WealthTracker() {
                           </div>
                           <div
                             style={{
-                              fontFamily: "DM Sans",
+                              fontFamily: tokens.typography.fontFamily,
                               fontSize: 15,
                               fontWeight: 800,
                               color: s.color,
@@ -2110,7 +2170,7 @@ export default function WealthTracker() {
                   fontSize: 16,
                   fontWeight: 800,
                   margin: "0 0 16px",
-                  color: "#0f172a",
+                  color: tokens.colors.text.primary,
                 }}
               >
                 Distribusi Aset
@@ -2118,7 +2178,7 @@ export default function WealthTracker() {
 
               {allocData.length === 0 ? (
                 <div
-                  style={{ color: "#94a3b8", fontSize: 14, padding: "20px 0" }}
+                  style={{ color: tokens.colors.text.tertiary, fontSize: 14, padding: "20px 0" }}
                 >
                   Belum ada aset yang diinput.
                 </div>
@@ -2155,7 +2215,7 @@ export default function WealthTracker() {
                             style={{
                               fontSize: 13,
                               fontWeight: 600,
-                              color: "#0f172a",
+                              color: tokens.colors.text.primary,
                             }}
                           >
                             {d.name}
@@ -2170,16 +2230,16 @@ export default function WealthTracker() {
                         >
                           <span
                             style={{
-                              fontFamily: "DM Sans",
+                              fontFamily: tokens.typography.fontFamily,
                               fontSize: 12,
-                              color: "#94a3b8",
+                              color: tokens.colors.text.tertiary,
                             }}
                           >
                             {formatCompact(d.idr)}
                           </span>
                           <span
                             style={{
-                              fontFamily: "DM Sans",
+                              fontFamily: tokens.typography.fontFamily,
                               fontSize: 14,
                               fontWeight: 800,
                               color: d.color,
@@ -2211,20 +2271,20 @@ export default function WealthTracker() {
                           alignItems: "center",
                         }}
                       >
-                        <span style={{ fontSize: 10, color: "#94a3b8" }}>
+                        <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
                           Gross: {d.return}% → Net:{" "}
                           {afterTaxReturn(d).toFixed(1)}%
                         </span>
-                        <span style={{ fontSize: 10, color: "#94a3b8" }}>
+                        <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
                           Likuid: {d.liquidity} · {d.risk}
                         </span>
                         {(monthlyContribs[d.id] || 0) > 0 && (
                           <span
                             style={{
                               fontSize: 10,
-                              color: "#7c3aed",
+                              color: tokens.colors.dataViz.rdpu,
                               fontWeight: 700,
-                              background: "#f5f3ff",
+                              background: tokens.colors.surface.active,
                               padding: "1px 7px",
                               borderRadius: 20,
                             }}
@@ -2246,7 +2306,7 @@ export default function WealthTracker() {
               {/* Breakdown */}
               <div
                 style={{
-                  borderTop: "1px solid #e2e8f0",
+                  borderTop: `1px solid ${tokens.colors.border.subtle}`,
                   paddingTop: 16,
                   marginTop: 16,
                   display: "grid",
@@ -2260,35 +2320,35 @@ export default function WealthTracker() {
                     value: allocData
                       .filter((d) => !d.isEquity)
                       .reduce((s, d) => s + d.pct, 0),
-                    color: "#2563eb",
+                    color: tokens.colors.semantic.brand,
                   },
                   {
                     label: "Aset Ekuitas",
                     value: allocData
                       .filter((d) => d.isEquity)
                       .reduce((s, d) => s + d.pct, 0),
-                    color: "#f59e0b",
+                    color: tokens.colors.semantic.warning,
                   },
                   {
                     label: "Aset IDR",
                     value: allocData
                       .filter((d) => !d.isUSD)
                       .reduce((s, d) => s + d.pct, 0),
-                    color: "#10b981",
+                    color: tokens.colors.semantic.success,
                   },
                   {
                     label: "Aset USD",
                     value: allocData
                       .filter((d) => d.isUSD)
                       .reduce((s, d) => s + d.pct, 0),
-                    color: "#059669",
+                    color: tokens.colors.dataViz.usd,
                   },
                 ].map((s, i) => (
                   <div key={i} className="stat">
                     <div
                       style={{
                         fontSize: 10,
-                        color: "#94a3b8",
+                        color: tokens.colors.text.tertiary,
                         marginBottom: 4,
                       }}
                     >
@@ -2296,7 +2356,7 @@ export default function WealthTracker() {
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Sans",
+                        fontFamily: tokens.typography.fontFamily,
                         fontSize: 18,
                         fontWeight: 800,
                         color: s.color,
@@ -2319,7 +2379,7 @@ export default function WealthTracker() {
             <hr
               style={{
                 border: 0,
-                borderTop: "1.5px dashed #cbd5e1",
+                borderTop: `1.5px dashed ${tokens.colors.border.input}`,
                 margin: "32px 0",
               }}
             />
@@ -2340,7 +2400,7 @@ export default function WealthTracker() {
                   style={{
                     fontSize: 18,
                     fontWeight: 800,
-                    color: "#0f172a",
+                    color: tokens.colors.text.primary,
                     margin: 0,
                   }}
                 >
@@ -2364,7 +2424,7 @@ export default function WealthTracker() {
                     style={{
                       width: 15,
                       height: 15,
-                      accentColor: "#6366f1",
+                      accentColor: tokens.colors.semantic.brand,
                       cursor: "pointer",
                       margin: 0,
                     }}
@@ -2374,9 +2434,9 @@ export default function WealthTracker() {
                     style={{
                       fontSize: 11,
                       fontWeight: 600,
-                      color: "#475569",
+                      color: tokens.colors.text.secondary,
                       cursor: "pointer",
-                      fontFamily: "DM Sans",
+                      fontFamily: tokens.typography.fontFamily,
                     }}
                   >
                     Gabungkan Target ke Total Aset & Proyeksi
@@ -2396,7 +2456,7 @@ export default function WealthTracker() {
                   >
                     {/* Kolom 1: Pengeluaran Bulanan */}
                     <div>
-                      <div className="cl">Pengeluaran Bulanan</div>
+                      <div className="cl" style={{ color: tokens.colors.text.secondary }}>Pengeluaran Bulanan</div>
                       <div style={{ position: "relative", marginTop: 4 }}>
                         <span
                           style={{
@@ -2404,9 +2464,9 @@ export default function WealthTracker() {
                             left: 14,
                             top: "50%",
                             transform: "translateY(-50%)",
-                            color: "#94a3b8",
+                            color: tokens.colors.text.tertiary,
                             fontSize: 13,
-                            fontFamily: "DM Sans",
+                            fontFamily: tokens.typography.fontFamily,
                           }}
                         >
                           Rp
@@ -2448,7 +2508,7 @@ export default function WealthTracker() {
                           </button>
                         </div>
                       </div>
-                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 6 }}>
+                      <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 6 }}>
                         Kelipatan Rp 50.000
                       </div>
                     </div>
@@ -2464,7 +2524,7 @@ export default function WealthTracker() {
                     >
                       <div
                         className="cl"
-                        style={{ width: "100%", textAlign: "center" }}
+                        style={{ width: "100%", textAlign: "center", color: tokens.colors.text.secondary }}
                       >
                         Target Dana Darurat
                       </div>
@@ -2486,17 +2546,17 @@ export default function WealthTracker() {
                           onChange={(e) => setTargetMonths(Number(e.target.value))}
                           style={{
                             flex: 1,
-                            accentColor: "#6366f1",
-                            background: `linear-gradient(to right,#6366f1 ${((targetMonths - 3) / 9) * 100
-                              }%,#e2e8f0 0%)`,
+                            accentColor: tokens.colors.semantic.brand,
+                            background: `linear-gradient(to right,${tokens.colors.semantic.brand} ${((targetMonths - 3) / 9) * 100
+                              }%,${tokens.colors.border.subtle} 0%)`,
                           }}
                         />
                         <span
                           style={{
-                            fontFamily: "DM Sans",
+                            fontFamily: tokens.typography.fontFamily,
                             fontSize: 16,
                             fontWeight: 800,
-                            color: "#6366f1",
+                            color: tokens.colors.semantic.brand,
                             minWidth: 55,
                             textAlign: "right",
                           }}
@@ -2515,19 +2575,19 @@ export default function WealthTracker() {
                         textAlign: "right",
                       }}
                     >
-                      <div className="cl">Total Kebutuhan</div>
+                      <div className="cl" style={{ color: tokens.colors.text.secondary }}>Total Kebutuhan</div>
                       <div
                         style={{
-                          fontFamily: "DM Sans",
+                          fontFamily: tokens.typography.fontFamily,
                           fontSize: 26,
                           fontWeight: 800,
-                          color: "#0f172a",
+                          color: tokens.colors.text.primary,
                           marginTop: 4,
                         }}
                       >
                         {formatCompact(monthlyExpense * targetMonths)}
                       </div>
-                      <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, marginTop: 2 }}>
                         {formatIDR(monthlyExpense * targetMonths)}
                       </div>
                     </div>
@@ -2545,25 +2605,25 @@ export default function WealthTracker() {
                   {/* Card Lapis 1: Cash/Bank */}
                   <div
                     className="card"
-                    style={{ padding: "16px 20px", borderTop: "6px solid #3b82f6" }}
+                    style={{ padding: "16px 20px", borderTop: `6px solid ${tokens.colors.dataViz.cash}` }}
                   >
                     <div
-                      style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
+                      style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}
                     >
                       Lapis 1 ({t1Months} Bulan) - Cash / Bank
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Sans",
+                        fontFamily: tokens.typography.fontFamily,
                         fontSize: 20,
                         fontWeight: 800,
-                        color: "#0f172a",
+                        color: tokens.colors.text.primary,
                         margin: "6px 0",
                       }}
                     >
                       {formatIDR(monthlyExpense * t1Months)}
                     </div>
-                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    <div style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>
                       Untuk likuiditas instan H-0. Hindari instrumen fluktuatif.
                     </div>
                   </div>
@@ -2571,25 +2631,25 @@ export default function WealthTracker() {
                   {/* Card Lapis 2: Bank Digital */}
                   <div
                     className="card"
-                    style={{ padding: "16px 20px", borderTop: "6px solid #06b6d4" }}
+                    style={{ padding: "16px 20px", borderTop: `6px solid ${tokens.colors.dataViz.digitalBank}` }}
                   >
                     <div
-                      style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
+                      style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}
                     >
                       Lapis 2 ({t2Months} Bulan) - Bank Digital
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Sans",
+                        fontFamily: tokens.typography.fontFamily,
                         fontSize: 20,
                         fontWeight: 800,
-                        color: "#0f172a",
+                        color: tokens.colors.text.primary,
                         margin: "6px 0",
                       }}
                     >
                       {formatIDR(monthlyExpense * t2Months)}
                     </div>
-                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    <div style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>
                       Likuiditas tinggi dengan yield lebih baik dari bank
                       konvensional.
                     </div>
@@ -2598,25 +2658,25 @@ export default function WealthTracker() {
                   {/* Card Lapis 3: RDPU */}
                   <div
                     className="card"
-                    style={{ padding: "16px 20px", borderTop: "6px solid #10b981" }}
+                    style={{ padding: "16px 20px", borderTop: `6px solid ${tokens.colors.dataViz.rdpu}` }}
                   >
                     <div
-                      style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}
+                      style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}
                     >
                       Lapis 3 ({t3Months} Bulan) - RDPU
                     </div>
                     <div
                       style={{
-                        fontFamily: "DM Sans",
+                        fontFamily: tokens.typography.fontFamily,
                         fontSize: 20,
                         fontWeight: 800,
-                        color: "#0f172a",
+                        color: tokens.colors.text.primary,
                         margin: "6px 0",
                       }}
                     >
                       {formatIDR(monthlyExpense * t3Months)}
                     </div>
-                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    <div style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>
                       Pelindung nilai dari inflasi. Pencairan memakan waktu 1-3 hari
                       kerja.
                     </div>
@@ -2657,7 +2717,7 @@ export default function WealthTracker() {
         )}
 
         {/* ── MOBILE STICKY TAB BAR ── */}
-        <div className="tab-bar-sticky">
+        <div className="tab-bar-sticky" style={{ background: tokens.colors.surface.card, borderTop: `1.5px solid ${tokens.colors.border.subtle}` }}>
           {[
             ["input", "⚙️", "Input"],
             ["projection", "📈", "Proyeksi"],
@@ -2667,6 +2727,7 @@ export default function WealthTracker() {
               key={id}
               className={`tab ${activeTab === id ? "on" : ""}`}
               onClick={() => setActiveTab(id)}
+              style={{ color: activeTab === id ? "#fff" : tokens.colors.text.tertiary }}
             >
               {icon} {lbl}
             </button>
@@ -2693,7 +2754,7 @@ export default function WealthTracker() {
           >
             <div
               style={{
-                backgroundColor: "#fff",
+                backgroundColor: tokens.colors.surface.card,
                 borderRadius: "16px",
                 boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
                 width: "100%",
@@ -2706,7 +2767,7 @@ export default function WealthTracker() {
               <div style={{ fontSize: "40px", marginBottom: "12px" }}>
                 {modalAction.type === "delete" ? "🗑️" : "🔄"}
               </div>
-              <p style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", lineHeight: 1.65, marginBottom: "22px", fontFamily: "'DM Sans',sans-serif" }}>
+              <p style={{ fontSize: "14px", fontWeight: 600, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
                 {modalAction.title}
               </p>
               <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
@@ -2733,10 +2794,10 @@ export default function WealthTracker() {
                   }}
                   style={{
                     padding: "9px 22px", borderRadius: "8px", border: "none",
-                    background: modalAction.type === "delete" ? "#ef4444" : "linear-gradient(135deg,#2563eb,#4f46e5)",
+                    background: modalAction.type === "delete" ? tokens.colors.semantic.danger : tokens.colors.semantic.brand,
                     color: "#fff", fontWeight: 700, fontSize: "13px",
-                    cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-                    boxShadow: modalAction.type === "delete" ? "0 4px 12px rgba(239,68,68,.35)" : "0 4px 12px rgba(37,99,235,.35)"
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily,
+                    boxShadow: modalAction.type === "delete" ? `0 4px 12px ${tokens.colors.semantic.danger}35` : `0 4px 12px rgba(15,23,42,.2)`
                   }}
                 >
                   {modalAction.type === "delete" ? "🗑️ Hapus" : "🔄 Ya, Update"}
@@ -2744,9 +2805,9 @@ export default function WealthTracker() {
                 <button
                   onClick={closeModal}
                   style={{
-                    padding: "9px 22px", borderRadius: "8px", border: "1.5px solid #e2e8f0",
-                    background: "#f1f5f9", color: "#475569", fontWeight: 700, fontSize: "13px",
-                    cursor: "pointer", fontFamily: "'DM Sans',sans-serif"
+                    padding: "9px 22px", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                    background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "13px",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
                   }}
                 >
                   Batal
