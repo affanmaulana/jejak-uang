@@ -353,8 +353,8 @@ export default function WealthTracker() {
 
   const saveNewTemplate = () => {
     const trimmedName = templateNameInput.trim();
-    if (!trimmedName) return alert("Nama Profile wajib diisi.");
-    if (userTemplates.length >= 3) return alert("Maksimal 3 profile. Hapus profile lama untuk membuat yang baru.");
+    if (!trimmedName) return alert("Nama Profil wajib diisi.");
+    if (userTemplates.length >= 3) return alert("Maksimal 3 profil. Hapus profil lama untuk membuat yang baru.");
     if (
       userTemplates.some(
         (t) => t.name.toLowerCase() === trimmedName.toLowerCase()
@@ -385,7 +385,7 @@ export default function WealthTracker() {
     e.stopPropagation();
     setModalAction({
       isOpen: true,
-      title: "Update profile ini dengan angka di layar saat ini?",
+      title: "Update profil ini dengan angka di layar saat ini?",
       type: "update",
       targetId: id,
     });
@@ -410,7 +410,7 @@ export default function WealthTracker() {
     e.stopPropagation();
     setModalAction({
       isOpen: true,
-      title: "Hapus profile ini secara permanen? Tindakan ini tidak bisa dibatalkan.",
+      title: "Hapus profil ini secara permanen? Tindakan ini tidak bisa dibatalkan.",
       type: "delete",
       targetId: id,
     });
@@ -908,7 +908,7 @@ export default function WealthTracker() {
           ))}
         </div>
 
-        {/* ── PROFILE ALOKASI KAMU (naked, selalu tampil) ── */}
+        {/* ── PROFIL ALOKASI KAMU (naked, selalu tampil) ── */}
         <div style={{ marginBottom: 14 }}>
           <div
             style={{
@@ -918,7 +918,7 @@ export default function WealthTracker() {
               marginBottom: 20,
             }}
           >
-            Profile Alokasi Kamu
+            Profil Alokasi Kamu
           </div>
           <div className="profile-row">
             {userTemplates.map((t) => (
@@ -1036,7 +1036,7 @@ export default function WealthTracker() {
                     fontWeight: 600,
                     color: tokens.colors.text.primary,
                   }}
-                  placeholder="Nama Profile..."
+                  placeholder="Nama Profil..."
                   value={templateNameInput}
                   onChange={(e) => setTemplateNameInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -1057,7 +1057,7 @@ export default function WealthTracker() {
               </div>
             ) : (
               <div
-                title="Hapus salah satu profile untuk membuat yang baru"
+                title="Hapus salah satu profil untuk membuat yang baru"
                 style={{
                   display: "flex",
                   alignItems: "center",
