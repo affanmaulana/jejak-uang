@@ -206,6 +206,28 @@ export default function WealthTracker() {
   const [inflationRate, setInflationRate] = useState(5.0);
   const [showAfterTax, setShowAfterTax] = useState(true);
   const [activeTab, setActiveTab] = useState("input");
+
+  // ── State Option 2: Top Modal ──
+  const [activeAssetIds, setActiveAssetIds] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState({ isOpen: false, title: "", type: null, targetId: null });
+
+  const closeModal = () => setModalAction({ isOpen: false, title: "", type: null, targetId: null });
+
+  const addAsset = (id) => {
+    setActiveAssetIds((prev) => prev.includes(id) ? prev : [...prev, id]);
+    // Auto-close if all assets are now active
+    if (ASSET_CLASSES.filter((c) => !activeAssetIds.includes(c.id)).length <= 1) {
+      setIsModalOpen(false);
+    }
+  };
+
+  const removeAsset = (id) => {
+    setActiveAssetIds((prev) => prev.filter((aid) => aid !== id));
+    // Reset the asset value and contrib when removed
+    setAssets((prev) => ({ ...prev, [id]: 0 }));
+    setMonthlyContribs((prev) => ({ ...prev, [id]: 0 }));
+  };
   // ── State Custom Templates (LocalStorage) ──
   const [userTemplates, setUserTemplates] = useState(() => {
     try {
@@ -233,6 +255,7 @@ export default function WealthTracker() {
   const saveNewTemplate = () => {
     const trimmedName = templateNameInput.trim();
     if (!trimmedName) return alert("Nama Profile wajib diisi.");
+    if (userTemplates.length >= 3) return alert("Maksimal 3 profile. Hapus profile lama untuk membuat yang baru.");
     if (
       userTemplates.some(
         (t) => t.name.toLowerCase() === trimmedName.toLowerCase()
@@ -246,6 +269,7 @@ export default function WealthTracker() {
       name: trimmedName,
       assets: { ...assets },
       contribs: { ...monthlyContribs },
+      activeIds: [...activeAssetIds],
       fireTarget: fireTarget,
       monthlyExpense: monthlyExpense,
       targetMonths: targetMonths,
@@ -260,30 +284,22 @@ export default function WealthTracker() {
 
   const updateExistingTemplate = (id, e) => {
     e.stopPropagation();
-    if (!confirm("Update template ini dengan angka di layar saat ini?")) return;
-
-    setUserTemplates((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          return {
-            ...t,
-            assets: { ...assets },
-            contribs: { ...monthlyContribs },
-            fireTarget: fireTarget,
-            monthlyExpense: monthlyExpense,
-            targetMonths: targetMonths,
-            includeEmergencyInTotal: includeEmergencyInTotal,
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        return t;
-      })
-    );
+    setModalAction({
+      isOpen: true,
+      title: "Update profile ini dengan angka di layar saat ini?",
+      type: "update",
+      targetId: id,
+    });
   };
 
   const loadUserTemplate = (t) => {
     setAssets((prev) => ({ ...prev, ...t.assets }));
     setMonthlyContribs((prev) => ({ ...prev, ...(t.contribs || {}) }));
+    // Fallback: jika profil lama tidak punya activeIds, derive dari nilai aset > 0
+    setActiveAssetIds(
+      t.activeIds ||
+      Object.keys(t.assets || {}).filter((key) => (t.assets[key] || 0) > 0)
+    );
     setFireTarget(t.fireTarget);
     setMonthlyExpense(t.monthlyExpense);
     setTargetMonths(t.targetMonths);
@@ -293,9 +309,12 @@ export default function WealthTracker() {
 
   const deleteTemplate = (id, e) => {
     e.stopPropagation();
-    if (!confirm("Hapus template ini secara permanen?")) return;
-    setUserTemplates((prev) => prev.filter((t) => t.id !== id));
-    if (activeTemplateId === id) setActiveTemplateId(null); // RESET JIKA YG DIHAPUS ADALAH TEMPLATE AKTIF
+    setModalAction({
+      isOpen: true,
+      title: "Hapus profile ini secara permanen? Tindakan ini tidak bisa dibatalkan.",
+      type: "delete",
+      targetId: id,
+    });
   };
 
   // ── State Dana Darurat ──
@@ -576,7 +595,7 @@ export default function WealthTracker() {
                 color: "#0f172a",
               }}
             >
-              Peta Alokasi Aset Likuid
+              Peta Alokasi Hartamu
             </h1>
             <p
               style={{
@@ -621,9 +640,8 @@ export default function WealthTracker() {
           {[
             {
               label: showAfterTax ? "Return After-Tax" : "Return Bruto",
-              value: `${
-                showAfterTax ? stats.weightedNet : stats.weightedGross
-              }%`,
+              value: `${showAfterTax ? stats.weightedNet : stats.weightedGross
+                }%`,
               sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
               color: "#2563eb",
             },
@@ -696,6 +714,191 @@ export default function WealthTracker() {
             </div>
           ))}
 
+        {/* ── PROFILE ALOKASI KAMU (global, selalu tampil) ── */}
+        <div className="card" style={{ padding: 16, marginBottom: 14 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "#94a3b8",
+              textTransform: "uppercase",
+              letterSpacing: ".1em",
+              marginBottom: 12,
+            }}
+          >
+            Profile Alokasi Kamu
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "nowrap",
+              gap: 10,
+              alignItems: "stretch",
+              overflowX: "auto",
+              paddingBottom: 4,
+            }}
+          >
+            {userTemplates.map((t) => (
+              <div
+                key={t.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "8px 12px",
+                  gap: 12,
+                  cursor: "pointer",
+                  border:
+                    activeTemplateId === t.id
+                      ? "1.5px solid #3b82f6"
+                      : "1.5px solid #e2e8f0",
+                  backgroundColor:
+                    activeTemplateId === t.id ? "#eff6ff" : "#fff",
+                  borderRadius: 10,
+                  transition: "all 0.2s",
+                }}
+                onClick={() => loadUserTemplate(t)}
+                onMouseOver={(e) => {
+                  if (activeTemplateId !== t.id)
+                    e.currentTarget.style.borderColor = "#3b82f6";
+                }}
+                onMouseOut={(e) => {
+                  if (activeTemplateId !== t.id)
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    minWidth: 100,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: "#0f172a",
+                    }}
+                  >
+                    {t.name}
+                  </span>
+                  <span style={{ fontSize: 10, color: "#94a3b8" }}>
+                    {" "}
+                    {new Date(t.updatedAt).toLocaleDateString("id-ID")}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 4,
+                    borderLeft: "1.5px solid #f1f5f9",
+                    paddingLeft: 10,
+                  }}
+                >
+                  <button
+                    onClick={(e) => updateExistingTemplate(t.id, e)}
+                    style={{
+                      background: "#f1f5f9",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "4px 6px",
+                      cursor: "pointer",
+                      fontSize: 13,
+                    }}
+                    title="Timpa template ini"
+                  >
+                    🔄
+                  </button>
+                  <button
+                    onClick={(e) => deleteTemplate(t.id, e)}
+                    style={{
+                      background: "#fef2f2",
+                      color: "#ef4444",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "4px 6px",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      fontWeight: "bold",
+                    }}
+                    title="Hapus"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ))}
+            {userTemplates.length < 3 ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#f8fafc",
+                  padding: 6,
+                  borderRadius: 10,
+                  border: "1.5px dashed #cbd5e1",
+                  flexShrink: 0,
+                }}
+              >
+                <input
+                  type="text"
+                  style={{
+                    width: 140,
+                    padding: "8px 12px",
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "#0f172a",
+                  }}
+                  placeholder="Nama Profile..."
+                  value={templateNameInput}
+                  onChange={(e) => setTemplateNameInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveNewTemplate();
+                  }}
+                />
+                <button
+                  className="tab on"
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 8,
+                    height: "100%",
+                  }}
+                  onClick={saveNewTemplate}
+                >
+                  + Add
+                </button>
+              </div>
+            ) : (
+              <div
+                title="Hapus salah satu profile untuk membuat yang baru"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 14px",
+                  borderRadius: 10,
+                  border: "1.5px solid #e2e8f0",
+                  background: "#f8fafc",
+                  color: "#94a3b8",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  flexShrink: 0,
+                  userSelect: "none",
+                  cursor: "default",
+                  letterSpacing: ".02em",
+                }}
+              >
+                <span style={{ fontSize: 14 }}>🔒</span>
+                <span>3 / 3</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* ── TABS ── */}
         <div
           style={{
@@ -729,164 +932,6 @@ export default function WealthTracker() {
         ══════════════════════════════════════════════ */}
         {activeTab === "input" && (
           <div>
-            {/* Manajemen Template Custom - Horizontal Design */}
-            <div className="card" style={{ padding: 16, marginBottom: 14 }}>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "#94a3b8",
-                  textTransform: "uppercase",
-                  letterSpacing: ".1em",
-                  marginBottom: 12,
-                }}
-              >
-                Profile Alokasi Kamu
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 10,
-                  alignItems: "stretch",
-                }}
-              >
-                {userTemplates.map((t) => (
-                  <div
-                    key={t.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "8px 12px",
-                      gap: 12,
-                      cursor: "pointer",
-                      border:
-                        activeTemplateId === t.id
-                          ? "1.5px solid #3b82f6"
-                          : "1.5px solid #e2e8f0",
-                      backgroundColor:
-                        activeTemplateId === t.id ? "#eff6ff" : "#fff",
-                      borderRadius: 10,
-                      transition: "all 0.2s",
-                    }}
-                    onClick={() => loadUserTemplate(t)}
-                    onMouseOver={(e) => {
-                      if (activeTemplateId !== t.id)
-                        e.currentTarget.style.borderColor = "#3b82f6";
-                    }}
-                    onMouseOut={(e) => {
-                      if (activeTemplateId !== t.id)
-                        e.currentTarget.style.borderColor = "#e2e8f0";
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        minWidth: 100,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: "#0f172a",
-                        }}
-                      >
-                        {t.name}
-                      </span>
-                      <span style={{ fontSize: 10, color: "#94a3b8" }}>
-                        Update:{" "}
-                        {new Date(t.updatedAt).toLocaleDateString("id-ID")}
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 4,
-                        borderLeft: "1.5px solid #f1f5f9",
-                        paddingLeft: 10,
-                      }}
-                    >
-                      <button
-                        onClick={(e) => updateExistingTemplate(t.id, e)}
-                        style={{
-                          background: "#f1f5f9",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "4px 6px",
-                          cursor: "pointer",
-                          fontSize: 13,
-                        }}
-                        title="Timpa template ini"
-                      >
-                        🔄
-                      </button>
-                      <button
-                        onClick={(e) => deleteTemplate(t.id, e)}
-                        style={{
-                          background: "#fef2f2",
-                          color: "#ef4444",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "4px 6px",
-                          cursor: "pointer",
-                          fontSize: 14,
-                          fontWeight: "bold",
-                        }}
-                        title="Hapus"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    background: "#f8fafc",
-                    padding: 6,
-                    borderRadius: 10,
-                    border: "1.5px dashed #cbd5e1",
-                  }}
-                >
-                  <input
-                    type="text"
-                    style={{
-                      width: 140,
-                      padding: "8px 12px",
-                      background: "transparent",
-                      border: "none",
-                      outline: "none",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: "#0f172a",
-                    }}
-                    placeholder="Nama Profile..."
-                    value={templateNameInput}
-                    onChange={(e) => setTemplateNameInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") saveNewTemplate();
-                    }}
-                  />
-                  <button
-                    className="tab on"
-                    style={{
-                      padding: "6px 14px",
-                      borderRadius: 8,
-                      height: "100%",
-                    }}
-                    onClick={saveNewTemplate}
-                  >
-                    + Add
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Toggle after-tax */}
             <div className="note" style={{ marginBottom: 14 }}>
               <label
                 style={{
@@ -907,172 +952,233 @@ export default function WealthTracker() {
               </label>
             </div>
 
-            {/* Asset Cards */}
+            {/* ── OPTION 2: TOP MODAL — Action Header ── */}
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(290px,1fr))",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
                 gap: 12,
+                marginBottom: 14,
               }}
             >
-              {ASSET_CLASSES.map((cls) => {
-                const raw = assets[cls.id] || 0;
-                const idr = cls.isUSD ? raw * USD_RATE : raw;
-                const pct =
-                  totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
-                const netR = afterTaxReturn(cls).toFixed(1);
-                const max = cls.isUSD ? 100000 : 1000000000;
-                const step = cls.isUSD ? 50 : 50000;
-                const mc = monthlyContribs[cls.id] || 0;
-                const contribMax = cls.isUSD ? 1000 : 10000000;
-                const contribStep = cls.isUSD ? 10 : 50000;
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>
+                {activeAssetIds.length > 0
+                  ? `${activeAssetIds.length} instrumen aktif`
+                  : "Belum ada instrumen dipilih"}
+              </div>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                disabled={activeAssetIds.length >= ASSET_CLASSES.length}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 20px",
+                  borderRadius: 999,
+                  border: "none",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  cursor: activeAssetIds.length >= ASSET_CLASSES.length ? "not-allowed" : "pointer",
+                  background: activeAssetIds.length >= ASSET_CLASSES.length ? "#f1f5f9" : "linear-gradient(135deg,#2563eb,#4f46e5)",
+                  color: activeAssetIds.length >= ASSET_CLASSES.length ? "#94a3b8" : "#fff",
+                  boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : "0 4px 14px rgba(37,99,235,.35)",
+                  transition: "all .2s",
+                  fontFamily: "'DM Sans',sans-serif",
+                }}
+              >
+                <span style={{ fontSize: 18, lineHeight: 1 }}>＋</span>
+                Tambah Instrumen Baru
+              </button>
+            </div>
 
-                return (
-                  <div
-                    key={cls.id}
-                    className="card"
-                    style={{
-                      padding: 16,
-                      borderTop: `6px solid ${cls.color}`,
-                    }}
-                  >
-                    {/* Elemen glow-bar dihapus */}
-                    {/* Header */}
+            {/* ── EMPTY STATE ── */}
+            {activeAssetIds.length === 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: 320,
+                  background: "linear-gradient(135deg,#f8fafc 0%,#eff6ff 100%)",
+                  border: "2px dashed #bfdbfe",
+                  borderRadius: 20,
+                  padding: "48px 24px",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontSize: 48, marginBottom: 16 }}>🏦</div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: "#1e3a8a",
+                    marginBottom: 8,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  Harta yang tak tercatat,
+                  <br />
+                  <span style={{ color: "#2563eb" }}>adalah harta yang tak terjaga.</span>
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "#94a3b8",
+                    marginBottom: 28,
+                    maxWidth: 360,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Mulai lacak portofoliomu. Pilih instrumen investasi yang kamu miliki dan simulasikan pertumbuhannya.
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "12px 28px",
+                    borderRadius: 999,
+                    border: "none",
+                    fontWeight: 800,
+                    fontSize: 14,
+                    cursor: "pointer",
+                    background: "linear-gradient(135deg,#2563eb,#4f46e5)",
+                    color: "#fff",
+                    boxShadow: "0 6px 20px rgba(37,99,235,.40)",
+                    fontFamily: "'DM Sans',sans-serif",
+                    transition: "transform .15s",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                  onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                >
+                  <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>
+                  Tambah Instrumen Pertamamu
+                </button>
+              </div>
+            ) : (
+              /* ── ACTIVE ASSET CARDS GRID ── */
+              <div className="flex flex-wrap justify-start gap-6" style={{ gap: "12px" }}>
+                {ASSET_CLASSES.filter((cls) => activeAssetIds.includes(cls.id)).map((cls) => {
+                  const raw = assets[cls.id] || 0;
+                  const idr = cls.isUSD ? raw * USD_RATE : raw;
+                  const pct =
+                    totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
+                  const netR = afterTaxReturn(cls).toFixed(1);
+                  const mc = monthlyContribs[cls.id] || 0;
 
-                    {/* Header */}
+                  return (
                     <div
+                      key={cls.id}
+                      className="card w-full max-w-[310px]"
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        marginBottom: 10,
+                        padding: 16,
+                        borderTop: `6px solid ${cls.color}`,
+                        position: "relative",
                       }}
                     >
-                      {/* TAMBAHKAN flex: 1 dan paddingRight DI SINI */}
-                      <div style={{ flex: 1, paddingRight: 12 }}>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontSize: 14,
-                            color: "#0f172a",
-                          }}
-                        >
-                          {cls.name}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: "#94a3b8",
-                            marginTop: 2,
-                            lineHeight: 1.4,
-                          }}
-                        >
-                          {cls.description}
-                        </div>
-                      </div>
-                      {/* TAMBAHKAN minWidth dan textAlign DI SINI */}
+
+                      {/* Header */}
                       <div
                         style={{
-                          fontFamily: "DM Sans",
-                          fontWeight: 800,
-                          fontSize: 16,
-                          color: cls.color,
-                          minWidth: "55px",
-                          textAlign: "right",
-                        }}
-                      >
-                        {pct}%
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 6,
-                        marginBottom: 10,
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <span
-                        className="tag"
-                        style={{
-                          background: `${cls.color}18`,
-                          color: cls.color,
-                        }}
-                      >
-                        Likuid: {cls.liquidity}
-                      </span>
-                      <span
-                        className="tag"
-                        style={{ background: "#f1f5f9", color: "#64748b" }}
-                      >
-                        Risiko: {cls.risk}
-                      </span>
-                    </div>
-
-                    {/* ── NILAI ASET ── */}
-                    <div className="cl">Nilai Aset</div>
-                    <div style={{ position: "relative", marginBottom: 8 }}>
-                      <span
-                        style={{
-                          position: "absolute",
-                          left: 10,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: "#94a3b8",
-                          fontSize: 12,
-                          fontFamily: "DM Sans",
-                        }}
-                      >
-                        {cls.isUSD ? "$" : "Rp"}
-                      </span>
-                      <input
-                        type="text"
-                        className="ifield"
-                        value={
-                          raw === 0
-                            ? ""
-                            : new Intl.NumberFormat(
-                                cls.isUSD ? "en-US" : "id-ID"
-                              ).format(raw)
-                        }
-                        onChange={(e) => handleInput(cls.id, e)}
-                        placeholder="0"
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          right: 6,
-                          top: "50%",
-                          transform: "translateY(-50%)",
                           display: "flex",
-                          gap: 4,
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          marginBottom: 10,
                         }}
                       >
-                        <button
-                          className="stepbtn"
-                          onClick={() => handleStep(cls.id, -1)}
+                        <div style={{ flex: 1, paddingRight: 12 }}>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 14,
+                              color: "#0f172a",
+                            }}
+                          >
+                            {cls.name}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "#94a3b8",
+                              marginTop: 2,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {cls.description}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            flexShrink: 0,
+                          }}
                         >
-                          −
-                        </button>
-                        <button
-                          className="stepbtn"
-                          onClick={() => handleStep(cls.id, 1)}
+                          <span
+                            style={{
+                              fontFamily: "DM Sans",
+                              fontWeight: 800,
+                              fontSize: 16,
+                              color: cls.color,
+                            }}
+                          >
+                            {pct}%
+                          </span>
+                          <button
+                            onClick={() => removeAsset(cls.id)}
+                            title={`Hapus ${cls.name}`}
+                            className="p-1 hover:text-red-500 transition-colors rounded-md"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "#94a3b8",
+                              lineHeight: 1,
+                              fontSize: 20,
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Tags */}
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          marginBottom: 10,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          className="tag"
+                          style={{
+                            background: `${cls.color}18`,
+                            color: cls.color,
+                          }}
                         >
-                          +
-                        </button>
+                          Likuid: {cls.liquidity}
+                        </span>
+                        <span
+                          className="tag"
+                          style={{ background: "#f1f5f9", color: "#64748b" }}
+                        >
+                          Risiko: {cls.risk}
+                        </span>
                       </div>
-                    </div>
 
-                    {/* Slider */}
-
-                    {/* ── KONTRIBUSI BULANAN ── */}
-                    <div className="contrib-row">
-                      <div className="cl" style={{ color: "#6366f1" }}>
-                        + Kontribusi Rutin / Bulan
-                      </div>
-                      <div style={{ position: "relative" }}>
+                      {/* ── NILAI ASET ── */}
+                      <div className="cl">Nilai Aset</div>
+                      <div style={{ position: "relative", marginBottom: 8 }}>
                         <span
                           style={{
                             position: "absolute",
@@ -1080,7 +1186,7 @@ export default function WealthTracker() {
                             top: "50%",
                             transform: "translateY(-50%)",
                             color: "#94a3b8",
-                            fontSize: 11,
+                            fontSize: 12,
                             fontFamily: "DM Sans",
                           }}
                         >
@@ -1088,16 +1194,16 @@ export default function WealthTracker() {
                         </span>
                         <input
                           type="text"
-                          className="ifield-sm"
+                          className="ifield"
                           value={
-                            mc === 0
+                            raw === 0
                               ? ""
                               : new Intl.NumberFormat(
-                                  cls.isUSD ? "en-US" : "id-ID"
-                                ).format(mc)
+                                cls.isUSD ? "en-US" : "id-ID"
+                              ).format(raw)
                           }
-                          onChange={(e) => handleContribInput(cls.id, e)}
-                          placeholder="0 (opsional)"
+                          onChange={(e) => handleInput(cls.id, e)}
+                          placeholder="0"
                         />
                         <div
                           style={{
@@ -1106,84 +1212,354 @@ export default function WealthTracker() {
                             top: "50%",
                             transform: "translateY(-50%)",
                             display: "flex",
-                            gap: 3,
+                            gap: 4,
                           }}
                         >
                           <button
-                            className="stepbtn-sm"
-                            onClick={() => handleContribStep(cls.id, -1)}
+                            className="stepbtn"
+                            onClick={() => handleStep(cls.id, -1)}
                           >
                             −
                           </button>
                           <button
-                            className="stepbtn-sm"
-                            onClick={() => handleContribStep(cls.id, 1)}
+                            className="stepbtn"
+                            onClick={() => handleStep(cls.id, 1)}
                           >
                             +
                           </button>
                         </div>
                       </div>
-                      {/* ---> TAMBAHKAN KODE SLIDER DI BAWAH INI <--- */}
 
-                      {/* ---> BATAS KODE SLIDER <--- */}
-                    </div>
+                      {/* ── KONTRIBUSI BULANAN ── */}
+                      <div className="contrib-row">
+                        <div className="cl" style={{ color: "#6366f1" }}>
+                          + Kontribusi Rutin / Bulan
+                        </div>
+                        <div style={{ position: "relative" }}>
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: 10,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: "#94a3b8",
+                              fontSize: 11,
+                              fontFamily: "DM Sans",
+                            }}
+                          >
+                            {cls.isUSD ? "$" : "Rp"}
+                          </span>
+                          <input
+                            type="text"
+                            className="ifield-sm"
+                            value={
+                              mc === 0
+                                ? ""
+                                : new Intl.NumberFormat(
+                                  cls.isUSD ? "en-US" : "id-ID"
+                                ).format(mc)
+                            }
+                            onChange={(e) => handleContribInput(cls.id, e)}
+                            placeholder="0 (opsional)"
+                          />
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: 6,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              display: "flex",
+                              gap: 3,
+                            }}
+                          >
+                            <button
+                              className="stepbtn-sm"
+                              onClick={() => handleContribStep(cls.id, -1)}
+                            >
+                              −
+                            </button>
+                            <button
+                              className="stepbtn-sm"
+                              onClick={() => handleContribStep(cls.id, 1)}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
-                    {/* Return info */}
-                    <div
-                      style={{
-                        marginTop: 10,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        flexWrap: "wrap",
-                        gap: 6,
-                        fontSize: 11,
-                        borderTop: "1px solid #f1f5f9",
-                        paddingTop: 8,
-                      }}
-                    >
-                      <span>
-                        <span style={{ color: "#94a3b8" }}>Gross: </span>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontFamily: "DM Sans",
-                            color: "#475569",
-                          }}
-                        >
-                          {cls.return}%
-                        </span>
-                      </span>
-                      <span>
-                        <span style={{ color: "#94a3b8" }}>After-Tax: </span>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontFamily: "DM Sans",
-                            color: "#16a34a",
-                          }}
-                        >
-                          {netR}%
-                        </span>
-                      </span>
-                      {cls.isUSD && idr > 0 && (
+                      {/* Return info */}
+                      <div
+                        style={{
+                          marginTop: 10,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: 6,
+                          fontSize: 11,
+                          borderTop: "1px solid #f1f5f9",
+                          paddingTop: 8,
+                        }}
+                      >
                         <span>
-                          <span style={{ color: "#94a3b8" }}>≈ </span>
+                          <span style={{ color: "#94a3b8" }}>Gross: </span>
                           <span
                             style={{
                               fontWeight: 700,
                               fontFamily: "DM Sans",
-                              color: "#d97706",
+                              color: "#475569",
                             }}
                           >
-                            {formatCompact(idr)}
+                            {cls.return}%
                           </span>
                         </span>
+                        <span>
+                          <span style={{ color: "#94a3b8" }}>After-Tax: </span>
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              fontFamily: "DM Sans",
+                              color: "#16a34a",
+                            }}
+                          >
+                            {netR}%
+                          </span>
+                        </span>
+                        {cls.isUSD && idr > 0 && (
+                          <span>
+                            <span style={{ color: "#94a3b8" }}>≈ </span>
+                            <span
+                              style={{
+                                fontWeight: 700,
+                                fontFamily: "DM Sans",
+                                color: "#d97706",
+                              }}
+                            >
+                              {formatCompact(idr)}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ── MODAL OVERLAY: KATALOG INSTRUMEN ── */}
+            {isModalOpen && (
+              <div
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  position: "fixed",
+                  inset: 0,
+                  background: "rgba(15,23,42,0.55)",
+                  backdropFilter: "blur(4px)",
+                  zIndex: 200,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 16,
+                }}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 20,
+                    boxShadow: "0 24px 80px rgba(0,0,0,.22)",
+                    width: "100%",
+                    maxWidth: 820,
+                    maxHeight: "85vh",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Modal Header */}
+                  <div
+                    style={{
+                      padding: "20px 24px",
+                      borderBottom: "1.5px solid #f1f5f9",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      background: "#fff",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontWeight: 800,
+                          fontSize: 18,
+                          color: "#0f172a",
+                          marginBottom: 3,
+                        }}
+                      >
+                        📦 Katalog Instrumen Investasi
+                      </div>
+                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                        Pilih instrumen untuk ditambahkan ke simulasi portofoliomu.
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setIsModalOpen(false)}
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "50%",
+                        border: "1.5px solid #e2e8f0",
+                        background: "#f8fafc",
+                        color: "#64748b",
+                        fontSize: 16,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all .15s",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = "#fef2f2";
+                        e.currentTarget.style.color = "#ef4444";
+                        e.currentTarget.style.borderColor = "#fca5a5";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "#f8fafc";
+                        e.currentTarget.style.color = "#64748b";
+                        e.currentTarget.style.borderColor = "#e2e8f0";
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div
+                    style={{
+                      padding: 20,
+                      overflowY: "auto",
+                      background: "#f8fafc",
+                      flexGrow: 1,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))",
+                        gap: 12,
+                      }}
+                    >
+                      {ASSET_CLASSES.filter((cls) => !activeAssetIds.includes(cls.id)).map((cls) => (
+                        <div
+                          key={cls.id}
+                          onClick={() => addAsset(cls.id)}
+                          style={{
+                            background: "#fff",
+                            border: "1.5px solid #e2e8f0",
+                            borderTop: `4px solid ${cls.color}`,
+                            borderRadius: 14,
+                            padding: "14px 16px",
+                            cursor: "pointer",
+                            transition: "all .18s",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.borderColor = cls.color;
+                            e.currentTarget.style.boxShadow = `0 4px 16px ${cls.color}28`;
+                            e.currentTarget.style.transform = "translateY(-2px)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.borderColor = "#e2e8f0";
+                            e.currentTarget.style.boxShadow = "none";
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.borderTopColor = cls.color;
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              marginBottom: 6,
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontWeight: 700,
+                                fontSize: 13,
+                                color: "#0f172a",
+                              }}
+                            >
+                              {cls.name}
+                            </div>
+                            <div
+                              style={{
+                                width: 22,
+                                height: 22,
+                                borderRadius: "50%",
+                                background: `${cls.color}18`,
+                                color: cls.color,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: 14,
+                                fontWeight: 700,
+                                flexShrink: 0,
+                              }}
+                            >
+                              +
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "#94a3b8",
+                              lineHeight: 1.45,
+                              marginBottom: 10,
+                            }}
+                          >
+                            {cls.description}
+                          </div>
+                          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                            <span
+                              className="tag"
+                              style={{ background: `${cls.color}14`, color: cls.color }}
+                            >
+                              {cls.liquidity}
+                            </span>
+                            <span
+                              className="tag"
+                              style={{ background: "#f1f5f9", color: "#475569" }}
+                            >
+                              {cls.risk}
+                            </span>
+                            <span
+                              className="tag"
+                              style={{ background: "#f0fdf4", color: "#16a34a" }}
+                            >
+                              {cls.return}% gross
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      {ASSET_CLASSES.filter((cls) => !activeAssetIds.includes(cls.id)).length === 0 && (
+                        <div
+                          style={{
+                            gridColumn: "1/-1",
+                            textAlign: "center",
+                            padding: 40,
+                            color: "#94a3b8",
+                            fontSize: 13,
+                          }}
+                        >
+                          ✅ Semua instrumen sudah aktif di portofoliomu!
+                        </div>
                       )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1242,9 +1618,8 @@ export default function WealthTracker() {
                       style={{
                         flex: 1,
                         accentColor: "#ef4444",
-                        background: `linear-gradient(to right,#ef4444 ${
-                          ((inflationRate - 1) / 14) * 100
-                        }%,#e2e8f0 0%)`,
+                        background: `linear-gradient(to right,#ef4444 ${((inflationRate - 1) / 14) * 100
+                          }%,#e2e8f0 0%)`,
                       }}
                     />
                     <span
@@ -1340,7 +1715,7 @@ export default function WealthTracker() {
                       marginBottom: 8,
                     }}
                   >
-                    Target Kekayaan (FIRE)
+                    Target Kekayaan
                   </label>
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 10 }}
@@ -1477,7 +1852,7 @@ export default function WealthTracker() {
                     y={fireTarget}
                     label={{
                       position: "top",
-                      value: "Target FIRE",
+                      value: "Target",
                       fill: "#8b5cf6",
                       fontSize: 11,
                       fontWeight: "bold",
@@ -1771,8 +2146,8 @@ export default function WealthTracker() {
                             +
                             {d.isUSD
                               ? `$${new Intl.NumberFormat("en-US").format(
-                                  monthlyContribs[d.id]
-                                )}`
+                                monthlyContribs[d.id]
+                              )}`
                               : formatCompact(monthlyContribs[d.id] || 0)}
                             /bln
                           </span>
@@ -1955,8 +2330,8 @@ export default function WealthTracker() {
                         monthlyExpense === 0
                           ? ""
                           : new Intl.NumberFormat("id-ID").format(
-                              monthlyExpense
-                            )
+                            monthlyExpense
+                          )
                       }
                       onChange={handleExpenseInput}
                       placeholder="0"
@@ -2024,9 +2399,8 @@ export default function WealthTracker() {
                       style={{
                         flex: 1,
                         accentColor: "#6366f1",
-                        background: `linear-gradient(to right,#6366f1 ${
-                          ((targetMonths - 3) / 9) * 100
-                        }%,#e2e8f0 0%)`,
+                        background: `linear-gradient(to right,#6366f1 ${((targetMonths - 3) / 9) * 100
+                          }%,#e2e8f0 0%)`,
                       }}
                     />
                     <span
@@ -2177,6 +2551,88 @@ export default function WealthTracker() {
           dengan penasihat keuangan berlisensi.
         </div>
         <Analytics />
+
+        {/* ── CONFIRM DIALOG MODAL ── */}
+        {modalAction.isOpen && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0, left: 0, right: 0, bottom: 0,
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(15,23,42,0.6)",
+              backdropFilter: "blur(4px)",
+              padding: "16px"
+            }}
+            onClick={closeModal}
+          >
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "16px",
+                boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
+                width: "100%",
+                maxWidth: "360px",
+                padding: "24px",
+                textAlign: "center"
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>
+                {modalAction.type === "delete" ? "🗑️" : "🔄"}
+              </div>
+              <p style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", lineHeight: 1.65, marginBottom: "22px", fontFamily: "'DM Sans',sans-serif" }}>
+                {modalAction.title}
+              </p>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button
+                  onClick={() => {
+                    if (modalAction.type === "delete") {
+                      setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
+                      if (activeTemplateId === modalAction.targetId) setActiveTemplateId(null);
+                    } else if (modalAction.type === "update") {
+                      setUserTemplates((prev) =>
+                        prev.map((t) => {
+                          if (t.id === modalAction.targetId) {
+                            return {
+                              ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
+                              activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
+                              targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
+                            };
+                          }
+                          return t;
+                        })
+                      );
+                    }
+                    closeModal();
+                  }}
+                  style={{
+                    padding: "9px 22px", borderRadius: "8px", border: "none",
+                    background: modalAction.type === "delete" ? "#ef4444" : "linear-gradient(135deg,#2563eb,#4f46e5)",
+                    color: "#fff", fontWeight: 700, fontSize: "13px",
+                    cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                    boxShadow: modalAction.type === "delete" ? "0 4px 12px rgba(239,68,68,.35)" : "0 4px 12px rgba(37,99,235,.35)"
+                  }}
+                >
+                  {modalAction.type === "delete" ? "🗑️ Hapus" : "🔄 Ya, Update"}
+                </button>
+                <button
+                  onClick={closeModal}
+                  style={{
+                    padding: "9px 22px", borderRadius: "8px", border: "1.5px solid #e2e8f0",
+                    background: "#f1f5f9", color: "#475569", fontWeight: 700, fontSize: "13px",
+                    cursor: "pointer", fontFamily: "'DM Sans',sans-serif"
+                  }}
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
