@@ -1536,7 +1536,7 @@ export default function WealthTracker() {
                   inset: 0,
                   background: "rgba(15,23,42,0.55)",
                   backdropFilter: "blur(4px)",
-                  zIndex: 200,
+                  zIndex: 8000,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
