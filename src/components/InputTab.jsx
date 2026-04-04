@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function InputTab({
   // Global & Asset Data
@@ -46,6 +46,43 @@ export default function InputTab({
   const [rawContribs, setRawContribs] = useState({});
   const [rawExpense, setRawExpense] = useState("");
   const [editingAssetId, setEditingAssetId] = useState(null);
+  const [draftAsset, setDraftAsset] = useState(0);
+  const [draftContrib, setDraftContrib] = useState(0);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false); // STATE BARU
+
+  // Initialize draft when modal opens
+  useEffect(() => {
+    if (editingAssetId !== null) {
+      setDraftAsset(assets[editingAssetId] || 0);
+      setDraftContrib(monthlyContribs[editingAssetId] || 0);
+    }
+  }, [editingAssetId]);
+
+  const handleDraftStep = (dir, isUSD) => {
+    const step = isUSD ? 50 : 50000;
+    const max = isUSD ? 100000 : 1000000000;
+    setDraftAsset((prev) => Math.max(0, Math.min(prev + step * dir, max)));
+  };
+
+  const handleDraftContribStep = (dir, isUSD) => {
+    const step = isUSD ? 50 : 50000;
+    const max = 100000000;
+    setDraftContrib((prev) => Math.max(0, Math.min(prev + step * dir, max)));
+  };
+
+  const handleCloseModal = () => {
+    if (editingAssetId === null) return;
+    const hasChanged =
+      draftAsset !== (assets[editingAssetId] || 0) ||
+      draftContrib !== (monthlyContribs[editingAssetId] || 0);
+
+    if (hasChanged) {
+      // Panggil pop-up kustom, bukan bawaan browser
+      setShowDiscardConfirm(true);
+    } else {
+      setEditingAssetId(null);
+    }
+  };
 
   // Derived logic for Emergency Fund tiering
   const t1Months = 1;
@@ -284,7 +321,7 @@ export default function InputTab({
         {/* ── FLOATING MODAL EDITOR ── */}
         {editingAssetId && (
           <div
-            onClick={() => setEditingAssetId(null)}
+            onClick={handleCloseModal}
             style={{
               position: "fixed",
               inset: 0,
@@ -328,10 +365,10 @@ export default function InputTab({
                 const cls = ASSET_CLASSES.find((c) => c.id === editingAssetId);
                 if (!cls) return null;
 
-                const raw = assets[cls.id] || 0;
+                const raw = draftAsset;
                 const idr = cls.isUSD ? raw * USD_RATE : raw;
                 const netR = afterTaxReturn(cls).toFixed(1);
-                const mc = monthlyContribs[cls.id] || 0;
+                const mc = draftContrib;
 
                 return (
                   <>
@@ -378,7 +415,7 @@ export default function InputTab({
                         </p>
                       </div>
                       <button
-                        onClick={() => setEditingAssetId(null)}
+                        onClick={handleCloseModal}
                         style={{
                           background: "none",
                           border: "none",
@@ -432,9 +469,9 @@ export default function InputTab({
                             value={
                               rawInputs[cls.id] !== undefined
                                 ? rawInputs[cls.id]
-                                : raw === 0
+                                : draftAsset === 0
                                   ? ""
-                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(raw)
+                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(draftAsset)
                             }
                             onChange={(e) => {
                               const formatted = formatWhileTyping(e.target.value);
@@ -444,7 +481,7 @@ export default function InputTab({
                               const result = parseExpression(e.target.value);
                               if (result !== null) {
                                 const max = cls.isUSD ? 100000 : 1000000000;
-                                setAssets((prev) => ({ ...prev, [cls.id]: Math.min(result, max) }));
+                                setDraftAsset(Math.min(result, max));
                               }
                               setRawInputs((prev) => {
                                 const n = { ...prev };
@@ -467,10 +504,10 @@ export default function InputTab({
                               gap: 6,
                             }}
                           >
-                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleStep(cls.id, -1)}>
+                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleDraftStep(-1, cls.isUSD)}>
                               −
                             </button>
-                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleStep(cls.id, 1)}>
+                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleDraftStep(1, cls.isUSD)}>
                               +
                             </button>
                           </div>
@@ -515,9 +552,9 @@ export default function InputTab({
                             value={
                               rawContribs[cls.id] !== undefined
                                 ? rawContribs[cls.id]
-                                : mc === 0
+                                : draftContrib === 0
                                   ? ""
-                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(mc)
+                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(draftContrib)
                             }
                             onChange={(e) => {
                               const formatted = formatWhileTyping(e.target.value);
@@ -526,10 +563,7 @@ export default function InputTab({
                             onBlur={(e) => {
                               const result = parseExpression(e.target.value);
                               if (result !== null) {
-                                setMonthlyContribs((prev) => ({
-                                  ...prev,
-                                  [cls.id]: Math.min(result, 100000000),
-                                }));
+                                setDraftContrib(Math.min(result, 100000000));
                               }
                               setRawContribs((prev) => {
                                 const n = { ...prev };
@@ -552,10 +586,10 @@ export default function InputTab({
                               gap: 6,
                             }}
                           >
-                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleContribStep(cls.id, -1)}>
+                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleDraftContribStep(-1, cls.isUSD)}>
                               −
                             </button>
-                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleContribStep(cls.id, 1)}>
+                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleDraftContribStep(1, cls.isUSD)}>
                               +
                             </button>
                           </div>
@@ -599,7 +633,11 @@ export default function InputTab({
                       {/* Footer Actions */}
                       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
                         <button
-                          onClick={() => setEditingAssetId(null)}
+                          onClick={() => {
+                            setAssets((prev) => ({ ...prev, [cls.id]: draftAsset }));
+                            setMonthlyContribs((prev) => ({ ...prev, [cls.id]: draftContrib }));
+                            setEditingAssetId(null);
+                          }}
                           style={{
                             padding: "16px",
                             borderRadius: 12,
@@ -638,7 +676,7 @@ export default function InputTab({
                             gap: 8,
                           }}
                         >
-                          🗑️ Hapus dari Portofolio
+                          Hapus dari Portofolio
                         </button>
                       </div>
                     </div>
@@ -1184,6 +1222,67 @@ export default function InputTab({
       >
         + Instrumen Baru
       </button>
+      {/* ── STYLED CONFIRMATION POPUP (Mirrored exactly from App.jsx) ── */}
+      {showDiscardConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: tokens.colors.overlay,
+            backdropFilter: "blur(4px)",
+            padding: "16px",
+            WebkitTapHighlightColor: "transparent"
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: tokens.colors.surface.card,
+              borderRadius: "16px",
+              boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
+              width: "100%",
+              maxWidth: "360px",
+              padding: "16px",
+              textAlign: "center"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+              Angka yang kamu ubah belum disimpan. Yakin ingin membuang perubahan ini?
+            </p>
+            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+              <button
+                onClick={() => setShowDiscardConfirm(false)}
+                style={{
+                  flex: 1,
+                  padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                  background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                }}
+              >
+                Lanjut Edit
+              </button>
+              <button
+                onClick={() => {
+                  setEditingAssetId(null);
+                  setShowDiscardConfirm(false);
+                }}
+                style={{
+                  flex: 1,
+                  padding: "12px 0", borderRadius: "8px", border: "none",
+                  background: tokens.colors.semantic.danger, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                }}
+              >
+                Ya, Buang
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
