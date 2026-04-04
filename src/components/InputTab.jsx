@@ -458,7 +458,6 @@ export default function InputTab({
                           <input
                             type="text"
                             className="ifield"
-                            autoFocus
                             style={{
                               paddingLeft: 42,
                               height: 52,
@@ -510,6 +509,9 @@ export default function InputTab({
                             <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleDraftStep(1, cls.isUSD)}>
                               +
                             </button>
+                          </div>
+                          <div style={{ fontSize: "11px", color: tokens.colors.text.tertiary, marginTop: "6px", marginLeft: "4px" }}>
+                            Bisa operasi matematika (+ dan -)
                           </div>
                         </div>
                       </div>
