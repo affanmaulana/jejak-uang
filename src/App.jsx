@@ -685,31 +685,25 @@ export default function WealthTracker() {
         .cl { font-size:10px; font-weight:700; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
-/* Matikan semua outline pada elemen Recharts secara paksa */
+/* Matikan SEMUA kemungkinan outline pada elemen Recharts */
         .recharts-wrapper, 
         .recharts-surface, 
-        .recharts-container,
-        .recharts-tooltip-wrapper,
-        path.recharts-rectangle,
-        path.recharts-sector,
-        .recharts-dot {
-            outline: none !important;
-            -webkit-appearance: none !important;
-            -webkit-tap-highlight-color: transparent !important;
-            user-select: none !important;
+        .recharts-wrapper *, 
+        svg, 
+        path, 
+        rect {
+          outline: none !important;
+          -webkit-tap-highlight-color: transparent !important;
+          -webkit-focus-ring-color: transparent !important;
+          user-select: none !important;
         }
 
-        /* Reset global untuk menghilangkan highlight saat klik di mobile */
-        * {
-            -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-            -webkit-tap-highlight-color: transparent !important;
+        /* Tambahan khusus untuk mobile agar tidak ada box biru/hitam saat ditekan */
+        *:focus, *:active {
+          outline: none !important;
+          -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
         }
-
-        /* Tambahan untuk SVG agar tidak fokus saat disentuh */
-        svg:focus {
-            outline: none !important;
-        }
-        /* ── Stat scroll strip ── */
+          /* ── Stat scroll strip ── */
         .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 8px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .stat-strip::-webkit-scrollbar { display:none; }
         /* ── Profile row (naked) ── */
