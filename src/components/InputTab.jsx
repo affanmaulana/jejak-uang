@@ -1002,9 +1002,8 @@ export default function InputTab({
                     }}
                     onBlur={(e) => {
                       const result = parseExpression(e.target.value);
-                      if (result !== null) {
-                        setMonthlyExpense(Math.min(result, 1000000000));
-                      }
+                      // Jika result null (kosong/dihapus), paksa jadi 0
+                      setMonthlyExpense(result !== null ? Math.min(result, 1000000000) : 0);
                       setRawExpense("");
                     }}
                     onKeyDown={(e) => {
