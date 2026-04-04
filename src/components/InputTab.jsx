@@ -1122,93 +1122,73 @@ export default function InputTab({
             </div>
           </div>
 
-          {/* BARIS 2: TIERING CARDS (Non-editable) */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-              gap: 12,
-            }}
-          >
-            {/* Card Lapis 1: Cash/Bank */}
-            <div
-              className="card"
-              style={{ padding: "16px 20px", borderTop: `6px solid ${tokens.colors.dataViz.cash}` }}
-            >
-              <div
-                style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}
-              >
-                Lapis 1 ({t1Months} Bulan) - Cash / Bank
+          {/* BARIS 2: TIERING CARDS (Compact, Read-Only Style) */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+
+            {/* ── Lapis 1: Cash/Bank ── */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px",
+              background: tokens.colors.surface.card, borderRadius: 16,
+              border: `1px solid ${tokens.colors.border.subtle}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+                {/* Indikator Warna Sesuai Token DataViz */}
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.cash, flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 1: Cash / Bank</span>
+                  <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t1Months} Bulan • Likuiditas Instan</span>
+                </div>
               </div>
-              <div
-                style={{
-                  fontFamily: tokens.typography.fontFamily,
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: tokens.colors.text.primary,
-                  margin: "6px 0",
-                }}
-              >
-                {formatIDR(monthlyExpense * t1Months)}
-              </div>
-              <div style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>
-                Untuk likuiditas instan H-0. Hindari instrumen fluktuatif.
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
+                  {formatIDR(monthlyExpense * t1Months)}
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}>Target Dana</div>
               </div>
             </div>
 
-            {/* Card Lapis 2: Bank Digital */}
-            <div
-              className="card"
-              style={{ padding: "16px 20px", borderTop: `6px solid ${tokens.colors.dataViz.digitalBank}` }}
-            >
-              <div
-                style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}
-              >
-                Lapis 2 ({t2Months} Bulan) - Bank Digital
+            {/* ── Lapis 2: Bank Digital ── */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px",
+              background: tokens.colors.surface.card, borderRadius: 16,
+              border: `1px solid ${tokens.colors.border.subtle}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.digitalBank, flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 2: Bank Digital</span>
+                  <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t2Months} Bulan • Yield Lebih Baik</span>
+                </div>
               </div>
-              <div
-                style={{
-                  fontFamily: tokens.typography.fontFamily,
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: tokens.colors.text.primary,
-                  margin: "6px 0",
-                }}
-              >
-                {formatIDR(monthlyExpense * t2Months)}
-              </div>
-              <div style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>
-                Likuiditas tinggi dengan yield lebih baik dari bank
-                konvensional.
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
+                  {formatIDR(monthlyExpense * t2Months)}
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}>Target Dana</div>
               </div>
             </div>
 
-            {/* Card Lapis 3: RDPU */}
-            <div
-              className="card"
-              style={{ padding: "16px 20px", borderTop: `6px solid ${tokens.colors.dataViz.rdpu}` }}
-            >
-              <div
-                style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}
-              >
-                Lapis 3 ({t3Months} Bulan) - RDPU
+            {/* ── Lapis 3: RDPU ── */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px",
+              background: tokens.colors.surface.card, borderRadius: 16,
+              border: `1px solid ${tokens.colors.border.subtle}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.rdpu, flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 3: RDPU</span>
+                  <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t3Months} Bulan • Pelindung Inflasi</span>
+                </div>
               </div>
-              <div
-                style={{
-                  fontFamily: tokens.typography.fontFamily,
-                  fontSize: 20,
-                  fontWeight: 800,
-                  color: tokens.colors.text.primary,
-                  margin: "6px 0",
-                }}
-              >
-                {formatIDR(monthlyExpense * t3Months)}
-              </div>
-              <div style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>
-                Pelindung nilai dari inflasi. Pencairan memakan waktu 1-3 hari
-                kerja.
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
+                  {formatIDR(monthlyExpense * t3Months)}
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}>Target Dana</div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
