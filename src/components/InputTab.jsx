@@ -44,7 +44,7 @@ export default function InputTab({
   // INTERNAL STATES (as requested)
   const [rawInputs, setRawInputs] = useState({});
   const [rawContribs, setRawContribs] = useState({});
-  const [rawExpense, setRawExpense] = useState("");
+  const [rawExpense, setRawExpense] = useState(undefined);
   const [editingAssetId, setEditingAssetId] = useState(null);
   const [draftAsset, setDraftAsset] = useState(0);
   const [draftContrib, setDraftContrib] = useState(0);
@@ -990,7 +990,7 @@ export default function InputTab({
                     type="text"
                     className="ifield"
                     value={
-                      rawExpense !== ""
+                      rawExpense !== undefined
                         ? rawExpense
                         : monthlyExpense === 0
                           ? ""
@@ -1002,9 +1002,10 @@ export default function InputTab({
                     }}
                     onBlur={(e) => {
                       const result = parseExpression(e.target.value);
-                      // Jika result null (kosong/dihapus), paksa jadi 0
+                      // Paksa jadi 0 kalau user menghapus habis angkanya
                       setMonthlyExpense(result !== null ? Math.min(result, 1000000000) : 0);
-                      setRawExpense("");
+                      // Kembalikan ke undefined agar React tahu kita berhenti ngedit
+                      setRawExpense(undefined);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") e.target.blur();
