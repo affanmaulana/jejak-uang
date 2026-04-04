@@ -677,7 +677,7 @@ export default function WealthTracker() {
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
 /* ── Stat scroll strip ── */
-        .stat-strip { display:flex; flex-direction:row; gap:10px; overflow-x:auto; margin: 0 -16px 20px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 8px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .stat-strip::-webkit-scrollbar { display:none; }
         /* ── Profile row (naked) ── */
         .profile-row { display:flex; flex-wrap:nowrap; gap:10px; overflow-x:auto; margin: 0 -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
@@ -704,7 +704,7 @@ export default function WealthTracker() {
     z-index:1000;
     width:auto;
     height:auto;
-    border-radius:999px;
+    border-radius:12px;
     background: #0f172a;
     border: none;
     cursor:pointer;
@@ -723,7 +723,7 @@ export default function WealthTracker() {
     background: #fff;
     backdrop-filter: blur(12px);
     border: 1.5px solid ${tokens.colors.border.subtle};
-    border-radius: 24px;
+    border-radius: 20px;
     display:flex;
     padding:8px;
     gap:4px;
@@ -735,7 +735,7 @@ export default function WealthTracker() {
     font-size:14px;
     font-weight: 700;
     padding:12px 4px;
-    border-radius: 16px; 
+    border-radius: 12px; 
   }
   .mobile-bottom-spacer { height:4px; }
 }
@@ -777,7 +777,7 @@ export default function WealthTracker() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: 12,
-            marginBottom: 20,
+            marginBottom: 16,
             flexWrap: "wrap",
           }}
         >
@@ -796,7 +796,6 @@ export default function WealthTracker() {
                 width: "fit-content",
               }}
             >
-              <span style={{ fontSize: 13 }}>{stats.realReturn >= 0 ? "✅" : "⚠️"}</span>
               <span
                 style={{
                   fontSize: 13,
@@ -829,7 +828,7 @@ export default function WealthTracker() {
           {/* RIGHT: Total Aset */}
           <div style={{ textAlign: "right" }}>
             <div style={{ ...tokens.typography.eyebrow, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
-              Total Aset (IDR)
+              Total Aset
             </div>
             <div
               style={{
@@ -917,7 +916,7 @@ export default function WealthTracker() {
         </div>
 
         {/* ── PROFIL ALOKASI KAMU (naked, selalu tampil) ── */}
-        <div style={{ marginBottom: 14 }}>
+        <div style={{ marginBottom: 8 }}>
           <div
             style={{
               ...tokens.typography.eyebrow,
@@ -1106,7 +1105,7 @@ export default function WealthTracker() {
           style={{
             display: "flex",
             gap: 4,
-            marginBottom: 18,
+            marginBottom: 8,
             background: tokens.colors.surface.input,
             border: `1.5px solid ${tokens.colors.border.subtle}`,
             borderRadius: 10,
@@ -1160,7 +1159,7 @@ export default function WealthTracker() {
                   alignItems: "center",
                   gap: 8,
                   padding: "8px 16px",
-                  borderRadius: 999,
+                  borderRadius: 12,
                   border: "none",
                   fontWeight: 700,
                   fontSize: 13,
@@ -1173,7 +1172,7 @@ export default function WealthTracker() {
                 }}
               >
                 <span style={{ fontSize: 18, lineHeight: 1 }}>＋</span>
-                Tambah Instrumen Baru
+                Instrumen Baru
               </button>
             </div>
 
@@ -1225,7 +1224,7 @@ export default function WealthTracker() {
                     alignItems: "center",
                     gap: 8,
                     padding: "12px 28px",
-                    borderRadius: 999,
+                    borderRadius: 12,
                     border: "none",
                     fontWeight: 800,
                     fontSize: 14,
