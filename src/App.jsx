@@ -685,6 +685,10 @@ export default function WealthTracker() {
         .cl { font-size:10px; font-weight:700; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+        .recharts-wrapper:focus { outline: none !important; }
+        .recharts-surface:focus { outline: none !important; }
+        path:focus { outline: none !important; }
+        * { -webkit-tap-highlight-color: transparent; }
 /* ── Stat scroll strip ── */
         .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 8px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .stat-strip::-webkit-scrollbar { display:none; }
