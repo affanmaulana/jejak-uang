@@ -49,6 +49,8 @@ export default function InputTab({
   const [draftAsset, setDraftAsset] = useState(0);
   const [draftContrib, setDraftContrib] = useState(0);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false); // STATE BARU
+  // Tambahkan di bawah showDiscardConfirm (Sekitar baris 46)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Initialize draft when modal opens
   useEffect(() => {
@@ -660,10 +662,7 @@ export default function InputTab({
                         </button>
 
                         <button
-                          onClick={() => {
-                            removeAsset(cls.id);
-                            setEditingAssetId(null);
-                          }}
+                          onClick={() => setShowDeleteConfirm(true)} // Pemicu pop-up kustom
                           style={{
                             padding: "12px",
                             borderRadius: 12,
@@ -1261,6 +1260,57 @@ export default function InputTab({
                 }}
               >
                 Ya, Buang
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── STYLED DELETE CONFIRMATION POPUP ── */}
+      {showDeleteConfirm && (
+        <div
+          style={{
+            position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 10000, // Lebih tinggi dari modal editor
+            display: "flex", alignItems: "center", justifyContent: "center",
+            backgroundColor: tokens.colors.overlay, backdropFilter: "blur(4px)", padding: "16px",
+            WebkitTapHighlightColor: "transparent"
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: tokens.colors.surface.card, borderRadius: "16px",
+              boxShadow: "0 24px 50px rgba(0,0,0,0.2)", width: "100%", maxWidth: "360px",
+              padding: "20px", textAlign: "center"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+              Hapus <strong>{ASSET_CLASSES.find(c => c.id === editingAssetId)?.name}</strong> dari portofolio? Semua data nilai dan kontribusi akan hilang permanen.
+            </p>
+            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  flex: 1, padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                  background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  removeAsset(editingAssetId);
+                  setEditingAssetId(null);
+                  setShowDeleteConfirm(false);
+                }}
+                style={{
+                  flex: 1, padding: "12px 0", borderRadius: "8px", border: "none",
+                  background: tokens.colors.semantic.danger, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                }}
+              >
+                Ya, Hapus
               </button>
             </div>
           </div>
