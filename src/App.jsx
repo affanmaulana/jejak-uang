@@ -709,7 +709,7 @@ export default function WealthTracker() {
           box-shadow: none !important;
         }
           /* ── Stat scroll strip ── */
-        .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 8px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 12px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .stat-strip::-webkit-scrollbar { display:none; }
         /* ── Profile row (naked) ── */
         .profile-row { display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; margin: 0 -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
@@ -967,7 +967,7 @@ export default function WealthTracker() {
               ...tokens.typography.eyebrow,
               fontSize: 11,
               color: tokens.colors.text.tertiary,
-              marginBottom: 10,
+              marginBottom: 12,
             }}
           >
             Profil Alokasi Kamu
@@ -1150,7 +1150,7 @@ export default function WealthTracker() {
           style={{
             display: "flex",
             gap: 4,
-            marginBottom: 8,
+            marginBottom: 12,
             background: tokens.colors.surface.input,
             border: `1.5px solid ${tokens.colors.border.subtle}`,
             borderRadius: 10,

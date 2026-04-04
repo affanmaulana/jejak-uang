@@ -45,6 +45,7 @@ export default function InputTab({
   const [rawInputs, setRawInputs] = useState({});
   const [rawContribs, setRawContribs] = useState({});
   const [rawExpense, setRawExpense] = useState("");
+  const [editingAssetId, setEditingAssetId] = useState(null);
 
   // Derived logic for Emergency Fund tiering
   const t1Months = 1;
@@ -166,313 +167,485 @@ export default function InputTab({
             </button>
           </div>
         ) : (
-          /* ── ACTIVE ASSET CARDS GRID ── */
-          <div className="asset-grid">
+          /* ── COMPACT LIST OF ASSETS ── */
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
             {ASSET_CLASSES.filter((cls) => activeAssetIds.includes(cls.id)).map((cls) => {
               const raw = assets[cls.id] || 0;
               const idr = cls.isUSD ? raw * USD_RATE : raw;
-              const pct =
-                totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
-              const netR = afterTaxReturn(cls).toFixed(1);
-              const mc = monthlyContribs[cls.id] || 0;
+              const pct = totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
 
               return (
                 <div
                   key={cls.id}
-                  className="card"
+                  onClick={() => setEditingAssetId(cls.id)}
                   style={{
-                    padding: 16,
-                    borderTop: `6px solid ${cls.color}`,
-                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "16px 16px",
+                    background: tokens.colors.surface.card,
+                    borderRadius: 16,
+                    cursor: "pointer",
+                    boxShadow: tokens.shadows.small || "0 2px 8px rgba(0,0,0,0.05)",
+                    border: `1px solid ${tokens.colors.border.subtle}`,
+                    transition: "transform 0.15s, border-color 0.15s",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = tokens.colors.border.input;
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                    e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
-                  {/* Header */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      marginBottom: 10,
-                    }}
-                  >
-                    <div style={{ flex: 1, paddingRight: 12 }}>
-                      <div
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+                    <div
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        background: cls.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span
                         style={{
-                          fontWeight: 700,
                           fontSize: 14,
+                          fontWeight: 700,
                           color: tokens.colors.text.primary,
                         }}
                       >
                         {cls.name}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: tokens.colors.text.tertiary,
+                        }}
+                      >
+                        {tokens.typography.fontFamily.includes("Inter") ? "Portfolio Component" : cls.risk}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                    <div style={{ textAlign: "right" }}>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 800,
+                          color: tokens.colors.text.primary,
+                          fontFamily: tokens.typography.fontFamily,
+                        }}
+                      >
+                        {formatIDR(idr)}
                       </div>
                       <div
                         style={{
                           fontSize: 11,
-                          color: tokens.colors.text.tertiary,
-                          marginTop: 2,
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {cls.description}
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: tokens.typography.fontFamily,
-                          fontWeight: 800,
-                          fontSize: 16,
+                          fontWeight: 700,
                           color: cls.color,
                         }}
                       >
                         {pct}%
-                      </span>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        background: tokens.colors.surface.app,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        style={{ width: 18, height: 18, color: tokens.colors.text.secondary }}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── FLOATING MODAL EDITOR ── */}
+        {editingAssetId && (
+          <div
+            onClick={() => setEditingAssetId(null)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: tokens.colors.overlay,
+              backdropFilter: "blur(4px)",
+              zIndex: 9000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <style>
+              {`
+                @media (max-width: 768px) {
+                  .floating-modal-container {
+                    align-self: flex-end !important;
+                    margin: 16px !important;
+                    width: calc(100% - 32px) !important;
+                    border-radius: 20px !important;
+                  }
+                }
+              `}
+            </style>
+            <div
+              className="floating-modal-container"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: tokens.colors.surface.card,
+                borderRadius: 20,
+                boxShadow: "0 24px 60px rgba(15, 23, 42, 0.3)",
+                width: "100%",
+                maxWidth: 480,
+                maxHeight: "90vh",
+                overflowY: "auto",
+                display: "flex",
+                flexDirection: "column",
+                position: "relative",
+              }}
+            >
+              {(() => {
+                const cls = ASSET_CLASSES.find((c) => c.id === editingAssetId);
+                if (!cls) return null;
+
+                const raw = assets[cls.id] || 0;
+                const idr = cls.isUSD ? raw * USD_RATE : raw;
+                const netR = afterTaxReturn(cls).toFixed(1);
+                const mc = monthlyContribs[cls.id] || 0;
+
+                return (
+                  <>
+                    {/* Header */}
+                    <div
+                      style={{
+                        padding: "20px 24px 16px",
+                        borderBottom: `1px solid ${tokens.colors.border.subtle}`,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                          <div
+                            style={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              background: cls.color,
+                            }}
+                          />
+                          <h3
+                            style={{
+                              margin: 0,
+                              fontSize: 18,
+                              fontWeight: 800,
+                              color: tokens.colors.text.primary,
+                            }}
+                          >
+                            Edit {cls.name}
+                          </h3>
+                        </div>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 13,
+                            color: tokens.colors.text.tertiary,
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {cls.description}
+                        </p>
+                      </div>
                       <button
-                        onClick={() => removeAsset(cls.id)}
-                        title={`Hapus ${cls.name}`}
-                        className="p-1 hover:text-red-500 transition-colors rounded-md"
+                        onClick={() => setEditingAssetId(null)}
                         style={{
                           background: "none",
                           border: "none",
                           cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: tokens.colors.text.tertiary,
-                          lineHeight: 1,
                           fontSize: 20,
+                          color: tokens.colors.text.tertiary,
                         }}
                       >
                         ✕
                       </button>
                     </div>
-                  </div>
 
-                  {/* Tags */}
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 6,
-                      marginBottom: 10,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <span
-                      className="tag"
-                      style={{
-                        background: `${cls.color}18`,
-                        color: cls.color,
-                      }}
-                    >
-                      Likuid: {cls.liquidity}
-                    </span>
-                    <span
-                      className="tag"
-                      style={{ background: tokens.colors.surface.input, color: tokens.colors.text.secondary }}
-                    >
-                      Risiko: {cls.risk}
-                    </span>
-                  </div>
+                    {/* Content */}
+                    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+                      {/* Nilai Aset */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <label
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: tokens.colors.text.secondary,
+                          }}
+                        >
+                          Berapa total nilai {cls.name} saat ini?
+                        </label>
+                        <div style={{ position: "relative" }}>
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: 14,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: tokens.colors.text.tertiary,
+                              fontWeight: 700,
+                              fontSize: 14,
+                            }}
+                          >
+                            {cls.isUSD ? "$" : "Rp"}
+                          </span>
+                          <input
+                            type="text"
+                            className="ifield"
+                            autoFocus
+                            style={{
+                              paddingLeft: 42,
+                              height: 52,
+                              fontSize: 18,
+                              fontWeight: 800,
+                              background: tokens.colors.surface.app,
+                            }}
+                            value={
+                              rawInputs[cls.id] !== undefined
+                                ? rawInputs[cls.id]
+                                : raw === 0
+                                  ? ""
+                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(raw)
+                            }
+                            onChange={(e) => {
+                              const formatted = formatWhileTyping(e.target.value);
+                              setRawInputs((prev) => ({ ...prev, [cls.id]: formatted }));
+                            }}
+                            onBlur={(e) => {
+                              const result = parseExpression(e.target.value);
+                              if (result !== null) {
+                                const max = cls.isUSD ? 100000 : 1000000000;
+                                setAssets((prev) => ({ ...prev, [cls.id]: Math.min(result, max) }));
+                              }
+                              setRawInputs((prev) => {
+                                const n = { ...prev };
+                                delete n[cls.id];
+                                return n;
+                              });
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.target.blur();
+                            }}
+                            placeholder="0"
+                          />
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: 10,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              display: "flex",
+                              gap: 6,
+                            }}
+                          >
+                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleStep(cls.id, -1)}>
+                              −
+                            </button>
+                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleStep(cls.id, 1)}>
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
-                  {/* ── NILAI ASET ── */}
-                  <div className="cl">Nilai Aset</div>
-                  <div style={{ position: "relative", marginBottom: 8 }}>
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: 10,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: tokens.colors.text.tertiary,
-                        fontSize: 12,
-                        fontFamily: tokens.typography.fontFamily,
-                      }}
-                    >
-                      {cls.isUSD ? "$" : "Rp"}
-                    </span>
-                    <input
-                      type="text"
-                      className="ifield"
-                      value={rawInputs[cls.id] !== undefined
-                        ? rawInputs[cls.id]
-                        : raw === 0 ? "" : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(raw)
-                      }
-                      onChange={(e) => {
-                        const formatted = formatWhileTyping(e.target.value);
-                        setRawInputs((prev) => ({ ...prev, [cls.id]: formatted }));
-                      }}
-                      onBlur={(e) => {
-                        const result = parseExpression(e.target.value);
-                        if (result !== null) {
-                          const cls2 = ASSET_CLASSES.find((c) => c.id === cls.id);
-                          const max = cls2.isUSD ? 100000 : 1000000000;
-                          setAssets((prev) => ({ ...prev, [cls.id]: Math.min(result, max) }));
-                        }
-                        setRawInputs((prev) => { const n = { ...prev }; delete n[cls.id]; return n; });
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") e.target.blur();
-                      }}
-                      placeholder="0"
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: 6,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        display: "flex",
-                        gap: 4,
-                      }}
-                    >
-                      <button
-                        className="stepbtn"
-                        onClick={() => handleStep(cls.id, -1)}
-                      >
-                        −
-                      </button>
-                      <button
-                        className="stepbtn"
-                        onClick={() => handleStep(cls.id, 1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4, letterSpacing: ".01em" }}>
-                    Bisa operasi matematika (+ dan -)
-                  </div>
+                      {/* Kontribusi Bulanan */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <label
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: tokens.colors.text.secondary,
+                          }}
+                        >
+                          Tambahan investasi rutin setiap bulan (DCA)?
+                        </label>
+                        <div style={{ position: "relative" }}>
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: 14,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              color: tokens.colors.text.tertiary,
+                              fontWeight: 700,
+                              fontSize: 13,
+                            }}
+                          >
+                            {cls.isUSD ? "$" : "Rp"}
+                          </span>
+                          <input
+                            type="text"
+                            className="ifield"
+                            style={{
+                              paddingLeft: 42,
+                              height: 48,
+                              fontSize: 16,
+                              fontWeight: 700,
+                              background: tokens.colors.surface.app,
+                            }}
+                            value={
+                              rawContribs[cls.id] !== undefined
+                                ? rawContribs[cls.id]
+                                : mc === 0
+                                  ? ""
+                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(mc)
+                            }
+                            onChange={(e) => {
+                              const formatted = formatWhileTyping(e.target.value);
+                              setRawContribs((prev) => ({ ...prev, [cls.id]: formatted }));
+                            }}
+                            onBlur={(e) => {
+                              const result = parseExpression(e.target.value);
+                              if (result !== null) {
+                                setMonthlyContribs((prev) => ({
+                                  ...prev,
+                                  [cls.id]: Math.min(result, 100000000),
+                                }));
+                              }
+                              setRawContribs((prev) => {
+                                const n = { ...prev };
+                                delete n[cls.id];
+                                return n;
+                              });
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.target.blur();
+                            }}
+                            placeholder="0"
+                          />
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: 10,
+                              top: "50%",
+                              transform: "translateY(-50%)",
+                              display: "flex",
+                              gap: 6,
+                            }}
+                          >
+                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleContribStep(cls.id, -1)}>
+                              −
+                            </button>
+                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleContribStep(cls.id, 1)}>
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
-                  {/* ── KONTRIBUSI BULANAN ── */}
-                  <div className="contrib-row">
-                    <div className="cl" style={{ color: tokens.colors.dataViz.bonds }}>
-                      + Kontribusi Rutin / Bulan
-                    </div>
-                    <div style={{ position: "relative" }}>
-                      <span
-                        style={{
-                          position: "absolute",
-                          left: 10,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: tokens.colors.text.tertiary,
-                          fontSize: 11,
-                          fontFamily: tokens.typography.fontFamily,
-                        }}
-                      >
-                        {cls.isUSD ? "$" : "Rp"}
-                      </span>
-                      <input
-                        type="text"
-                        className="ifield-sm"
-                        value={rawContribs[cls.id] !== undefined
-                          ? rawContribs[cls.id]
-                          : mc === 0 ? "" : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(mc)
-                        }
-                        onChange={(e) => {
-                          const formatted = formatWhileTyping(e.target.value);
-                          setRawContribs((prev) => ({ ...prev, [cls.id]: formatted }));
-                        }}
-                        onBlur={(e) => {
-                          const result = parseExpression(e.target.value);
-                          if (result !== null) {
-                            setMonthlyContribs((prev) => ({ ...prev, [cls.id]: Math.min(result, 100000000) }));
-                          }
-                          setRawContribs((prev) => { const n = { ...prev }; delete n[cls.id]; return n; });
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") e.target.blur();
-                        }}
-                        placeholder="0"
-                      />
+                      {/* Summary Info */}
                       <div
                         style={{
-                          position: "absolute",
-                          right: 6,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          display: "flex",
-                          gap: 3,
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: 12,
+                          background: tokens.colors.surface.app,
+                          padding: "8px 16px",
+                          borderRadius: 12,
                         }}
                       >
+                        <div>
+                          <div style={{ fontSize: 11, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
+                            Proyeksi Imbal Hasil
+                          </div>
+                          <div style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
+                            <span style={{ fontSize: 16, fontWeight: 800, color: tokens.colors.semantic.success }}>
+                              {netR}%
+                            </span>
+                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>net / thn</span>
+                          </div>
+                        </div>
+                        {cls.isUSD && idr > 0 && (
+                          <div style={{ textAlign: "right" }}>
+                            <div style={{ fontSize: 11, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
+                              Setara Rupiah
+                            </div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                              {formatCompact(idr)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
                         <button
-                          className="stepbtn-sm"
-                          onClick={() => handleContribStep(cls.id, -1)}
+                          onClick={() => setEditingAssetId(null)}
+                          style={{
+                            padding: "16px",
+                            borderRadius: 12,
+                            border: "none",
+                            background: tokens.colors.semantic.brand,
+                            color: tokens.colors.surface.card,
+                            fontWeight: 800,
+                            fontSize: 16,
+                            cursor: "pointer",
+                            boxShadow: tokens.shadows.medium,
+                            transition: "transform 0.15s",
+                          }}
+                          onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+                          onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
                         >
-                          −
+                          Simpan & Kembali
                         </button>
+
                         <button
-                          className="stepbtn-sm"
-                          onClick={() => handleContribStep(cls.id, 1)}
+                          onClick={() => {
+                            removeAsset(cls.id);
+                            setEditingAssetId(null);
+                          }}
+                          style={{
+                            padding: "12px",
+                            borderRadius: 12,
+                            border: `1.5px solid ${tokens.colors.border.subtle}`,
+                            background: "none",
+                            color: tokens.colors.semantic.danger,
+                            fontWeight: 700,
+                            fontSize: 13,
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 8,
+                          }}
                         >
-                          +
+                          🗑️ Hapus dari Portofolio
                         </button>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Return info */}
-                  <div
-                    style={{
-                      marginTop: 10,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      flexWrap: "wrap",
-                      gap: 6,
-                      fontSize: 11,
-                      borderTop: `1px solid ${tokens.colors.surface.input}`,
-                      paddingTop: 8,
-                    }}
-                  >
-                    <span>
-                      <span style={{ color: tokens.colors.text.tertiary }}>Gross: </span>
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          fontFamily: tokens.typography.fontFamily,
-                          color: tokens.colors.text.secondary,
-                        }}
-                      >
-                        {cls.return}%
-                      </span>
-                    </span>
-                    <span>
-                      <span style={{ color: tokens.colors.text.tertiary }}>After-Tax: </span>
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          fontFamily: tokens.typography.fontFamily,
-                          color: tokens.colors.semantic.success,
-                        }}
-                      >
-                        {netR}%
-                      </span>
-                    </span>
-                    {cls.isUSD && idr > 0 && (
-                      <span>
-                        <span style={{ color: tokens.colors.text.tertiary }}>≈ </span>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            fontFamily: tokens.typography.fontFamily,
-                            color: tokens.colors.semantic.warning,
-                          }}
-                        >
-                          {formatCompact(idr)}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                  </>
+                );
+              })()}
+            </div>
           </div>
         )}
 
