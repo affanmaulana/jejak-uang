@@ -220,6 +220,7 @@ export default function ProjectionTab({
           <ComposedChart
             data={chartData}
             margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
+            style={{ outline: "none", WebkitTapHighlightColor: "transparent", userSelect: "none", touchAction: "manipulation" }}
           >
             <defs>
               <linearGradient id="lg_portfolio" x1="0" y1="0" x2="0" y2="1">
