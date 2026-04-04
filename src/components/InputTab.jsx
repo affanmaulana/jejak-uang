@@ -661,8 +661,10 @@ export default function InputTab({
 
                         <button
                           onClick={() => {
-                            removeAsset(cls.id);
-                            setEditingAssetId(null);
+                            if (window.confirm(`Hapus ${cls.name} dari portofolio? Semua data nilai dan kontribusi instrumen ini akan terhapus secara permanen.`)) {
+                              removeAsset(cls.id);
+                              setEditingAssetId(null);
+                            }
                           }}
                           style={{
                             padding: "12px",
