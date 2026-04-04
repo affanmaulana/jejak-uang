@@ -639,6 +639,7 @@ export default function WealthTracker() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         * { box-sizing:border-box; }
+        body, html { margin: 0; padding: 0; background: #f8fafc; overflow-x: hidden; }
         button, input, select, textarea { font-family: inherit; }
         :root {
           --color-surface-app: ${tokens.colors.surface.app};
@@ -1898,7 +1899,6 @@ export default function WealthTracker() {
                   </div>
                 </div>
 
-                {/* ---> LETAKKAN KODE DI SINI, SEBAGAI ELEMEN KE-4 <--- */}
                 <div>
                   <label
                     style={{
@@ -1933,7 +1933,7 @@ export default function WealthTracker() {
               </div>
             </div>
 
-            {/* Chart */}
+            {/* Chart Section */}
             <div className="card" style={{ padding: 20 }}>
               <div
                 style={{
@@ -1941,7 +1941,7 @@ export default function WealthTracker() {
                   display: "flex",
                   justifyContent: "space-between",
                   flexWrap: "wrap",
-                  gap: 8,
+                  gap: 12,
                 }}
               >
                 <div>
@@ -1965,6 +1965,30 @@ export default function WealthTracker() {
                     Nominal · Nilai Riil · Garis Inflasi
                   </p>
                 </div>
+
+                {/* Legend Row */}
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+                  {[
+                    { label: "Portofolio Nominal", color: tokens.colors.semantic.success, dashed: false },
+                    { label: "Nilai Riil", color: tokens.colors.semantic.brand, dashed: false },
+                    { label: "Garis Inflasi", color: tokens.colors.semantic.danger, dashed: true },
+                  ].map((leg, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div
+                        style={{
+                          width: 24,
+                          height: leg.dashed ? 0 : 3,
+                          borderRadius: 3,
+                          background: leg.dashed ? "transparent" : leg.color,
+                          borderTop: leg.dashed ? `2.5px dashed ${leg.color}` : "none",
+                        }}
+                      />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                        {leg.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <ResponsiveContainer width="100%" height={320}>
@@ -1973,42 +1997,16 @@ export default function WealthTracker() {
                   margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
                 >
                   <defs>
-                    <linearGradient
-                      id="lg_portfolio"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor={tokens.colors.semantic.success}
-                        stopOpacity={0.15}
-                      />
+                    <linearGradient id="lg_portfolio" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={tokens.colors.semantic.success} stopOpacity={0.15} />
                       <stop offset="95%" stopColor={tokens.colors.semantic.success} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={tokens.colors.surface.input}
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="year"
-                    stroke={tokens.colors.border.input}
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    tickFormatter={formatCompact}
-                    stroke={tokens.colors.border.input}
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                    dx={-5}
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke={tokens.colors.surface.input} vertical={false} />
+                  <XAxis dataKey="year" stroke={tokens.colors.border.input} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis tickFormatter={formatCompact} stroke={tokens.colors.border.input} fontSize={11} tickLine={false} axisLine={false} dx={-5} />
                   <Tooltip
+                    itemSorter={(item) => -item.value}
                     formatter={(v, name) => [formatIDR(v), name]}
                     contentStyle={{
                       background: tokens.colors.surface.card,
@@ -2019,193 +2017,115 @@ export default function WealthTracker() {
                     }}
                     labelStyle={{ color: tokens.colors.text.tertiary, fontSize: 11 }}
                   />
-                  <Area
-                    type="monotone"
-                    dataKey="portfolio"
-                    name="Portofolio Nominal"
-                    stroke={tokens.colors.semantic.success}
-                    strokeWidth={2.5}
-                    fill="url(#lg_portfolio)"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="real"
-                    name="Nilai Riil (Daya Beli)"
-                    stroke={tokens.colors.semantic.brand}
-                    strokeWidth={3}
-                    dot={false}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="inflation"
-                    name="Garis Inflasi"
-                    stroke={tokens.colors.semantic.danger}
-                    strokeWidth={2}
-                    strokeDasharray="4 4"
-                    dot={false}
-                  />
+                  <Area type="monotone" dataKey="portfolio" name="Portofolio Nominal" stroke={tokens.colors.semantic.success} strokeWidth={2.5} fill="url(#lg_portfolio)" />
+                  <Line type="monotone" dataKey="real" name="Nilai Riil (Daya Beli)" stroke={tokens.colors.semantic.brand} strokeWidth={3} dot={false} />
+                  <Line type="monotone" dataKey="inflation" name="Garis Inflasi" stroke={tokens.colors.semantic.danger} strokeWidth={2} strokeDasharray="4 4" dot={false} />
                   <ReferenceLine
                     y={fireTarget}
-                    label={{
-                      position: "top",
-                      value: "Target",
-                      fill: tokens.colors.dataViz.rdpu,
-                      fontSize: 11,
-                      fontWeight: "bold",
-                    }}
+                    label={{ position: "top", value: "Target", fill: tokens.colors.dataViz.rdpu, fontSize: 11, fontWeight: "bold" }}
                     stroke={tokens.colors.dataViz.rdpu}
                     strokeDasharray="3 3"
                   />
                 </ComposedChart>
               </ResponsiveContainer>
 
-              {/* Legenda penjelasan */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))",
-                  gap: 8,
-                  marginTop: 14,
-                }}
-              >
-                {[
-                  {
-                    color: tokens.colors.semantic.success,
-                    label: "Portofolio Nominal",
-                    desc: "Nilai rupiah portofolio di masa depan (belum dikoreksi inflasi).",
-                  },
-                  {
-                    color: tokens.colors.semantic.brand,
-                    label: "Nilai Riil (Daya Beli)",
-                    desc: 'Setara "uang sekarang". Ini yang benar-benar bisa kamu beli di masa depan.',
-                  },
-                  {
-                    color: tokens.colors.semantic.danger,
-                    label: "Garis Inflasi",
-                    desc: "Jika aset cuma mengikuti inflasi — tidak tumbuh, tidak menyusut secara riil.",
-                  },
-                ].map((g, i) => (
+              {/* Year 10 Scorecards */}
+              {chartData.length > 0 && (() => {
+                const last = chartData[chartData.length - 1];
+                return (
                   <div
-                    key={i}
-                    className="card2"
-                    style={{ padding: "10px 12px" }}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+                      gap: 12,
+                      marginTop: 20,
+                    }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                        marginBottom: 4,
-                      }}
-                    >
+                    {[
+                      { label: "Nominal", value: formatCompact(last.portfolio), color: tokens.colors.semantic.success },
+                      { label: "Nilai Riil", value: formatCompact(last.real), color: tokens.colors.semantic.brand },
+                      { label: "Inflasi", value: formatCompact(last.inflation), color: tokens.colors.semantic.danger },
+                    ].map((s, i) => (
                       <div
+                        key={i}
                         style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          background: g.color,
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: g.color,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          background: tokens.colors.surface.card,
+                          borderRadius: 12,
+                          padding: "16px 20px",
+                          border: `1.5px solid ${tokens.colors.border.subtle}`,
                         }}
                       >
-                        {g.label}
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: tokens.colors.text.secondary,
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {g.desc}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Year 10 summary */}
-              {chartData.length > 0 &&
-                (() => {
-                  const last = chartData[chartData.length - 1];
-                  return (
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(3,1fr)",
-                        gap: 10,
-                        marginTop: 12,
-                      }}
-                    >
-                      {[
-                        {
-                          label: "Nominal (Thn 10)",
-                          value: formatCompact(last.portfolio),
-                          color: tokens.colors.semantic.success,
-                        },
-                        {
-                          label: "Nilai Riil (Thn 10)",
-                          value: formatCompact(last.real),
-                          color: tokens.colors.semantic.brand,
-                        },
-                        {
-                          label: "Garis Inflasi (Thn 10)",
-                          value: formatCompact(last.inflation),
-                          color: tokens.colors.semantic.danger,
-                        },
-                      ].map((s, i) => (
-                        <div
-                          key={i}
-                          className="card2"
-                          style={{ padding: "10px 14px" }}
-                        >
-                          <div
-                            style={{
-                              fontSize: 10,
-                              color: tokens.colors.text.tertiary,
-                              marginBottom: 4,
-                            }}
-                          >
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: s.color, textTransform: "uppercase", letterSpacing: ".05em" }}>
                             {s.label}
                           </div>
-                          <div
-                            style={{
-                              fontFamily: tokens.typography.fontFamily,
-                              fontSize: 15,
-                              fontWeight: 800,
-                              color: s.color,
-                            }}
-                          >
-                            {s.value}
+                          <div style={{ fontSize: 12, fontWeight: 500, color: tokens.colors.text.tertiary, marginTop: 2 }}>
+                            Tahun ke-10
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  );
-                })()}
+                        <div style={{ fontFamily: tokens.typography.fontFamily, fontSize: 24, fontWeight: 800, color: s.color }}>
+                          {s.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
 
-            <div className="note">
-              💡{" "}
-              <strong>
-                Kenapa "Nilai Riil" selalu lebih rendah dari nominal?
-              </strong>
-              <br />
-              Karena inflasi menggerus daya beli uang seiring waktu. Contoh:
-              portofolio nominal Rp 300Jt di tahun ke-10, dengan inflasi 5%/thn,
-              setara hanya <em>~Rp 184Jt uang hari ini</em>. "Nilai Riil" itulah
-              angka yang jujur — apakah kamu benar-benar menang melawan inflasi
-              atau tidak?
-              <br />
-              <strong>Nilai Riil di atas Garis Inflasi</strong> = kamu
-              benar-benar kaya secara riil. ✅
-            </div>
+            {/* Explanation Boxes */}
+            {chartData.length > 0 && (() => {
+              const last = chartData[chartData.length - 1];
+              const isWinning = last.real >= last.inflation;
+              return (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+                    gap: 16,
+                    marginTop: 16,
+                  }}
+                >
+                  <div className="card" style={{ padding: 18, background: tokens.colors.surface.card }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, marginBottom: 8 }}>
+                      Mengapa riil selalu lebih rendah?
+                    </div>
+                    <div style={{ fontSize: 12, color: tokens.colors.text.secondary, lineHeight: 1.6 }}>
+                      Inflasi menggerus daya beli — {formatCompact(300000000)} di thn ke-10 setara hanya ~{formatCompact(184000000)} uang hari ini. "Nilai Riil" adalah angka jujur yang sudah dikoreksi inflasi.
+                    </div>
+                  </div>
+
+                  <div
+                    className="card"
+                    style={{
+                      padding: 18,
+                      background: isWinning ? tokens.colors.semantic.successBg : tokens.colors.semantic.dangerBg,
+                      borderColor: isWinning ? tokens.colors.semantic.successBorder : tokens.colors.semantic.dangerBorder,
+                    }}
+                  >
+                    <div style={{
+                      fontSize: 14,
+                      fontWeight: 800,
+                      color: isWinning ? tokens.colors.semantic.success : tokens.colors.semantic.danger,
+                      marginBottom: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6
+                    }}>
+                      {isWinning ? "Kamu menang vs inflasi" : "Kekayaan tergerus inflasi"} {isWinning ? "✅" : "❌"}
+                    </div>
+                    <div style={{ fontSize: 12, color: isWinning ? tokens.colors.semantic.success : tokens.colors.semantic.danger, lineHeight: 1.6, opacity: 0.8 }}>
+                      {isWinning
+                        ? "Nilai Riil di atas Garis Inflasi = kekayaan nyata bertambah secara riil."
+                        : "Nilai Riil di bawah Garis Inflasi = pertumbuhan asetmu tidak cukup menutupi kenaikan harga barang."}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
