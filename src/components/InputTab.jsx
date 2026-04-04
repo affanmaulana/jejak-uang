@@ -510,9 +510,10 @@ export default function InputTab({
                               +
                             </button>
                           </div>
-                          <div style={{ fontSize: "11px", color: tokens.colors.text.tertiary, marginTop: "6px", marginLeft: "4px" }}>
-                            Bisa operasi matematika (+ dan -)
-                          </div>
+
+                        </div>
+                        <div style={{ fontSize: "11px", color: tokens.colors.text.tertiary, marginLeft: "4px" }}>
+                          Bisa operasi matematika (+ dan -)
                         </div>
                       </div>
 
