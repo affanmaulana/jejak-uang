@@ -25,6 +25,7 @@ const tokens = {
       input: '#F1F5F9',
       active: '#E2E8F0',
     },
+    overlay: 'rgba(15, 23, 42, 0.6)',
     border: {
       subtle: '#E2E8F0',
       input: '#CBD5E1',
@@ -57,8 +58,13 @@ const tokens = {
       rdSaham: '#fb7185',
     },
   },
+  shadows: {
+    soft: "0 4px 12px rgba(15, 23, 42, 0.08)",
+    medium: "0 8px 24px rgba(15, 23, 42, 0.12)",
+    strong: "0 12px 32px rgba(15, 23, 42, 0.18)",
+  },
   typography: {
-    fontFamily: "'Plus Jakarta Sans', 'DM Sans', 'Segoe UI', sans-serif",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
     display: { fontSize: '48px', fontWeight: 700, lineHeight: '1.1', letterSpacing: '-0.02em' },
     h1: { fontSize: '32px', fontWeight: 700, lineHeight: '1.2', letterSpacing: '-0.01em' },
     h2: { fontSize: '24px', fontWeight: 600, lineHeight: '1.3', letterSpacing: '0' },
@@ -207,10 +213,12 @@ const formatIDR = (v) =>
   }).format(v);
 
 const formatCompact = (v) => {
-  if (v >= 1e12) return `Rp ${(v / 1e12).toFixed(1)}T`;
-  if (v >= 1e9) return `Rp ${(v / 1e9).toFixed(1)}M`;
-  if (v >= 1e6) return `Rp ${(v / 1e6).toFixed(1)}Jt`;
-  return `Rp ${Math.round(v)}`;
+  const abs = Math.abs(v);
+  const sign = v < 0 ? "-" : "";
+  if (abs >= 1e12) return `${sign}Rp ${(abs / 1e12).toFixed(2)}T`;
+  if (abs >= 1e9) return `${sign}Rp ${(abs / 1e9).toFixed(1)}M`;
+  if (abs >= 1e6) return `${sign}Rp ${(abs / 1e6).toFixed(1)}Jt`;
+  return `${sign}Rp ${Math.round(abs).toLocaleString("id-ID")}`;
 };
 
 const parseExpression = (str) => {
@@ -629,8 +637,9 @@ export default function WealthTracker() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         * { box-sizing:border-box; }
+        button, input, select, textarea { font-family: inherit; }
         :root {
           --color-surface-app: ${tokens.colors.surface.app};
           --color-surface-card: ${tokens.colors.surface.card};
@@ -649,8 +658,8 @@ export default function WealthTracker() {
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:var(--color-border-input); border-radius:4px; }
         input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
-        input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid #fff; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:0 1px 4px rgba(0,0,0,.18); }
+        input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:0 1px 4px rgba(0,0,0,.18); }
         .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; }
         .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
@@ -662,11 +671,11 @@ export default function WealthTracker() {
         .stepbtn:hover { background:var(--color-border-subtle); color:var(--color-text-primary); border-color:var(--color-border-input); }
         .stepbtn-sm { width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:5px; cursor:pointer; font-size:13px; transition:all .15s; }
         .stepbtn-sm:hover { background:var(--color-border-subtle); color:var(--color-text-primary); }
-        .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); }
+        .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); font-family:var(--font-family); }
         .tab:hover { color:var(--color-text-secondary); }
-        .tab.on { background:var(--color-brand); color: ${tokens.colors.surface.card}; box-shadow:0 4px 12px rgba(15,23,42,.15); }
+        .tab.on { background:var(--color-brand); color: var(--color-surface-card); box-shadow:0 4px 12px rgba(15,23,42,.15); }
         .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
-        .tmplbtn:hover { border-color:var(--color-border-active); color: ${tokens.colors.semantic.brand}; background: ${tokens.colors.surface.active}; }
+        .tmplbtn:hover { border-color:var(--color-border-active); color: var(--color-brand); background: var(--color-surface-active); }
         .warn { background: ${tokens.colors.semantic.dangerBg}; border:1.5px solid ${tokens.colors.semantic.dangerBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-danger); display:flex; align-items:center; gap:10px; }
         .ok   { background: ${tokens.colors.semantic.successBg}; border:1.5px solid ${tokens.colors.semantic.successBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
         .note { background: ${tokens.colors.surface.active}; border:1.5px solid ${tokens.colors.border.subtle}; border-radius:10px; padding:12px 14px; font-size:11.5px; color: ${tokens.colors.text.secondary}; margin-top:10px; line-height:1.65; }
@@ -680,7 +689,7 @@ export default function WealthTracker() {
         .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 8px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .stat-strip::-webkit-scrollbar { display:none; }
         /* ── Profile row (naked) ── */
-        .profile-row { display:flex; flex-wrap:nowrap; gap:10px; overflow-x:auto; margin: 0 -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .profile-row { display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; margin: 0 -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .profile-row::-webkit-scrollbar { display:none; }
         /* ── iOS-style toggle ── */
         .ios-toggle-wrap { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
@@ -705,35 +714,35 @@ export default function WealthTracker() {
     width:auto;
     height:auto;
     border-radius:12px;
-    background: #0f172a;
+    background: var(--color-brand);
     border: none;
     cursor:pointer;
-    font-size:16px;
+    font-size:14px;
     font-family: var(--font-family);
-    font-weight: 600;
-    color: #fff;
+    font-weight: 800;
+    color: var(--color-surface-card);
     transition:transform .15s;
-    box-shadow: 0 8px 24px rgba(15,23,42,.2);
+    box-shadow: ${tokens.shadows.medium};
   }
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
     position:fixed;
     bottom:8px; left:16px; right:16px;
     z-index:999;
-    background: #fff;
+    background: var(--color-surface-card);
     backdrop-filter: blur(12px);
     border: 1.5px solid ${tokens.colors.border.subtle};
     border-radius: 20px;
     display:flex;
     padding:8px;
     gap:4px;
-    box-shadow: 0 8px 24px rgba(15,23,42,.1);
+    box-shadow: ${tokens.shadows.medium};
   }
   .tab-bar-sticky .tab { 
     flex:1; 
     text-align:center; 
     font-size:14px;
-    font-weight: 700;
+    font-weight: 800;
     padding:12px 4px;
     border-radius: 12px; 
   }
@@ -871,11 +880,11 @@ export default function WealthTracker() {
               tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
             },
             {
-              label: "Stress Test (Bear)",
-              value: formatCompact(worstCase),
-              sub: "Ekuitas −30% crash scenario",
-              color: tokens.colors.semantic.warning,
-              tip: "Simulasi crash pasar: semua aset ekuitas turun 30% sekaligus. Ini nilai portofoliomu di skenario terburuk.",
+              label: "Worst Case",
+              value: formatCompact(worstCase - totalAssets),
+              sub: `Portofolio jadi ${formatCompact(worstCase)}`,
+              color: tokens.colors.semantic.danger,
+              tip: "Simulasi crash pasar: semua aset ekuitas turun 30% sekaligus. Ini potensi nilai kerugian (dalam minus) dan nilai akhir portofoliomu.",
             },
           ].map((s, i) => (
             <div key={i} className="stat">
@@ -890,7 +899,20 @@ export default function WealthTracker() {
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                   {s.label}
                   {s.tip && (
-                    <span title={s.tip} style={{ cursor: "help", display: "inline-flex" }}>
+                    <span
+                      title={s.tip}
+                      style={{ cursor: "help", display: "inline-flex" }}
+                      onClick={(e) => {
+                        if (window.innerWidth <= 768) {
+                          e.stopPropagation();
+                          setModalAction({
+                            isOpen: true,
+                            title: `${s.label}:\n${s.tip}`,
+                            type: "info"
+                          });
+                        }
+                      }}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                       </svg>
@@ -1166,9 +1188,9 @@ export default function WealthTracker() {
                   cursor: activeAssetIds.length >= ASSET_CLASSES.length ? "not-allowed" : "pointer",
                   background: activeAssetIds.length >= ASSET_CLASSES.length ? tokens.colors.surface.input : tokens.colors.semantic.brand,
                   color: activeAssetIds.length >= ASSET_CLASSES.length ? tokens.colors.text.tertiary : tokens.colors.surface.card,
-                  boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : "0 4px 12px rgba(15,23,42,.15)",
+                  boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : tokens.shadows.medium,
                   transition: "all .2s",
-                  fontFamily: "'DM Sans',sans-serif",
+                  fontFamily: tokens.typography.fontFamily,
                 }}
               >
                 <span style={{ fontSize: 18, lineHeight: 1 }}>＋</span>
@@ -1209,7 +1231,7 @@ export default function WealthTracker() {
                 <div
                   style={{
                     fontSize: 13,
-                    color: "#94a3b8",
+                    color: tokens.colors.text.tertiary,
                     marginBottom: 28,
                     maxWidth: 360,
                     lineHeight: 1.6,
@@ -1230,9 +1252,9 @@ export default function WealthTracker() {
                     fontSize: 14,
                     cursor: "pointer",
                     background: tokens.colors.semantic.brand,
-                    color: "#fff",
+                    color: tokens.colors.surface.card,
                     boxShadow: "0 8px 24px rgba(15,23,42,.15)",
-                    fontFamily: "'DM Sans',sans-serif",
+                    fontFamily: tokens.typography.fontFamily,
                     transition: "transform .15s",
                   }}
                   onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
@@ -1430,7 +1452,7 @@ export default function WealthTracker() {
 
                       {/* ── KONTRIBUSI BULANAN ── */}
                       <div className="contrib-row">
-                        <div className="cl" style={{ color: "#6366f1" }}>
+                        <div className="cl" style={{ color: tokens.colors.dataViz.bonds }}>
                           + Kontribusi Rutin / Bulan
                         </div>
                         <div style={{ position: "relative" }}>
@@ -1440,9 +1462,9 @@ export default function WealthTracker() {
                               left: 10,
                               top: "50%",
                               transform: "translateY(-50%)",
-                              color: "#94a3b8",
+                              color: tokens.colors.text.tertiary,
                               fontSize: 11,
-                              fontFamily: "DM Sans",
+                              fontFamily: tokens.typography.fontFamily,
                             }}
                           >
                             {cls.isUSD ? "$" : "Rp"}
@@ -1561,7 +1583,7 @@ export default function WealthTracker() {
                 style={{
                   position: "fixed",
                   inset: 0,
-                  background: "rgba(15,23,42,0.55)",
+                  background: tokens.colors.overlay,
                   backdropFilter: "blur(4px)",
                   zIndex: 8000,
                   display: "flex",
@@ -2436,38 +2458,23 @@ export default function WealthTracker() {
                 </h2>
 
                 {/* TOGGLE PENGGABUNGAN ASET */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    cursor: "pointer",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    id="toggleEmergency"
-                    checked={includeEmergencyInTotal}
-                    onChange={(e) => setIncludeEmergencyInTotal(e.target.checked)}
-                    style={{
-                      width: 15,
-                      height: 15,
-                      accentColor: tokens.colors.semantic.brand,
-                      cursor: "pointer",
-                      margin: 0,
-                    }}
-                  />
-                  <label
-                    htmlFor="toggleEmergency"
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: tokens.colors.text.secondary,
-                      cursor: "pointer",
-                      fontFamily: tokens.typography.fontFamily,
-                    }}
-                  >
-                    Gabungkan Target ke Total Aset & Proyeksi
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <label className="ios-toggle-wrap">
+                    <div
+                      className="ios-track"
+                      style={{ background: includeEmergencyInTotal ? tokens.colors.semantic.brand : tokens.colors.border.input }}
+                      onClick={() => setIncludeEmergencyInTotal((v) => !v)}
+                    >
+                      <div
+                        className="ios-thumb"
+                        style={{ transform: includeEmergencyInTotal ? "translateX(16px)" : "translateX(0)" }}
+                      />
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: tokens.colors.text.secondary, cursor: "pointer" }}
+                      onClick={() => setIncludeEmergencyInTotal((v) => !v)}
+                    >
+                      Gabungkan ke Total Aset
+                    </span>
                   </label>
                 </div>
               </div>
@@ -2733,16 +2740,12 @@ export default function WealthTracker() {
 
         {/* ── DISCLAIMER ── */}
         <div className="disc">
-          <strong>⚠️ Disclaimer:</strong> Kalkulator ini bersifat edukatif dan
-          tidak merupakan saran investasi. Asumsi return bersifat historis dan
-          tidak menjamin hasil masa depan. Return S&P 500 menggunakan rata-rata
-          historis jangka panjang (~10.5%/thn dalam USD, sudah termasuk estimasi
-          apresiasi kurs IDR). <strong>Emas:</strong> return bruto ~9%/thn
-          (historis IDR), biaya efektif ~1.5%/thn sudah diperhitungkan dalam
-          after-tax (mencakup spread fisik/digital 3.5–9% → ~1.25%/thn asumsi
-          hold 5thn, + PPh buyback 1.5% ber-NPWP → ~0.3%/thn, + admin ~0.1%/thn;
-          angka tengah fisik & digital). Konsultasikan keputusan investasi Anda
-          dengan penasihat keuangan berlisensi.
+          <strong>⚠️ Disclaimer:</strong> Seluruh perhitungan bersifat simulasi
+          edukatif berdasarkan data historis dan tidak menjamin hasil investasi di
+          masa depan. Angka return yang digunakan merupakan estimasi rata-rata
+          yang sudah disesuaikan dengan pajak (untuk After-tax) dan inflasi.
+          Selalu lakukan riset mandiri atau konsultasikan dengan penasihat
+          keuangan profesional sebelum mengambil keputusan investasi.
         </div>
 
         {/* ── MOBILE FAB ── */}
@@ -2787,7 +2790,7 @@ export default function WealthTracker() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "rgba(15,23,42,0.6)",
+              backgroundColor: tokens.colors.overlay,
               backdropFilter: "blur(4px)",
               padding: "16px"
             }}
@@ -2800,7 +2803,7 @@ export default function WealthTracker() {
                 boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
                 width: "100%",
                 maxWidth: "360px",
-                padding: "12px",
+                padding: "16px",
                 textAlign: "center"
               }}
               onClick={(e) => e.stopPropagation()}
@@ -2809,48 +2812,64 @@ export default function WealthTracker() {
                 {modalAction.title}
               </p>
               <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-                <button
-                  onClick={closeModal}
-                  style={{
-                    flex: 1,
-                    padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
-                    background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
-                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                  }}
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={() => {
-                    if (modalAction.type === "delete") {
-                      setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
-                      if (activeTemplateId === modalAction.targetId) setActiveTemplateId(null);
-                    } else if (modalAction.type === "update") {
-                      setUserTemplates((prev) =>
-                        prev.map((t) => {
-                          if (t.id === modalAction.targetId) {
-                            return {
-                              ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
-                              activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
-                              targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
-                            };
-                          }
-                          return t;
-                        })
-                      );
-                    }
-                    closeModal();
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "12px 0", borderRadius: "8px", border: "none",
-                    background: modalAction.type === "delete" ? tokens.colors.semantic.danger : tokens.colors.semantic.brand,
-                    color: "#fff", fontWeight: 700, fontSize: "14px",
-                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                  }}
-                >
-                  {modalAction.type === "delete" ? "Hapus" : "Ya, Update"}
-                </button>
+                {modalAction.type === "info" ? (
+                  <button
+                    onClick={closeModal}
+                    style={{
+                      width: "100%",
+                      padding: "14px 0", borderRadius: "10px", border: "none",
+                      background: tokens.colors.semantic.brand, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                      cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                    }}
+                  >
+                    Tutup
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={closeModal}
+                      style={{
+                        flex: 1,
+                        padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                        background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                        cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                      }}
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (modalAction.type === "delete") {
+                          setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
+                          if (activeTemplateId === modalAction.targetId) setActiveTemplateId(null);
+                        } else if (modalAction.type === "update") {
+                          setUserTemplates((prev) =>
+                            prev.map((t) => {
+                              if (t.id === modalAction.targetId) {
+                                return {
+                                  ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
+                                  activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
+                                  targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
+                                };
+                              }
+                              return t;
+                            })
+                          );
+                        }
+                        closeModal();
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: "12px 0", borderRadius: "8px", border: "none",
+                        background: modalAction.type === "delete" ? tokens.colors.semantic.danger : tokens.colors.semantic.brand,
+                        color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                        cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                      }}
+                    >
+                      {modalAction.type === "delete" ? "Hapus" : "Ya, Update"}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
