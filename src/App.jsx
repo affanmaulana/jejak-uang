@@ -1168,7 +1168,7 @@ export default function WealthTracker() {
                 marginBottom: 10,
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: tokens.colors.text.primary }}>
                 {activeAssetIds.length > 0
                   ? `${activeAssetIds.length} instrumen aktif`
                   : "Belum ada instrumen dipilih"}
