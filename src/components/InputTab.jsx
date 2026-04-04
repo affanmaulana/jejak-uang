@@ -246,7 +246,7 @@ export default function InputTab({
                         flexShrink: 0,
                       }}
                     />
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                       <span
                         style={{
                           fontSize: 14,
@@ -268,7 +268,7 @@ export default function InputTab({
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <div style={{ textAlign: "right" }}>
+                    <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: 4 }}>
                       <div
                         style={{
                           fontSize: 14,
@@ -1137,12 +1137,12 @@ export default function InputTab({
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                 {/* Indikator Warna Sesuai Token DataViz */}
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.cash, flexShrink: 0 }} />
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 1: Cash / Bank</span>
                   <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t1Months} Bulan • Likuiditas Instan</span>
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "right", gap: 4 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t1Months)}
                 </div>
@@ -1158,12 +1158,12 @@ export default function InputTab({
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.digitalBank, flexShrink: 0 }} />
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 2: Bank Digital</span>
                   <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t2Months} Bulan • Yield Lebih Baik</span>
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "right", gap: 4 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t2Months)}
                 </div>
@@ -1179,12 +1179,12 @@ export default function InputTab({
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.rdpu, flexShrink: 0 }} />
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 3: RDPU</span>
                   <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t3Months} Bulan • Pelindung Inflasi</span>
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "right", gap: 4 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t3Months)}
                 </div>
