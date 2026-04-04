@@ -48,6 +48,7 @@ export default function InputTab({
   const [editingAssetId, setEditingAssetId] = useState(null);
   const [draftAsset, setDraftAsset] = useState(0);
   const [draftContrib, setDraftContrib] = useState(0);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false); // STATE BARU
 
   // Initialize draft when modal opens
   useEffect(() => {
@@ -76,9 +77,8 @@ export default function InputTab({
       draftContrib !== (monthlyContribs[editingAssetId] || 0);
 
     if (hasChanged) {
-      if (window.confirm("Ada angka yang belum disimpan. Buang perubahan ini?")) {
-        setEditingAssetId(null);
-      }
+      // Panggil pop-up kustom, bukan bawaan browser
+      setShowDiscardConfirm(true);
     } else {
       setEditingAssetId(null);
     }
@@ -1222,6 +1222,67 @@ export default function InputTab({
       >
         + Instrumen Baru
       </button>
+      {/* ── STYLED CONFIRMATION POPUP (Mirrored exactly from App.jsx) ── */}
+      {showDiscardConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: tokens.colors.overlay,
+            backdropFilter: "blur(4px)",
+            padding: "16px",
+            WebkitTapHighlightColor: "transparent"
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: tokens.colors.surface.card,
+              borderRadius: "16px",
+              boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
+              width: "100%",
+              maxWidth: "360px",
+              padding: "16px",
+              textAlign: "center"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+              Angka yang kamu ubah belum disimpan. Yakin ingin membuang perubahan ini?
+            </p>
+            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+              <button
+                onClick={() => setShowDiscardConfirm(false)}
+                style={{
+                  flex: 1,
+                  padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
+                  background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                }}
+              >
+                Lanjut Edit
+              </button>
+              <button
+                onClick={() => {
+                  setEditingAssetId(null);
+                  setShowDiscardConfirm(false);
+                }}
+                style={{
+                  flex: 1,
+                  padding: "12px 0", borderRadius: "8px", border: "none",
+                  background: tokens.colors.semantic.danger, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                }}
+              >
+                Ya, Buang
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
