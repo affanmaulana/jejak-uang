@@ -376,6 +376,13 @@ export default function InputTab({
                   transform: translateY(1px) scale(0.96);
                   background: ${tokens.colors.surface.input};
                 }
+                  .floating-modal-container > div::-webkit-scrollbar {
+                  display: none;
+                }
+                .floating-modal-container > div {
+                  -ms-overflow-style: none;
+                  scrollbar-width: none;
+                }
               `}
             </style>
             <div
@@ -387,8 +394,8 @@ export default function InputTab({
                 boxShadow: "0 24px 60px rgba(15, 23, 42, 0.3)",
                 width: "100%",
                 maxWidth: 480,
-                maxHeight: "90vh",
-                overflowY: "auto",
+                maxHeight: "85vh",
+                overflow: "hidden",
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
@@ -410,6 +417,7 @@ export default function InputTab({
                       style={{
                         padding: "20px 24px 16px",
                         borderBottom: `1px solid ${tokens.colors.border.subtle}`,
+                        flexShrink: 0,
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "flex-start",
@@ -462,7 +470,7 @@ export default function InputTab({
                     </div>
 
                     {/* Content */}
-                    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div style={{ padding: "8px 24px 24px", display: "flex", flexDirection: "column", gap: 16, overflowY: "auto", flexGrow: 1 }}>
                       {/* Nilai Aset */}
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <label
