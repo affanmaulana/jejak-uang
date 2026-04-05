@@ -50,15 +50,31 @@ const tokens = {
       dangerBorder: '#FECACA',
     },
     dataViz: {
-      cash: '#14B8A6',
-      digitalBank: '#0EA5E9',
-      rdpu: '#8B5CF6',
-      bonds: '#6366F1',
-      localStocks: '#F43F5E',
-      sp500: '#3B82F6',
-      usd: '#10B981',
-      gold: '#EAB308',
-      rdSaham: '#fb7185',
+      // 🟩 KELOMPOK 1: KAS & VALAS (Nuansa Hijau/Teal - Likuiditas Instan)
+      cash: '#10B981',        // Emerald
+      digitalBank: '#14B8A6', // Teal
+      usd: '#0D9488',         // Dark Teal
+
+      // 🟦 KELOMPOK 2: PENDAPATAN TETAP (Nuansa Biru - Stabil)
+      sbnRitel: '#38BDF8',    // Light Sky Blue
+      obligasiFr: '#3B82F6',  // Blue
+      bonds: '#1D4ED8',       // Dark Blue (Reksadana Obligasi)
+
+      // 🟪 KELOMPOK 3: REKSADANA (Nuansa Ungu - Terkelola)
+      rdpu: '#C084FC',        // Light Purple
+      rdCampuran: '#A855F7',  // Purple
+      rdSaham: '#8B5CF6',     // Violet
+      rdpuUsd: '#5c0596', // Emerald Gelap (Turunan warna uang/USD)
+
+      // 🟥 KELOMPOK 4: SAHAM & ETF (Nuansa Oranye/Merah - Agresif)
+      localStocks: '#EF4444', // Red (Saham IDX)
+      sp500: '#F97316',       // Orange
+      nasdaq: '#F43F5E',      // Rose
+      usStocks: '#BE123C', // Rose Gelap (Kontras dari Saham Lokal & NASDAQ)
+
+      // 🟨 KELOMPOK 5: ALTERNATIF (Emas & Kripto)
+      gold: '#EAB308',        // Gold
+      kripto: '#4338CA',      // Indigo (Gelap & Kontras)
     },
   },
   shadows: {
@@ -106,6 +122,17 @@ const ASSET_CLASSES = [
       "Tabungan bank digital (Blu, Jago, dst). Bunga lebih tinggi, LPS terjamin.",
   },
   {
+    id: "sbn_ritel",
+    name: "SBN Ritel (ORI/SR/ST/SBR)",
+    description: "Surat Berharga Negara khusus ritel. Dijamin negara 100%.",
+    risk: "Sangat Rendah",
+    liquidity: "Rendah",
+    return: 6.0,
+    isEquity: false,
+    taxRate: 0.10,
+    color: tokens.colors.dataViz.sbnRitel,
+  },
+  {
     id: "rdpu",
     name: "Reksadana Pasar Uang",
     return: 5.1,
@@ -118,6 +145,43 @@ const ASSET_CLASSES = [
     description: "Reksa dana pasar uang. Stabil, cocok untuk dana darurat.",
   },
   {
+    id: "usd",
+    name: "Valas USD",
+    return: 3.5,
+    color: tokens.colors.dataViz.usd,
+    isEquity: false,
+    isUSD: true,
+    taxRate: 0,
+    liquidity: "T+0",
+    risk: "Sedang",
+    description:
+      "Simpanan USD. Return dari apresiasi kurs IDR/USD historis ~3–4%/tahun.",
+  },
+  {
+    id: "rdpu_usd",
+    name: "Reksadana Pasar Uang (USD)",
+    description: "Reksa dana pasar uang berdenominasi USD. Stabil dengan return mengikuti rate The Fed.",
+    risk: "Rendah",
+    liquidity: "Tinggi",
+    return: 4.8,
+    isEquity: false,
+    taxRate: 0,
+    color: tokens.colors.dataViz.rdpuUsd,
+    isUSD: false,
+    canSwitchCurrency: true,
+  },
+  {
+    id: "obligasi_fr",
+    name: "Obligasi FR",
+    description: "Obligasi negara yang dapat diperdagangkan di pasar sekunder. Risiko rendah.",
+    risk: "Rendah-Menengah",
+    liquidity: "Menengah",
+    return: 6.5,
+    isEquity: false,
+    taxRate: 0.10,
+    color: tokens.colors.dataViz.obligasiFr,
+  },
+  {
     id: "rdo",
     name: "Reksadana Obligasi",
     return: 6.5,
@@ -128,6 +192,45 @@ const ASSET_CLASSES = [
     liquidity: "T+2",
     risk: "Rendah–Sedang",
     description: "Reksa dana obligasi. Return lebih tinggi, sedikit fluktuasi.",
+  },
+  {
+    id: "gold",
+    name: "Emas / Gold",
+    return: 9.0,
+    color: tokens.colors.dataViz.gold,
+    isEquity: false,
+    isUSD: false,
+    taxRate: 0,
+    isGold: true,
+    liquidity: "T+1",
+    risk: "Sedang",
+    description:
+      "Emas fisik/digital (Antam, Pegadaian, dll). Return ~9%/thn IDR. Sudah dipotong biaya efektif ~1.5%/thn (spread + PPh buyback + admin).",
+  },
+  {
+    id: "rd_campuran",
+    name: "Reksadana Campuran",
+    description: "Kombinasi saham dan obligasi. Return moderat dengan risiko terukur.",
+    risk: "Menengah-Tinggi",
+    liquidity: "Tinggi",
+    return: 8.5,
+    isEquity: true,
+    taxRate: 0,
+    color: tokens.colors.dataViz.rdCampuran,
+  },
+  {
+    id: "sp500",
+    name: "S&P 500 ETF",
+    return: 10.5,
+    color: tokens.colors.dataViz.sp500,
+    isEquity: true,
+    isUSD: false,
+    canSwitchCurrency: true,
+    taxRate: 0.1,
+    liquidity: "T+2",
+    risk: "Tinggi",
+    description:
+      "Indeks saham AS. Return historis ~10% USD/tahun + estimasi apresiasi kurs IDR.",
   },
   {
     id: "rdSaham",
@@ -156,52 +259,45 @@ const ASSET_CLASSES = [
       "Saham IDX via LTS. Potensi return tinggi dengan volatilitas signifikan.",
   },
   {
-    id: "sp500",
-    name: "S&P 500 ETF",
-    return: 10.5,
-    color: tokens.colors.dataViz.sp500,
+    id: "nasdaq",
+    name: "NASDAQ 100 ETF",
+    description: "Indeks 100 perusahaan teknologi terbesar AS. Volatilitas tinggi.",
+    risk: "Sangat Tinggi",
+    liquidity: "Tinggi",
+    return: 15.0,
     isEquity: true,
+    taxRate: 0.10,
+    color: tokens.colors.dataViz.nasdaq,
     isUSD: false,
     canSwitchCurrency: true,
-    taxRate: 0.1,
-    liquidity: "T+2",
-    risk: "Tinggi",
-    description:
-      "Indeks saham AS. Return historis ~10% USD/tahun + estimasi apresiasi kurs IDR.",
   },
   {
-    id: "usd",
-    name: "Valas USD",
-    return: 3.5,
-    color: tokens.colors.dataViz.usd,
-    isEquity: false,
-    isUSD: true,
-    taxRate: 0,
-    liquidity: "T+0",
-    risk: "Sedang",
-    description:
-      "Simpanan USD. Return dari apresiasi kurs IDR/USD historis ~3–4%/tahun.",
-  },
-  {
-    id: "gold",
-    name: "Emas / Gold",
-    return: 9.0,
-    // Biaya efektif emas (angka tengah fisik & digital):
-    // - Spread fisik Antam ~9%, digital ~3.5% → rata-rata ~6.25% → /5thn hold = ~1.25%/thn
-    // - PPh buyback 1.5% (ber-NPWP) → /5thn = ~0.30%/thn
-    // - Biaya penyimpanan/admin digital ~0.10%/thn
-    // Total biaya efektif tahunan: ~1.65% → dibulatkan 1.5% (taxRate ~0.167 dari return 9%)
-    // Implementasi: afterTaxReturn mengurangi langsung 1.5% dari return
-    color: tokens.colors.dataViz.gold,
-    isEquity: false,
+    id: "us_stocks",
+    name: "Saham US Individu",
+    description: "Saham perusahaan Amerika Serikat secara spesifik (Apple, Microsoft, Tesla).",
+    risk: "Sangat Tinggi",
+    liquidity: "Tinggi",
+    return: 12.0,
+    isEquity: true,
+    taxRate: 0.10,
+    color: tokens.colors.dataViz.usStocks,
     isUSD: false,
-    taxRate: 0, // dihandle khusus di afterTaxReturn (bukan persentase dari return)
-    isGold: true, // flag khusus untuk logika biaya emas
-    liquidity: "T+1", // digital T+1, fisik bisa lebih lama
-    risk: "Sedang",
-    description:
-      "Emas fisik/digital (Antam, Pegadaian, dll). Return ~9%/thn IDR. Sudah dipotong biaya efektif ~1.5%/thn (spread + PPh buyback + admin).",
+    canSwitchCurrency: true,
   },
+  {
+    id: "kripto",
+    name: "Aset Kripto (BTC, ETH)",
+    description: "Aset digital desentralisasi. Volatilitas sangat ekstrem, potensi return eksponensial.",
+    risk: "Sangat Tinggi",
+    liquidity: "Sangat Tinggi",
+    return: 25.0,
+    isEquity: true,
+    taxRate: 0.0021, // Pajak kripto Indo: 0.1% PPh + 0.11% PPN
+    color: tokens.colors.dataViz.kripto,
+    isUSD: false,
+    canSwitchCurrency: true,
+  }
+
 ];
 
 const PROJECTION_YEARS = 10;
@@ -378,14 +474,21 @@ export default function WealthTracker() {
 
   const saveNewTemplate = () => {
     const trimmedName = templateNameInput.trim();
-    if (!trimmedName) return alert("Nama Profil wajib diisi.");
-    if (userTemplates.length >= 3) return alert("Maksimal 3 profil. Hapus profil lama untuk membuat yang baru.");
-    if (
-      userTemplates.some(
-        (t) => t.name.toLowerCase() === trimmedName.toLowerCase()
-      )
-    ) {
-      return alert("Nama template sudah digunakan.");
+
+    // Ganti alert() dengan pemanggilan modalAction tipe "info"
+    if (!trimmedName) {
+      setModalAction({ isOpen: true, title: "Nama Profil wajib diisi.", type: "info" });
+      return;
+    }
+
+    if (userTemplates.length >= 3) {
+      setModalAction({ isOpen: true, title: "Maksimal 3 profil. Hapus profil lama untuk membuat yang baru.", type: "info" });
+      return;
+    }
+
+    if (userTemplates.some((t) => t.name.toLowerCase() === trimmedName.toLowerCase())) {
+      setModalAction({ isOpen: true, title: "Nama template sudah digunakan.", type: "info" });
+      return;
     }
 
     const newTemplate = {
@@ -1155,7 +1258,7 @@ export default function WealthTracker() {
                   }}
                   onClick={saveNewTemplate}
                 >
-                  + Add
+                  Save
                 </button>
               </div>
             ) : (

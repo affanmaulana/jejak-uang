@@ -488,9 +488,9 @@ export default function InputTab({
                           border: `1.5px solid ${tokens.colors.border.subtle}`,
                           marginBottom: 4
                         }}>
-                          <div style={{ display: "flex", flexDirection: "column" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: tokens.colors.text.primary }}>Input dalam USD?</span>
-                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Ganti mata uang input aset ini</span>
+                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Ubah konversi USD-IDR di Instrumen 'Valas USD'</span>
                           </div>
                           <label className="ios-toggle-wrap">
                             <input
