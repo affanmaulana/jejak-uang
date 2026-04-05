@@ -805,7 +805,7 @@ export default function InputTab({
                               ? "*Incl. biaya spread & admin ~1.5%"
                               : cls.taxRate === 0
                                 ? "*Bebas pajak (0%)"
-                                : `*Sudah potong pajak/biaya ~${(cls.taxRate * 100) < 1 ? (cls.taxRate * 100).toFixed(1) : (cls.taxRate * 100).toFixed(0)}%`}
+                                : `*Include pajak/biaya ~${(cls.taxRate * 100) < 1 ? (cls.taxRate * 100).toFixed(1) : (cls.taxRate * 100).toFixed(0)}%`}
                           </div>
                         </div>
 
