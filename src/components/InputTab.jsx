@@ -776,31 +776,45 @@ export default function InputTab({
                       {/* Summary Info */}
                       <div
                         style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr",
-                          gap: 12,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                           background: tokens.colors.surface.app,
-                          padding: "8px 16px",
+                          padding: "16px",
                           borderRadius: 12,
+                          width: "100%",
+                          boxSizing: "border-box",
+                          gap: 16 // Kasih jarak aman jika ada elemen kanan
                         }}
                       >
-                        <div>
-                          <div style={{ fontSize: 11, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
-                            Proyeksi Imbal Hasil
+                        {/* THE FIX: flex: 1 memaksa kontainer ini memakan semua sisa ruang */}
+                        <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                          <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, whiteSpace: "nowrap" }}>
+                            Proyeksi Imbal Hasil (Net)
                           </div>
-                          <div style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
-                            <span style={{ fontSize: 16, fontWeight: 800, color: tokens.colors.semantic.success }}>
+                          <div style={{ display: "flex", gap: 6, alignItems: "baseline", flexWrap: "wrap" }}>
+                            <span style={{ fontSize: 18, fontWeight: 800, color: tokens.colors.semantic.success }}>
                               {netR}%
                             </span>
-                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>net / thn</span>
+                            <span style={{ fontSize: 12, color: tokens.colors.text.tertiary, whiteSpace: "nowrap" }}>/ thn</span>
+                          </div>
+
+                          {/* INFO PAJAK */}
+                          <div style={{ fontSize: 11, color: tokens.colors.text.tertiary, fontStyle: "italic", opacity: 0.8 }}>
+                            {cls.id === "gold"
+                              ? "*Incl. biaya spread & admin ~1.5%"
+                              : cls.taxRate === 0
+                                ? "*Bebas pajak (0%)"
+                                : `*Sudah potong pajak/biaya ~${(cls.taxRate * 100) < 1 ? (cls.taxRate * 100).toFixed(1) : (cls.taxRate * 100).toFixed(0)}%`}
                           </div>
                         </div>
+
                         {cls.isUSD && idr > 0 && (
-                          <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 11, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
+                          <div style={{ textAlign: "right", flexShrink: 0 }}>
+                            <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, marginBottom: 4, whiteSpace: "nowrap" }}>
                               Setara Rupiah
                             </div>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: tokens.colors.text.secondary }}>
                               {formatCompact(idr)}
                             </div>
                           </div>
