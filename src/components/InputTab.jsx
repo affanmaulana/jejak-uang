@@ -35,11 +35,12 @@ export default function InputTab({
   parseExpression,
   formatWhileTyping,
   afterTaxReturn,
+  customReturnOverrides,
+  setCustomReturnOverrides,
+  customDrawdowns,
+  setCustomDrawdowns,
   addAsset,
-  removeAsset,
-  handleStep,
-  handleContribStep,
-  handleExpenseStep
+  removeAsset
 }) {
   // INTERNAL STATES (as requested)
   const [rawInputs, setRawInputs] = useState({});
@@ -48,6 +49,9 @@ export default function InputTab({
   const [editingAssetId, setEditingAssetId] = useState(null);
   const [draftAsset, setDraftAsset] = useState(0);
   const [draftContrib, setDraftContrib] = useState(0);
+  const [draftReturn, setDraftReturn] = useState(0);
+  const [draftDrawdown, setDraftDrawdown] = useState(0);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false); // STATE BARU
   // Tambahkan di bawah showDiscardConfirm (Sekitar baris 46)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -55,28 +59,24 @@ export default function InputTab({
   // Initialize draft when modal opens
   useEffect(() => {
     if (editingAssetId !== null) {
+      const cls = ASSET_CLASSES.find(c => c.id === editingAssetId);
       setDraftAsset(assets[editingAssetId] || 0);
       setDraftContrib(monthlyContribs[editingAssetId] || 0);
+      setDraftReturn(customReturnOverrides[editingAssetId] ?? (cls?.return || 0));
+      setDraftDrawdown(customDrawdowns[editingAssetId] ?? (cls?.isEquity ? 30 : 0));
+      setShowAdvanced(false);
     }
   }, [editingAssetId]);
 
-  const handleDraftStep = (dir, isUSD) => {
-    const step = isUSD ? 50 : 50000;
-    const max = isUSD ? 100000 : 1000000000;
-    setDraftAsset((prev) => Math.max(0, Math.min(prev + step * dir, max)));
-  };
 
-  const handleDraftContribStep = (dir, isUSD) => {
-    const step = isUSD ? 50 : 50000;
-    const max = 100000000;
-    setDraftContrib((prev) => Math.max(0, Math.min(prev + step * dir, max)));
-  };
 
   const handleCloseModal = () => {
     if (editingAssetId === null) return;
     const hasChanged =
       draftAsset !== (assets[editingAssetId] || 0) ||
-      draftContrib !== (monthlyContribs[editingAssetId] || 0);
+      draftContrib !== (monthlyContribs[editingAssetId] || 0) ||
+      draftReturn !== (customReturnOverrides[editingAssetId] ?? (ASSET_CLASSES.find(c => c.id === editingAssetId)?.return || 0)) ||
+      draftDrawdown !== (customDrawdowns[editingAssetId] ?? (ASSET_CLASSES.find(c => c.id === editingAssetId)?.isEquity ? 30 : 0));
 
     if (hasChanged) {
       // Panggil pop-up kustom, bukan bawaan browser
@@ -345,6 +345,37 @@ export default function InputTab({
                     border-radius: 20px !important;
                   }
                 }
+                input[type=number]::-webkit-inner-spin-button,
+                input[type=number]::-webkit-outer-spin-button {
+                  -webkit-appearance: none;
+                  margin: 0;
+                }
+                input[type=number] {
+                  -moz-appearance: textfield;
+                }
+                .stepbtn {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-radius: 12px;
+                  border: 1.5px solid ${tokens.colors.border.subtle};
+                  background: ${tokens.colors.surface.card};
+                  color: ${tokens.colors.text.primary};
+                  font-weight: 800;
+                  cursor: pointer;
+                  transition: all 0.2s;
+                  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                  font-family: ${tokens.typography.fontFamily};
+                }
+                .stepbtn:hover {
+                  background: ${tokens.colors.surface.input};
+                  border-color: ${tokens.colors.border.input};
+                  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+                }
+                .stepbtn:active {
+                  transform: translateY(1px) scale(0.96);
+                  background: ${tokens.colors.surface.input};
+                }
               `}
             </style>
             <div
@@ -369,7 +400,7 @@ export default function InputTab({
 
                 const raw = draftAsset;
                 const idr = cls.isUSD ? raw * USD_RATE : raw;
-                const netR = afterTaxReturn(cls).toFixed(1);
+                const netR = afterTaxReturn(cls, draftReturn).toFixed(1);
                 const mc = draftContrib;
 
                 return (
@@ -495,23 +526,7 @@ export default function InputTab({
                             }}
                             placeholder="0"
                           />
-                          <div
-                            style={{
-                              position: "absolute",
-                              right: 10,
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                              display: "flex",
-                              gap: 6,
-                            }}
-                          >
-                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleDraftStep(-1, cls.isUSD)}>
-                              −
-                            </button>
-                            <button className="stepbtn" style={{ width: 34, height: 34 }} onClick={() => handleDraftStep(1, cls.isUSD)}>
-                              +
-                            </button>
-                          </div>
+
 
                         </div>
                         <div style={{ fontSize: "11px", color: tokens.colors.text.tertiary, marginLeft: "4px" }}>
@@ -581,24 +596,173 @@ export default function InputTab({
                             }}
                             placeholder="0"
                           />
-                          <div
+
+                        </div>
+                      </div>
+
+                      {/* Setup Tambahan (Advanced) */}
+                      <div style={{ marginTop: 4 }}>
+                        <button
+                          onClick={() => setShowAdvanced(!showAdvanced)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "4px 0",
+                            cursor: "pointer",
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: tokens.colors.text.secondary,
+                          }}
+                        >
+                          <span>Setup Tambahan</span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2.5}
+                            stroke="currentColor"
                             style={{
-                              position: "absolute",
-                              right: 10,
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                              display: "flex",
-                              gap: 6,
+                              width: 14,
+                              height: 14,
+                              transform: showAdvanced ? "rotate(180deg)" : "rotate(0)",
+                              transition: "transform 0.2s",
                             }}
                           >
-                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleDraftContribStep(-1, cls.isUSD)}>
-                              −
-                            </button>
-                            <button className="stepbtn" style={{ width: 30, height: 30 }} onClick={() => handleDraftContribStep(1, cls.isUSD)}>
-                              +
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                          </svg>
+                        </button>
+
+                        {showAdvanced && (
+                          <div
+                            style={{
+                              marginTop: 16,
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 20,
+                            }}
+                          >
+                            {/* Custom Return Rate */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                              <label style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                                Custom Return Rate (%)
+                              </label>
+                              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                <button
+                                  className="stepbtn"
+                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  onClick={() => setDraftReturn(prev => Math.max(0, parseFloat((prev - 0.1).toFixed(1))))}
+                                >
+                                  −
+                                </button>
+                                <div style={{ position: "relative", flex: 1 }}>
+                                  <input
+                                    type="number"
+                                    step="0.1"
+                                    className="ifield"
+                                    style={{
+                                      height: 44,
+                                      textAlign: "center",
+                                      padding: "0 40px",
+                                      fontSize: 16,
+                                      background: tokens.colors.surface.app,
+                                    }}
+                                    value={draftReturn}
+                                    onChange={(e) => setDraftReturn(Number(e.target.value))}
+                                  />
+                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: tokens.colors.text.tertiary }}>
+                                    %
+                                  </span>
+                                </div>
+                                <button
+                                  className="stepbtn"
+                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  onClick={() => setDraftReturn(prev => parseFloat((prev + 0.1).toFixed(1)))}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Stress Test Drawdown */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                              <label style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                                Stress Test Drawdown (%)
+                              </label>
+                              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                <button
+                                  className="stepbtn"
+                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  onClick={() => setDraftDrawdown(prev => Math.max(0, prev - 1))}
+                                >
+                                  −
+                                </button>
+                                <div style={{ position: "relative", flex: 1 }}>
+                                  <input
+                                    type="number"
+                                    className="ifield"
+                                    style={{
+                                      height: 44,
+                                      textAlign: "center",
+                                      padding: "0 40px",
+                                      fontSize: 16,
+                                      background: tokens.colors.surface.app,
+                                    }}
+                                    value={draftDrawdown}
+                                    onChange={(e) => setDraftDrawdown(Number(e.target.value))}
+                                  />
+                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: tokens.colors.text.tertiary }}>
+                                    %
+                                  </span>
+                                </div>
+                                <button
+                                  className="stepbtn"
+                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  onClick={() => setDraftDrawdown(prev => Math.min(100, prev + 1))}
+                                >
+                                  +
+                                </button>
+                              </div>
+                              <span style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 2 }}>
+                                Estimasi penurunan (%) saat skenario terburuk (crash).
+                              </span>
+                            </div>
+
+                            {/* Reset Button */}
+                            <button
+                              onClick={() => {
+                                setDraftReturn(cls.return);
+                                setDraftDrawdown(cls.isEquity ? 30 : 0);
+                              }}
+                              style={{
+                                marginTop: 4,
+                                width: "100%",
+                                padding: "12px",
+                                borderRadius: 12,
+                                border: `1.5px solid ${tokens.colors.border.subtle}`,
+                                background: "none",
+                                color: tokens.colors.text.secondary,
+                                fontWeight: 800,
+                                fontSize: 13,
+                                cursor: "pointer",
+                                transition: "all 0.2s",
+                                fontFamily: tokens.typography.fontFamily,
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.background = tokens.colors.surface.app;
+                                e.currentTarget.style.borderColor = tokens.colors.border.input;
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.background = "none";
+                                e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                              }}
+                            >
+                              Reset ke Default
                             </button>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       {/* Summary Info */}
@@ -641,6 +805,8 @@ export default function InputTab({
                           onClick={() => {
                             setAssets((prev) => ({ ...prev, [cls.id]: draftAsset }));
                             setMonthlyContribs((prev) => ({ ...prev, [cls.id]: draftContrib }));
+                            setCustomReturnOverrides((prev) => ({ ...prev, [cls.id]: draftReturn }));
+                            setCustomDrawdowns((prev) => ({ ...prev, [cls.id]: draftDrawdown }));
                             setEditingAssetId(null);
                           }}
                           style={{
@@ -1014,29 +1180,7 @@ export default function InputTab({
                     }}
                     placeholder="0"
                   />
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: 6,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      display: "flex",
-                      gap: 4,
-                    }}
-                  >
-                    <button
-                      className="stepbtn"
-                      onClick={() => handleExpenseStep(-1)}
-                    >
-                      −
-                    </button>
-                    <button
-                      className="stepbtn"
-                      onClick={() => handleExpenseStep(1)}
-                    >
-                      +
-                    </button>
-                  </div>
+
                 </div>
                 <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4, letterSpacing: ".01em" }}>
                   Bisa operasi matematika (+ dan -)

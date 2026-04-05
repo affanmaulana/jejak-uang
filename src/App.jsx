@@ -157,7 +157,7 @@ const ASSET_CLASSES = [
   },
   {
     id: "sp500",
-    name: "S&P 500 (VOO)",
+    name: "S&P 500 ETF",
     return: 10.5,
     color: tokens.colors.dataViz.sp500,
     isEquity: true,
@@ -252,13 +252,14 @@ const formatWhileTyping = (str) => {
   }).join("");
 };
 
-const afterTaxReturn = (cls) => {
-  if (cls.id === "saham") return cls.return * 0.97;
+const afterTaxReturn = (cls, overrideReturn) => {
+  const r = overrideReturn !== undefined ? overrideReturn : cls.return;
+  if (cls.id === "saham") return r * 0.97;
   // Emas: kurangi biaya efektif tahunan 1.5% langsung dari return
   // (mencakup: spread fisik/digital ~1.25%/thn + PPh buyback ~0.30%/thn − buffer)
-  if (cls.isGold) return cls.return - 1.5;
-  if (cls.taxRate === 0) return cls.return;
-  return cls.return * (1 - cls.taxRate);
+  if (cls.isGold) return r - 1.5;
+  if (cls.taxRate === 0) return r;
+  return r * (1 - cls.taxRate);
 };
 
 // ─── DATA MIGRATION PIPELINE ──────────────────────────────────────────────────
@@ -310,6 +311,9 @@ export default function WealthTracker() {
     rdSaham: 0,
   });
 
+  const [customReturnOverrides, setCustomReturnOverrides] = useState({});
+  const [customDrawdowns, setCustomDrawdowns] = useState({});
+
   const [inflationRate, setInflationRate] = useState(5.0);
   const [showAfterTax, setShowAfterTax] = useState(true);
   const [activeTab, setActiveTab] = useState("input");
@@ -331,9 +335,19 @@ export default function WealthTracker() {
 
   const removeAsset = (id) => {
     setActiveAssetIds((prev) => prev.filter((aid) => aid !== id));
-    // Reset the asset value and contrib when removed
+    // Reset the asset value, contrib, and overrides when removed
     setAssets((prev) => ({ ...prev, [id]: 0 }));
     setMonthlyContribs((prev) => ({ ...prev, [id]: 0 }));
+    setCustomReturnOverrides((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setCustomDrawdowns((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   };
   // ── State Custom Templates (LocalStorage) ──
   const [userTemplates, setUserTemplates] = useState(() => {
@@ -376,6 +390,8 @@ export default function WealthTracker() {
       name: trimmedName,
       assets: { ...assets },
       contribs: { ...monthlyContribs },
+      customReturns: { ...customReturnOverrides },
+      customDrawdowns: { ...customDrawdowns },
       activeIds: [...activeAssetIds],
       fireTarget: fireTarget,
       monthlyExpense: monthlyExpense,
@@ -402,6 +418,8 @@ export default function WealthTracker() {
   const loadUserTemplate = (t) => {
     setAssets((prev) => ({ ...prev, ...t.assets }));
     setMonthlyContribs((prev) => ({ ...prev, ...(t.contribs || {}) }));
+    setCustomReturnOverrides(t.customReturns || {});
+    setCustomDrawdowns(t.customDrawdowns || {});
     // Fallback: jika profil lama tidak punya activeIds, derive dari nilai aset > 0
     setActiveAssetIds(
       t.activeIds ||
@@ -536,8 +554,9 @@ export default function WealthTracker() {
       const raw = effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
       const idr = cls.isUSD ? raw * USD_RATE : raw;
       const w = idr / totalAssets;
-      gross += w * cls.return;
-      net += w * afterTaxReturn(cls);
+      const r = customReturnOverrides[cls.id] !== undefined ? customReturnOverrides[cls.id] : cls.return;
+      gross += w * r;
+      net += w * afterTaxReturn(cls, r);
       if (cls.isEquity) equity += w * 100;
     });
     return {
@@ -546,7 +565,7 @@ export default function WealthTracker() {
       equityPct: parseFloat(equity.toFixed(1)),
       realReturn: parseFloat(((showAfterTax ? net : gross) - inflationRate).toFixed(2)),
     };
-  }, [effectiveAssets, totalAssets, inflationRate, showAfterTax]); // <-- UBAH DI SINI
+  }, [effectiveAssets, totalAssets, inflationRate, showAfterTax, customReturnOverrides]); // <-- UBAH DI SINI
 
   // Proyeksi: setiap aset dihitung terpisah (FV dengan kontribusi per aset)
   const chartData = useMemo(() => {
@@ -563,7 +582,8 @@ export default function WealthTracker() {
         const mc = cls.isUSD
           ? (monthlyContribs[cls.id] || 0) * USD_RATE
           : monthlyContribs[cls.id] || 0;
-        const r = (showAfterTax ? afterTaxReturn(cls) : cls.return) / 100;
+        const baseR = customReturnOverrides[cls.id] !== undefined ? customReturnOverrides[cls.id] : cls.return;
+        const r = (showAfterTax ? afterTaxReturn(cls, baseR) : baseR) / 100;
         const fvInit = init * Math.pow(1 + r, y);
         const fvMC =
           r > 0 ? (mc * 12 * (Math.pow(1 + r, y) - 1)) / r : mc * 12 * y;
@@ -586,6 +606,7 @@ export default function WealthTracker() {
     inflationRate,
     showAfterTax,
     totalAssets,
+    customReturnOverrides
   ]); // <-- UBAH DI SINI
 
   const allocData = useMemo(
@@ -605,15 +626,20 @@ export default function WealthTracker() {
   const worstCase = useMemo(() => {
     let port = totalAssets;
     ASSET_CLASSES.forEach((cls) => {
-      if (cls.isEquity) {
-        const idr = cls.isUSD
-          ? (effectiveAssets[cls.id] || 0) * USD_RATE // <-- UBAH DI SINI
-          : effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
-        port += idr * -0.3;
+      const idr = cls.isUSD
+        ? (effectiveAssets[cls.id] || 0) * USD_RATE // <-- UBAH DI SINI
+        : effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
+
+      if (idr > 0) {
+        const drawdown = customDrawdowns[cls.id] !== undefined 
+          ? customDrawdowns[cls.id] 
+          : (cls.isEquity ? 30 : 0);
+        
+        port += idr * -(drawdown / 100);
       }
     });
     return Math.round(port);
-  }, [effectiveAssets, totalAssets]); // <-- UBAH DI SINI
+  }, [effectiveAssets, totalAssets, customDrawdowns]); // <-- UBAH DI SINI
 
   const getRiskInfo = (eq) => {
     if (eq < 20) return { label: "Sangat Konservatif", color: tokens.colors.semantic.brand };
@@ -970,7 +996,7 @@ export default function WealthTracker() {
               marginBottom: 12,
             }}
           >
-            Profil Alokasi Kamu
+            Simpan Profil Alokasi
           </div>
           <div className="profile-row">
             {userTemplates.map((t) => (
@@ -1203,6 +1229,10 @@ export default function WealthTracker() {
             parseExpression={parseExpression}
             formatWhileTyping={formatWhileTyping}
             afterTaxReturn={afterTaxReturn}
+            customReturnOverrides={customReturnOverrides}
+            setCustomReturnOverrides={setCustomReturnOverrides}
+            customDrawdowns={customDrawdowns}
+            setCustomDrawdowns={setCustomDrawdowns}
             addAsset={addAsset}
             removeAsset={removeAsset}
             handleStep={handleStep}
@@ -1349,6 +1379,8 @@ export default function WealthTracker() {
                               if (t.id === modalAction.targetId) {
                                 return {
                                   ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
+                                  customReturns: { ...customReturnOverrides },
+                                  customDrawdowns: { ...customDrawdowns },
                                   activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
                                   targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
                                 };
