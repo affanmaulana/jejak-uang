@@ -17,7 +17,7 @@ import AllocationTab from "./components/AllocationTab";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-const USD_RATE = 16900;
+const DEFAULT_USD_RATE = 17000;
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const tokens = {
@@ -162,6 +162,7 @@ const ASSET_CLASSES = [
     color: tokens.colors.dataViz.sp500,
     isEquity: true,
     isUSD: false,
+    canSwitchCurrency: true,
     taxRate: 0.1,
     liquidity: "T+2",
     risk: "Tinggi",
@@ -284,6 +285,8 @@ const migrateTemplates = (templates) => {
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export default function WealthTracker() {
+  const [customUSDRate, setCustomUSDRate] = useState(DEFAULT_USD_RATE);
+  const [assetCurrencyPrefs, setAssetCurrencyPrefs] = useState({});
   const [assets, setAssets] = useState({
     cash: 0,
     bankDigital: 0,
@@ -393,6 +396,8 @@ export default function WealthTracker() {
       customReturns: { ...customReturnOverrides },
       customDrawdowns: { ...customDrawdowns },
       activeIds: [...activeAssetIds],
+      customUSDRate: customUSDRate,
+      assetCurrencyPrefs: { ...assetCurrencyPrefs },
       fireTarget: fireTarget,
       monthlyExpense: monthlyExpense,
       targetMonths: targetMonths,
@@ -429,6 +434,8 @@ export default function WealthTracker() {
     setMonthlyExpense(t.monthlyExpense);
     setTargetMonths(t.targetMonths);
     setIncludeEmergencyInTotal(t.includeEmergencyInTotal);
+    setCustomUSDRate(t.customUSDRate ?? DEFAULT_USD_RATE);
+    setAssetCurrencyPrefs(t.assetCurrencyPrefs ?? {});
     setActiveTemplateId(t.id);
   };
 
@@ -530,18 +537,20 @@ export default function WealthTracker() {
       Object.entries(effectiveAssets).reduce((sum, [id, val]) => {
         // <-- UBAH DI SINI
         const cls = ASSET_CLASSES.find((c) => c.id === id);
-        return sum + (cls.isUSD ? val * USD_RATE : val);
+        const pref = assetCurrencyPrefs[id] || (cls.isUSD ? 'USD' : 'IDR');
+        return sum + (pref === 'USD' ? val * customUSDRate : val);
       }, 0),
-    [effectiveAssets] // <-- UBAH DI SINI
+    [effectiveAssets, customUSDRate, assetCurrencyPrefs] // <-- UBAH DI SINI
   );
 
   const totalMonthlyContrib = useMemo(
     () =>
       Object.entries(monthlyContribs).reduce((sum, [id, val]) => {
         const cls = ASSET_CLASSES.find((c) => c.id === id);
-        return sum + (cls.isUSD ? val * USD_RATE : val);
+        const pref = assetCurrencyPrefs[id] || (cls.isUSD ? 'USD' : 'IDR');
+        return sum + (pref === 'USD' ? val * customUSDRate : val);
       }, 0),
-    [monthlyContribs]
+    [monthlyContribs, customUSDRate, assetCurrencyPrefs]
   );
 
   const stats = useMemo(() => {
@@ -552,7 +561,8 @@ export default function WealthTracker() {
       equity = 0;
     ASSET_CLASSES.forEach((cls) => {
       const raw = effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
-      const idr = cls.isUSD ? raw * USD_RATE : raw;
+      const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+      const idr = pref === 'USD' ? raw * customUSDRate : raw;
       const w = idr / totalAssets;
       const r = customReturnOverrides[cls.id] !== undefined ? customReturnOverrides[cls.id] : cls.return;
       gross += w * r;
@@ -565,7 +575,7 @@ export default function WealthTracker() {
       equityPct: parseFloat(equity.toFixed(1)),
       realReturn: parseFloat(((showAfterTax ? net : gross) - inflationRate).toFixed(2)),
     };
-  }, [effectiveAssets, totalAssets, inflationRate, showAfterTax, customReturnOverrides]); // <-- UBAH DI SINI
+  }, [effectiveAssets, totalAssets, inflationRate, showAfterTax, customReturnOverrides, customUSDRate, assetCurrencyPrefs]); // <-- UBAH DI SINI
 
   // Proyeksi: setiap aset dihitung terpisah (FV dengan kontribusi per aset)
   const chartData = useMemo(() => {
@@ -576,11 +586,12 @@ export default function WealthTracker() {
     for (let y = 0; y <= PROJECTION_YEARS; y++) {
       let portTotal = 0;
       ASSET_CLASSES.forEach((cls) => {
-        const init = cls.isUSD
-          ? (effectiveAssets[cls.id] || 0) * USD_RATE // <-- UBAH DI SINI
+        const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+        const init = pref === 'USD'
+          ? (effectiveAssets[cls.id] || 0) * customUSDRate // <-- UBAH DI SINI
           : effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
-        const mc = cls.isUSD
-          ? (monthlyContribs[cls.id] || 0) * USD_RATE
+        const mc = pref === 'USD'
+          ? (monthlyContribs[cls.id] || 0) * customUSDRate
           : monthlyContribs[cls.id] || 0;
         const baseR = customReturnOverrides[cls.id] !== undefined ? customReturnOverrides[cls.id] : cls.return;
         const r = (showAfterTax ? afterTaxReturn(cls, baseR) : baseR) / 100;
@@ -606,6 +617,8 @@ export default function WealthTracker() {
     inflationRate,
     showAfterTax,
     totalAssets,
+    customUSDRate,
+    assetCurrencyPrefs,
     customReturnOverrides
   ]); // <-- UBAH DI SINI
 
@@ -613,33 +626,35 @@ export default function WealthTracker() {
     () =>
       ASSET_CLASSES.map((cls) => {
         const raw = effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
-        const idr = cls.isUSD ? raw * USD_RATE : raw;
+        const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+        const idr = pref === 'USD' ? raw * customUSDRate : raw;
         return {
           ...cls,
           idr,
           pct: totalAssets > 0 ? (idr / totalAssets) * 100 : 0,
         };
       }).filter((d) => d.idr > 0),
-    [effectiveAssets, totalAssets] // <-- UBAH DI SINI
+    [effectiveAssets, totalAssets, customUSDRate, assetCurrencyPrefs] // <-- UBAH DI SINI
   );
 
   const worstCase = useMemo(() => {
     let port = totalAssets;
     ASSET_CLASSES.forEach((cls) => {
-      const idr = cls.isUSD
-        ? (effectiveAssets[cls.id] || 0) * USD_RATE // <-- UBAH DI SINI
+      const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+      const idr = pref === 'USD'
+        ? (effectiveAssets[cls.id] || 0) * customUSDRate // <-- UBAH DI SINI
         : effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
 
       if (idr > 0) {
-        const drawdown = customDrawdowns[cls.id] !== undefined 
-          ? customDrawdowns[cls.id] 
+        const drawdown = customDrawdowns[cls.id] !== undefined
+          ? customDrawdowns[cls.id]
           : (cls.isEquity ? 30 : 0);
-        
+
         port += idr * -(drawdown / 100);
       }
     });
     return Math.round(port);
-  }, [effectiveAssets, totalAssets, customDrawdowns]); // <-- UBAH DI SINI
+  }, [effectiveAssets, totalAssets, customDrawdowns, customUSDRate, assetCurrencyPrefs]); // <-- UBAH DI SINI
 
   const getRiskInfo = (eq) => {
     if (eq < 20) return { label: "Sangat Konservatif", color: tokens.colors.semantic.brand };
@@ -1206,7 +1221,10 @@ export default function WealthTracker() {
           <InputTab
             tokens={tokens}
             ASSET_CLASSES={ASSET_CLASSES}
-            USD_RATE={USD_RATE}
+            customUSDRate={customUSDRate}
+            setCustomUSDRate={setCustomUSDRate}
+            assetCurrencyPrefs={assetCurrencyPrefs}
+            setAssetCurrencyPrefs={setAssetCurrencyPrefs}
             activeAssetIds={activeAssetIds}
             assets={assets}
             setAssets={setAssets}
@@ -1381,6 +1399,8 @@ export default function WealthTracker() {
                                   ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
                                   customReturns: { ...customReturnOverrides },
                                   customDrawdowns: { ...customDrawdowns },
+                                  customUSDRate: customUSDRate,
+                                  assetCurrencyPrefs: { ...assetCurrencyPrefs },
                                   activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
                                   targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
                                 };

@@ -4,10 +4,13 @@ export default function InputTab({
   // Global & Asset Data
   tokens,
   ASSET_CLASSES,
-  USD_RATE,
   activeAssetIds,
   assets,
   setAssets,
+  customUSDRate,
+  setCustomUSDRate,
+  assetCurrencyPrefs,
+  setAssetCurrencyPrefs,
   monthlyContribs,
   setMonthlyContribs,
   totalAssets,
@@ -210,7 +213,8 @@ export default function InputTab({
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
             {ASSET_CLASSES.filter((cls) => activeAssetIds.includes(cls.id)).map((cls) => {
               const raw = assets[cls.id] || 0;
-              const idr = cls.isUSD ? raw * USD_RATE : raw;
+              const currencyPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+              const idr = currencyPref === 'USD' ? raw * customUSDRate : raw;
               const pct = totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
 
               return (
@@ -406,7 +410,8 @@ export default function InputTab({
                 if (!cls) return null;
 
                 const raw = draftAsset;
-                const idr = cls.isUSD ? raw * USD_RATE : raw;
+                const currencyPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+                const idr = currencyPref === 'USD' ? raw * customUSDRate : raw;
                 const netR = afterTaxReturn(cls, draftReturn).toFixed(1);
                 const mc = draftContrib;
 
@@ -471,6 +476,50 @@ export default function InputTab({
 
                     {/* Content */}
                     <div style={{ padding: "8px 24px 24px", display: "flex", flexDirection: "column", gap: 16, overflowY: "auto", flexGrow: 1 }}>
+                      {/* Currency Toggle (if supported) */}
+                      {cls.canSwitchCurrency && (
+                        <div style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "12px 14px",
+                          background: tokens.colors.surface.app,
+                          borderRadius: 14,
+                          border: `1.5px solid ${tokens.colors.border.subtle}`,
+                          marginBottom: 4
+                        }}>
+                          <div style={{ display: "flex", flexDirection: "column" }}>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: tokens.colors.text.primary }}>Input dalam USD?</span>
+                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Ganti mata uang input aset ini</span>
+                          </div>
+                          <label className="ios-toggle-wrap">
+                            <input
+                              type="checkbox"
+                              hidden
+                              checked={currencyPref === 'USD'}
+                              onChange={(e) => setAssetCurrencyPrefs(prev => ({
+                                ...prev,
+                                [cls.id]: e.target.checked ? 'USD' : 'IDR'
+                              }))}
+                            />
+                            <div className="ios-track" style={{
+                              background: currencyPref === 'USD' ? tokens.colors.semantic.success : tokens.colors.border.subtle,
+                              width: 42,
+                              height: 24,
+                              borderRadius: 12
+                            }}>
+                              <div className="ios-thumb" style={{
+                                transform: currencyPref === 'USD' ? 'translateX(18px)' : 'translateX(0)',
+                                width: 18,
+                                height: 18,
+                                top: 3,
+                                left: 3
+                              }} />
+                            </div>
+                          </label>
+                        </div>
+                      )}
+
                       {/* Nilai Aset */}
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <label
@@ -480,7 +529,7 @@ export default function InputTab({
                             color: tokens.colors.text.secondary,
                           }}
                         >
-                          Berapa total nilai {cls.name} saat ini?
+                          Berapa total nilai {cls.name} saat ini? ({currencyPref})
                         </label>
                         <div style={{ position: "relative" }}>
                           <span
@@ -494,7 +543,7 @@ export default function InputTab({
                               fontSize: 14,
                             }}
                           >
-                            {cls.isUSD ? "$" : "Rp"}
+                            {currencyPref === 'USD' ? "$" : "Rp"}
                           </span>
                           <input
                             type="text"
@@ -511,7 +560,7 @@ export default function InputTab({
                                 ? rawInputs[cls.id]
                                 : draftAsset === 0
                                   ? ""
-                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(draftAsset)
+                                  : new Intl.NumberFormat(currencyPref === 'USD' ? "en-US" : "id-ID").format(draftAsset)
                             }
                             onChange={(e) => {
                               const formatted = formatWhileTyping(e.target.value);
@@ -520,7 +569,7 @@ export default function InputTab({
                             onBlur={(e) => {
                               const result = parseExpression(e.target.value);
                               if (result !== null) {
-                                const max = cls.isUSD ? 100000 : 1000000000;
+                                const max = currencyPref === 'USD' ? 100000 : 1000000000;
                                 setDraftAsset(Math.min(result, max));
                               }
                               setRawInputs((prev) => {
@@ -565,7 +614,7 @@ export default function InputTab({
                               fontSize: 13,
                             }}
                           >
-                            {cls.isUSD ? "$" : "Rp"}
+                            {currencyPref === 'USD' ? "$" : "Rp"}
                           </span>
                           <input
                             type="text"
@@ -582,7 +631,7 @@ export default function InputTab({
                                 ? rawContribs[cls.id]
                                 : draftContrib === 0
                                   ? ""
-                                  : new Intl.NumberFormat(cls.isUSD ? "en-US" : "id-ID").format(draftContrib)
+                                  : new Intl.NumberFormat(currencyPref === 'USD' ? "en-US" : "id-ID").format(draftContrib)
                             }
                             onChange={(e) => {
                               const formatted = formatWhileTyping(e.target.value);
@@ -738,11 +787,41 @@ export default function InputTab({
                               </span>
                             </div>
 
+                            {/* Custom Kurs USD (Specifically for Valas USD) */}
+                            {cls.id === 'usd' && (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                <label style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                                  Custom Kurs USD (Rp)
+                                </label>
+                                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                  <div style={{ position: "relative", flex: 1 }}>
+                                    <input
+                                      type="text"
+                                      className="ifield"
+                                      style={{
+                                        height: 44,
+                                        textAlign: "left",
+                                        padding: "0 40px",
+                                        fontSize: 16,
+                                        background: tokens.colors.surface.app,
+                                      }}
+                                      value={new Intl.NumberFormat("id-ID").format(customUSDRate)}
+                                      onChange={(e) => setCustomUSDRate(Number(e.target.value.replace(/\D/g, "")))}
+                                    />
+                                    <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 12, fontWeight: 700, color: tokens.colors.text.tertiary }}>
+                                      Rp
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
                             {/* Reset Button */}
                             <button
                               onClick={() => {
                                 setDraftReturn(cls.return);
                                 setDraftDrawdown(cls.isEquity ? 30 : 0);
+                                if (cls.id === 'usd') setCustomUSDRate(17000);
                               }}
                               style={{
                                 marginTop: 4,
@@ -809,13 +888,13 @@ export default function InputTab({
                           </div>
                         </div>
 
-                        {cls.isUSD && idr > 0 && (
+                        {((cls.isUSD || cls.canSwitchCurrency) && draftAsset > 0) && (
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
                             <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, marginBottom: 4, whiteSpace: "nowrap" }}>
-                              Setara Rupiah
+                              {currencyPref === 'USD' ? 'Setara Rupiah' : 'Setara USD'}
                             </div>
                             <div style={{ fontSize: 15, fontWeight: 700, color: tokens.colors.text.secondary }}>
-                              {formatCompact(idr)}
+                              {currencyPref === 'USD' ? formatCompact(idr) : `$${(draftAsset / customUSDRate).toFixed(2)}`}
                             </div>
                           </div>
                         )}
