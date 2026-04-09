@@ -485,12 +485,13 @@ export default function InputTab({
                           padding: "12px 14px",
                           background: tokens.colors.surface.app,
                           borderRadius: 14,
+                          gap: 16,
                           border: `1.5px solid ${tokens.colors.border.subtle}`,
                           marginBottom: 4
                         }}>
-                          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: tokens.colors.text.primary }}>Input dalam USD?</span>
-                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Ubah konversi USD-IDR di Instrumen 'Valas USD'</span>
+                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Ubah konversi USD-IDR di 'Valas USD'</span>
                           </div>
                           <label className="ios-toggle-wrap">
                             <input
@@ -503,7 +504,7 @@ export default function InputTab({
                               }))}
                             />
                             <div className="ios-track" style={{
-                              background: currencyPref === 'USD' ? tokens.colors.semantic.success : tokens.colors.border.subtle,
+                              background: currencyPref === 'USD' ? tokens.colors.semantic.brand : tokens.colors.border.subtle,
                               width: 42,
                               height: 24,
                               borderRadius: 12

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ComposedChart,
   Area,
@@ -20,139 +20,189 @@ export default function ProjectionTab({
   setFireTarget,
   tokens,
   formatIDR,
-  formatCompact
+  formatCompact,
+  totalAssets,
+  worstCase
 }) {
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+
+  // Calculate crash ratio based on current portfolio's risk profile
+  const crashRatio = totalAssets > 0 ? (totalAssets - worstCase) / totalAssets : 0;
   return (
     <div>
-      {/* Settings */}
-      <div className="card" style={{ padding: 16, marginBottom: 14 }}>
+      {/* Settings (Expandable) */}
+      <div
+        className="card"
+        style={{
+          padding: 0,
+          marginBottom: 14,
+          overflow: "hidden",
+          border: `1px solid ${tokens.colors.border.subtle}`
+        }}
+      >
         <div
+          onClick={() => setIsSettingsExpanded(!isSettingsExpanded)}
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: tokens.colors.text.tertiary,
-            textTransform: "uppercase",
-            letterSpacing: ".1em",
-            marginBottom: 12,
+            padding: "12px 16px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+            background: isSettingsExpanded ? tokens.colors.surface.input : tokens.colors.surface.card,
+            transition: "background 0.2s",
           }}
         >
-          Asumsi Proyeksi
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: tokens.colors.text.tertiary,
+              textTransform: "uppercase",
+              letterSpacing: ".1em",
+            }}
+          >
+            Asumsi Proyeksi & Target
+          </div>
+          <div style={{
+            transform: isSettingsExpanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            color: tokens.colors.text.tertiary
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))",
-            gap: 16,
-          }}
-        >
-          <div>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: tokens.colors.text.secondary,
-                textTransform: "uppercase",
-                letterSpacing: ".08em",
-                display: "block",
-                marginBottom: 8,
-              }}
-            >
-              Inflasi (% / tahun)
-            </label>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: 10 }}
-            >
-              <input
-                type="range"
-                min={1}
-                max={15}
-                step={0.5}
-                value={inflationRate}
-                onChange={(e) =>
-                  setInflationRate(parseFloat(e.target.value))
-                }
-                style={{
-                  flex: 1,
-                  accentColor: tokens.colors.semantic.danger,
-                  background: `linear-gradient(to right,${tokens.colors.semantic.danger} ${((inflationRate - 1) / 14) * 100
-                    }%,${tokens.colors.border.subtle} 0%)`,
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: tokens.typography.fontFamily,
-                  fontWeight: 800,
-                  fontSize: 16,
-                  color: tokens.colors.semantic.danger,
-                  minWidth: 42,
-                }}
-              >
-                {inflationRate}%
-              </span>
-            </div>
-            <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
-              Historis Indonesia: 2–8%/tahun
-            </div>
-          </div>
-          <div>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: tokens.colors.text.secondary,
-                textTransform: "uppercase",
-                letterSpacing: ".08em",
-                display: "block",
-                marginBottom: 8,
-              }}
-            >
-              Kontribusi Bulanan Total
-            </label>
-            <div
-              style={{
-                fontFamily: tokens.typography.fontFamily,
-                fontSize: 20,
-                fontWeight: 800,
-                color: tokens.colors.dataViz.rdpu,
-              }}
-            >
-              {formatCompact(totalMonthlyContrib)}
-            </div>
-            <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
-              Isi di tab "Input Aset" → tiap kartu aset. Proyeksi dihitung
-              per aset.
-            </div>
-          </div>
 
-          <div>
-            <label
+        <div style={{
+          display: "grid",
+          gridTemplateRows: isSettingsExpanded ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.3s ease-out, opacity 0.3s ease-out",
+          opacity: isSettingsExpanded ? 1 : 0,
+        }}>
+          <div style={{ minHeight: 0, overflow: "hidden" }}>
+            <div
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: tokens.colors.text.secondary,
-                textTransform: "uppercase",
-                letterSpacing: ".08em",
-                display: "block",
-                marginBottom: 8,
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))",
+                gap: 16,
+                padding: 16,
+                borderTop: `1px solid ${tokens.colors.border.subtle}`,
               }}
             >
-              Target Kekayaan
-            </label>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: 10 }}
-            >
-              <input
-                type="text"
-                className="ifield-sm"
-                style={{ paddingLeft: 10, paddingRight: 10 }}
-                value={new Intl.NumberFormat("id-ID").format(fireTarget)}
-                onChange={(e) =>
-                  setFireTarget(Number(e.target.value.replace(/\D/g, "")))
-                }
-              />
-            </div>
-            <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
-              Garis acuan saat proyeksi menyentuh target.
+              <div>
+                <label
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: tokens.colors.text.secondary,
+                    textTransform: "uppercase",
+                    letterSpacing: ".08em",
+                    display: "block",
+                    marginBottom: 8,
+                  }}
+                >
+                  Inflasi (% / tahun)
+                </label>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <input
+                    type="range"
+                    min={1}
+                    max={15}
+                    step={0.5}
+                    value={inflationRate}
+                    onChange={(e) =>
+                      setInflationRate(parseFloat(e.target.value))
+                    }
+                    style={{
+                      flex: 1,
+                      accentColor: tokens.colors.semantic.danger,
+                      background: `linear-gradient(to right,${tokens.colors.semantic.danger} ${((inflationRate - 1) / 14) * 100
+                        }%,${tokens.colors.border.subtle} 0%)`,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: tokens.typography.fontFamily,
+                      fontWeight: 800,
+                      fontSize: 16,
+                      color: tokens.colors.semantic.danger,
+                      minWidth: 42,
+                    }}
+                  >
+                    {inflationRate}%
+                  </span>
+                </div>
+                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
+                  Historis Indonesia: 2–8%/tahun
+                </div>
+              </div>
+              <div>
+                <label
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: tokens.colors.text.secondary,
+                    textTransform: "uppercase",
+                    letterSpacing: ".08em",
+                    display: "block",
+                    marginBottom: 8,
+                  }}
+                >
+                  Kontribusi Bulanan Total
+                </label>
+                <div
+                  style={{
+                    fontFamily: tokens.typography.fontFamily,
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: tokens.colors.dataViz.rdpu,
+                  }}
+                >
+                  {formatCompact(totalMonthlyContrib)}
+                </div>
+                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
+                  Isi di tab "Input Aset" → tiap kartu aset. Proyeksi dihitung
+                  per aset.
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: tokens.colors.text.secondary,
+                    textTransform: "uppercase",
+                    letterSpacing: ".08em",
+                    display: "block",
+                    marginBottom: 8,
+                  }}
+                >
+                  Target Kekayaan
+                </label>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <input
+                    type="text"
+                    className="ifield-sm"
+                    style={{ paddingLeft: 10, paddingRight: 10 }}
+                    value={new Intl.NumberFormat("id-ID").format(fireTarget)}
+                    onChange={(e) =>
+                      setFireTarget(Number(e.target.value.replace(/\D/g, "")))
+                    }
+                  />
+                </div>
+                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
+                  Garis acuan saat proyeksi menyentuh target.
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -256,48 +306,163 @@ export default function ProjectionTab({
           </ComposedChart>
         </ResponsiveContainer>
 
-        {/* Year 10 Scorecards */}
-        {chartData.length > 0 && (() => {
-          const last = chartData[chartData.length - 1];
+        {/* Yearly Breakdown Accordion */}
+        {chartData.length > 1 && (() => {
+          const projectionData = chartData.slice(1); // Skip Thn 0
           return (
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
-                gap: 12,
-                marginTop: 20,
+                marginTop: 24,
+                border: `1px solid ${tokens.colors.border.subtle}`,
+                borderRadius: 12,
+                overflow: "hidden",
+                background: tokens.colors.surface.card,
               }}
             >
-              {[
-                { label: "Nominal", value: formatCompact(last.portfolio), color: tokens.colors.semantic.success },
-                { label: "Nilai Riil", value: formatCompact(last.real), color: tokens.colors.semantic.brand },
-                { label: "Inflasi", value: formatCompact(last.inflation), color: tokens.colors.semantic.danger },
-              ].map((s, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    background: tokens.colors.surface.card,
-                    borderRadius: 12,
-                    padding: "16px 20px",
-                    border: `1.5px solid ${tokens.colors.border.subtle}`,
-                  }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: s.color, textTransform: "uppercase", letterSpacing: ".05em" }}>
-                      {s.label}
+              <div
+                style={{
+                  padding: "12px 16px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: tokens.colors.text.tertiary,
+                  textTransform: "uppercase",
+                  letterSpacing: ".08em",
+                  borderBottom: `1px solid ${tokens.colors.border.subtle}`,
+                  background: tokens.colors.surface.app,
+                }}
+              >
+                Rincian Proyeksi Tahunan
+              </div>
+              {projectionData.map((yearData, idx) => {
+                const realIdx = idx + 1; // Year index in full chartData
+                const prevData = chartData[realIdx - 1];
+                const isExpanded = expandedIndex === idx;
+
+                // Profit logic
+                const profitNominal = yearData.portfolio - prevData.portfolio;
+                const profitPct = ((profitNominal / prevData.portfolio) * 100).toFixed(1);
+                const isProfit = profitNominal >= 0;
+
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      borderBottom: realIdx === chartData.length - 1 ? "none" : `1px solid ${tokens.colors.border.subtle}`,
+                    }}
+                  >
+                    {/* Header / Collapsed State */}
+                    <div
+                      onClick={() => setExpandedIndex(isExpanded ? null : idx)}
+                      style={{
+                        padding: "14px 16px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        transition: "background 0.2s",
+                        background: isExpanded ? tokens.colors.surface.card : "transparent",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.semantic.brand }}>
+                          Tahun ke-{realIdx}
+                        </span>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 2 }}>
+                            Total Proyeksi
+                          </div>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.semantic.success }}>
+                            {formatCompact(yearData.portfolio)}
+                          </div>
+                        </div>
+                        <div style={{
+                          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                          transition: "transform 0.3s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          color: tokens.colors.text.tertiary
+                        }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: tokens.colors.text.tertiary, marginTop: 2 }}>
-                      Tahun ke-10
+
+                    {/* Expanded Detail State (Animated) */}
+                    <div style={{
+                      display: "grid",
+                      gridTemplateRows: isExpanded ? "1fr" : "0fr",
+                      transition: "grid-template-rows 0.3s ease-out, opacity 0.3s ease-out",
+                      opacity: isExpanded ? 1 : 0,
+                    }}>
+                      <div style={{ minHeight: 0, overflow: "hidden" }}>
+                        <div style={{
+                          padding: "16px",
+                          background: tokens.colors.surface.input,
+                          borderTop: `1px solid ${tokens.colors.border.subtle}`,
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: 16
+                        }}>
+                          {/* Column 1: Asset Health */}
+                          <div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                              <div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  Nilai Riil (Daya Beli)
+                                </div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.semantic.brand }}>
+                                  {formatIDR(yearData.real)}
+                                </div>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  Acuan Inflasi
+                                </div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.semantic.danger }}>
+                                  {formatIDR(yearData.inflation)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Column 2: Performance & Simulation */}
+                          <div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                              <div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  Keuntungan Tahun Ini
+                                </div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: isProfit ? tokens.colors.semantic.success : tokens.colors.semantic.danger }}>
+                                  {isProfit ? "+" : ""}{formatCompact(profitNominal)} ({isProfit ? "+" : ""}{profitPct}%)
+                                </div>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  Simulasi Market Crash
+                                </div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.semantic.danger }}>
+                                  {formatCompact(yearData.portfolio * (1 - crashRatio))}
+                                  <span style={{ fontSize: 10, fontWeight: 500, marginLeft: 6, opacity: 0.8 }}>
+                                    (-{(crashRatio * 100).toFixed(0)}%)
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 2 }}>
+                                  Jika terjadi koreksi tajam sesuai profil risiko Anda.
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ fontFamily: tokens.typography.fontFamily, fontSize: 24, fontWeight: 800, color: s.color }}>
-                    {s.value}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           );
         })()}

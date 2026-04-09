@@ -1376,6 +1376,8 @@ export default function WealthTracker() {
             chartData={chartData}
             formatIDR={formatIDR}
             formatCompact={formatCompact}
+            totalAssets={totalAssets}
+            worstCase={worstCase}
           />
         )}
 
