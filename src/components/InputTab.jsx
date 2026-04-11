@@ -822,7 +822,7 @@ export default function InputTab({
                               onClick={() => {
                                 setDraftReturn(cls.return);
                                 setDraftDrawdown(cls.isEquity ? 30 : 0);
-                                if (cls.id === 'usd') setCustomUSDRate(17000);
+                                if (cls.id === 'usd') setCustomUSDRate(17100);
                               }}
                               style={{
                                 marginTop: 4,
