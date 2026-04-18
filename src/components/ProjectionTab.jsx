@@ -507,7 +507,7 @@ export default function ProjectionTab({
                 alignItems: "center",
                 gap: 6
               }}>
-                {isWinning ? "Kamu menang vs inflasi" : "Kekayaan tergerus inflasi"} {isWinning ? "✅" : "❌"}
+                {isWinning ? "Kamu menang vs inflasi" : "Nilai Riil Kekayaanmu tergerus inflasi"} {isWinning ? "✅" : "❌"}
               </div>
               <div style={{ fontSize: 12, color: isWinning ? tokens.colors.semantic.success : tokens.colors.semantic.danger, lineHeight: 1.6, opacity: 0.8 }}>
                 {isWinning

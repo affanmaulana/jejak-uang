@@ -40,13 +40,13 @@ const tokens = {
       tertiary: '#94A3B8',
     },
     semantic: {
-      success: '#10B981',
+      success: '#4F46E5',
       danger: '#EF4444',
       warning: '#F59E0B',
       brand: '#0F172A',
-      successBg: '#F0FDF4',
+      successBg: '#f0f0fdff',
       dangerBg: '#FEF2F2',
-      successBorder: '#BBF7D0',
+      successBorder: '#c1bbf7ff',
       dangerBorder: '#FECACA',
     },
     dataViz: {
@@ -105,6 +105,7 @@ const ASSET_CLASSES = [
     taxRate: 0.2,
     liquidity: "T+0",
     risk: "Sangat Rendah",
+    defaultDrawdown: 0,
     description:
       "Uang fisik atau tabungan bank biasa. Likuid penuh, bunga rendah.",
   },
@@ -118,6 +119,7 @@ const ASSET_CLASSES = [
     taxRate: 0.2,
     liquidity: "T+0",
     risk: "Sangat Rendah",
+    defaultDrawdown: 0,
     description:
       "Tabungan bank digital (Blu, Jago, dst). Bunga lebih tinggi, LPS terjamin.",
   },
@@ -131,6 +133,7 @@ const ASSET_CLASSES = [
     isEquity: false,
     taxRate: 0.10,
     color: tokens.colors.dataViz.sbnRitel,
+    defaultDrawdown: 3,
   },
   {
     id: "rdpu",
@@ -142,6 +145,7 @@ const ASSET_CLASSES = [
     taxRate: 0.1,
     liquidity: "T+1",
     risk: "Rendah",
+    defaultDrawdown: 0.5,
     description: "Reksa dana pasar uang. Stabil, cocok untuk dana darurat.",
   },
   {
@@ -154,6 +158,7 @@ const ASSET_CLASSES = [
     taxRate: 0,
     liquidity: "T+0",
     risk: "Sedang",
+    defaultDrawdown: 10,
     description:
       "Simpanan USD. Return dari apresiasi kurs IDR/USD historis ~3–4%/tahun.",
   },
@@ -168,6 +173,7 @@ const ASSET_CLASSES = [
     taxRate: 0,
     color: tokens.colors.dataViz.rdpuUsd,
     isUSD: false,
+    defaultDrawdown: 1,
     canSwitchCurrency: true,
   },
   {
@@ -179,6 +185,7 @@ const ASSET_CLASSES = [
     return: 6.5,
     isEquity: false,
     taxRate: 0.10,
+    defaultDrawdown: 8,
     color: tokens.colors.dataViz.obligasiFr,
   },
   {
@@ -191,6 +198,7 @@ const ASSET_CLASSES = [
     taxRate: 0.1,
     liquidity: "T+2",
     risk: "Rendah–Sedang",
+    defaultDrawdown: 10,
     description: "Reksa dana obligasi. Return lebih tinggi, sedikit fluktuasi.",
   },
   {
@@ -204,6 +212,7 @@ const ASSET_CLASSES = [
     isGold: true,
     liquidity: "T+1",
     risk: "Sedang",
+    defaultDrawdown: 20,
     description:
       "Emas fisik/digital (Antam, Pegadaian, dll). Return ~9%/thn IDR. Sudah dipotong biaya efektif ~1.5%/thn (spread + PPh buyback + admin).",
   },
@@ -216,6 +225,7 @@ const ASSET_CLASSES = [
     return: 8.5,
     isEquity: true,
     taxRate: 0,
+    defaultDrawdown: 25,
     color: tokens.colors.dataViz.rdCampuran,
   },
   {
@@ -229,6 +239,7 @@ const ASSET_CLASSES = [
     taxRate: 0.1,
     liquidity: "T+2",
     risk: "Tinggi",
+    defaultDrawdown: 50,
     description:
       "Indeks saham AS. Return historis ~10% USD/tahun + estimasi apresiasi kurs IDR.",
   },
@@ -242,6 +253,7 @@ const ASSET_CLASSES = [
     taxRate: 0,
     liquidity: "T+3",
     risk: "Tinggi",
+    defaultDrawdown: 45,
     description:
       "Kumpulan saham pilihan yang dikelola oleh Manajer Investasi profesional. Diversifikasi tinggi, potensi return jangka panjang.",
   },
@@ -255,6 +267,7 @@ const ASSET_CLASSES = [
     taxRate: 0.001,
     liquidity: "T+2",
     risk: "Tinggi",
+    defaultDrawdown: 60,
     description:
       "Saham IDX via LTS. Potensi return tinggi dengan volatilitas signifikan.",
   },
@@ -269,6 +282,7 @@ const ASSET_CLASSES = [
     taxRate: 0.10,
     color: tokens.colors.dataViz.nasdaq,
     isUSD: false,
+    defaultDrawdown: 65,
     canSwitchCurrency: true,
   },
   {
@@ -282,6 +296,7 @@ const ASSET_CLASSES = [
     taxRate: 0.10,
     color: tokens.colors.dataViz.usStocks,
     isUSD: false,
+    defaultDrawdown: 75,
     canSwitchCurrency: true,
   },
   {
@@ -295,6 +310,7 @@ const ASSET_CLASSES = [
     taxRate: 0.0021, // Pajak kripto Indo: 0.1% PPh + 0.11% PPN
     color: tokens.colors.dataViz.kripto,
     isUSD: false,
+    defaultDrawdown: 90,
     canSwitchCurrency: true,
   }
 
@@ -423,6 +439,31 @@ export default function WealthTracker() {
   const [modalAction, setModalAction] = useState({ isOpen: false, title: "", type: null, targetId: null });
 
   const closeModal = () => setModalAction({ isOpen: false, title: "", type: null, targetId: null });
+
+  // ── BODY SCROLL LOCK ──
+  useEffect(() => {
+    const isAnyModalOpen = isModalOpen || modalAction.isOpen;
+    const scrollBarWidth = window.innerWidth - document.body.clientWidth;
+    
+    if (isAnyModalOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.paddingRight = `${scrollBarWidth}px`;
+      document.body.style.overscrollBehavior = "none";
+    } else {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
+      document.body.style.overscrollBehavior = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
+      document.body.style.overscrollBehavior = "unset";
+    };
+  }, [isModalOpen, modalAction.isOpen]);
+
 
   const addAsset = (id) => {
     setActiveAssetIds((prev) => prev.includes(id) ? prev : [...prev, id]);
@@ -745,19 +786,20 @@ export default function WealthTracker() {
     ASSET_CLASSES.forEach((cls) => {
       const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
       const idr = pref === 'USD'
-        ? (effectiveAssets[cls.id] || 0) * customUSDRate // <-- UBAH DI SINI
-        : effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
+        ? (effectiveAssets[cls.id] || 0) * customUSDRate
+        : effectiveAssets[cls.id] || 0;
 
       if (idr > 0) {
+        // Gunakan custom drawdown jika ada, jika tidak gunakan default per instrumen
         const drawdown = customDrawdowns[cls.id] !== undefined
           ? customDrawdowns[cls.id]
-          : (cls.isEquity ? 30 : 0);
+          : (cls.defaultDrawdown || 0);
 
         port += idr * -(drawdown / 100);
       }
     });
     return Math.round(port);
-  }, [effectiveAssets, totalAssets, customDrawdowns, customUSDRate, assetCurrencyPrefs]); // <-- UBAH DI SINI
+  }, [effectiveAssets, totalAssets, customDrawdowns, customUSDRate, assetCurrencyPrefs]);
 
   const getRiskInfo = (eq) => {
     if (eq < 20) return { label: "Sangat Konservatif", color: tokens.colors.semantic.brand };
@@ -782,7 +824,7 @@ export default function WealthTracker() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         * { box-sizing:border-box; }
-        body, html { margin: 0; padding: 0; background: #f8fafc; overflow-x: hidden; }
+        body, html { margin: 0; padding: 0; background: #f8fafc; overflow-x: hidden; width: 100%; height: 100%; }
         button, input, select, textarea { font-family: inherit; }
         :root {
           --color-surface-app: ${tokens.colors.surface.app};
@@ -1049,9 +1091,9 @@ export default function WealthTracker() {
             {
               label: "Worst Case",
               value: formatCompact(worstCase - totalAssets),
-              sub: `Portofolio jadi ${formatCompact(worstCase)}`,
+              sub: `Aset jadi ${formatCompact(worstCase)} (${totalAssets > 0 ? ((worstCase / totalAssets - 1) * 100).toFixed(1) : 0}%)`,
               color: tokens.colors.semantic.danger,
-              tip: "Simulasi crash pasar: semua aset ekuitas turun 30% sekaligus. Ini potensi nilai kerugian (dalam minus) dan nilai akhir portofoliomu.",
+              tip: "Simulasi saat aset mengalami worst drawdown sekaligus. Ini potensi nilai kerugian (dalam minus) dan nilai akhir portofoliomu.",
             },
           ].map((s, i) => (
             <div key={i} className="stat">
@@ -1439,14 +1481,16 @@ export default function WealthTracker() {
           <div
             style={{
               position: "fixed",
-              top: 0, left: 0, right: 0, bottom: 0,
+              inset: 0,
+              pointerEvents: "auto",
               zIndex: 9999,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: tokens.colors.overlay,
               backdropFilter: "blur(4px)",
-              padding: "16px"
+              padding: "16px",
+              transition: "all 0.3s ease"
             }}
             onClick={closeModal}
           >

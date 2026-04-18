@@ -58,6 +58,8 @@ export default function InputTab({
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false); // STATE BARU
   // Tambahkan di bawah showDiscardConfirm (Sekitar baris 46)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [catalogFilter, setCatalogFilter] = useState('all');
+
 
   // Initialize draft when modal opens
   useEffect(() => {
@@ -70,6 +72,31 @@ export default function InputTab({
       setShowAdvanced(false);
     }
   }, [editingAssetId]);
+
+  // ── BODY SCROLL LOCK ──
+  useEffect(() => {
+    const isAnyModalOpen = isModalOpen || editingAssetId !== null || showDiscardConfirm || showDeleteConfirm;
+    const scrollBarWidth = window.innerWidth - document.body.clientWidth;
+
+    if (isAnyModalOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.paddingRight = `${scrollBarWidth}px`;
+      document.body.style.overscrollBehavior = "none";
+    } else {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
+      document.body.style.overscrollBehavior = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
+      document.body.style.overscrollBehavior = "unset";
+    };
+  }, [isModalOpen, editingAssetId, showDiscardConfirm, showDeleteConfirm]);
+
 
 
 
@@ -331,12 +358,14 @@ export default function InputTab({
             style={{
               position: "fixed",
               inset: 0,
+              pointerEvents: "auto",
               background: tokens.colors.overlay,
               backdropFilter: "blur(4px)",
               zIndex: 9000,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "all 0.3s ease"
             }}
           >
             <style>
@@ -964,6 +993,7 @@ export default function InputTab({
             style={{
               position: "fixed",
               inset: 0,
+              pointerEvents: "auto",
               background: tokens.colors.overlay,
               backdropFilter: "blur(4px)",
               zIndex: 8000,
@@ -971,6 +1001,7 @@ export default function InputTab({
               alignItems: "center",
               justifyContent: "center",
               padding: 16,
+              transition: "all 0.3s ease"
             }}
           >
             <div
@@ -982,6 +1013,7 @@ export default function InputTab({
                 width: "100%",
                 maxWidth: 820,
                 maxHeight: "85vh",
+                minHeight: "85vh",
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
@@ -990,59 +1022,114 @@ export default function InputTab({
               {/* Modal Header */}
               <div
                 style={{
-                  padding: "20px 24px",
+                  padding: "20px 24px 16px",
                   borderBottom: `1.5px solid ${tokens.colors.surface.input}`,
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  flexDirection: "column",
                   background: tokens.colors.surface.card,
                   flexShrink: 0,
                 }}
               >
-                <div>
-                  <div
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        fontSize: 18,
+                        color: tokens.colors.text.primary,
+                        marginBottom: 3,
+                      }}
+                    >
+                      📦 Katalog Instrumen Investasi
+                    </div>
+                    <div style={{ fontSize: 12, color: tokens.colors.text.tertiary }}>
+                      Pilih instrumen untuk ditambahkan ke simulasi portofoliomu.
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
                     style={{
-                      fontWeight: 800,
-                      fontSize: 18,
-                      color: tokens.colors.text.primary,
-                      marginBottom: 3,
+                      width: 34,
+                      height: 34,
+                      borderRadius: "50%",
+                      border: `1.5px solid ${tokens.colors.border.subtle}`,
+                      background: tokens.colors.surface.app,
+                      color: tokens.colors.text.secondary,
+                      fontSize: 16,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all .15s",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = tokens.colors.semantic.dangerBg;
+                      e.currentTarget.style.color = tokens.colors.semantic.danger;
+                      e.currentTarget.style.borderColor = tokens.colors.semantic.dangerBorder;
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = tokens.colors.surface.app;
+                      e.currentTarget.style.color = tokens.colors.text.secondary;
+                      e.currentTarget.style.borderColor = tokens.colors.border.subtle;
                     }}
                   >
-                    📦 Katalog Instrumen Investasi
-                  </div>
-                  <div style={{ fontSize: 12, color: tokens.colors.text.tertiary }}>
-                    Pilih instrumen untuk ditambahkan ke simulasi portofoliomu.
-                  </div>
+                    ✕
+                  </button>
                 </div>
-                <button
-                  onClick={() => setIsModalOpen(false)}
+
+                {/* Filter Bar */}
+                <div
                   style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: "50%",
-                    border: `1.5px solid ${tokens.colors.border.subtle}`,
-                    background: tokens.colors.surface.app,
-                    color: tokens.colors.text.secondary,
-                    fontSize: 16,
-                    cursor: "pointer",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "all .15s",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = tokens.colors.semantic.dangerBg;
-                    e.currentTarget.style.color = tokens.colors.semantic.danger;
-                    e.currentTarget.style.borderColor = tokens.colors.semantic.dangerBorder;
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = tokens.colors.surface.app;
-                    e.currentTarget.style.color = tokens.colors.text.secondary;
-                    e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                    gap: 10,
+                    overflowX: "auto",
+                    flexWrap: "nowrap",
+                    paddingBottom: 4,
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
                   }}
                 >
-                  ✕
-                </button>
+                  <style>{`
+                    .filter-chip::-webkit-scrollbar { display: none; }
+                  `}</style>
+                  {[
+                    { id: 'all', label: 'Semua', sub: 'Semua', color: tokens.colors.text.tertiary },
+                    { id: 'safe', label: 'Safe Haven', sub: 'Safe', color: tokens.colors.dataViz.cash },
+                    { id: 'stable', label: 'Stable Growth', sub: 'Stable', color: tokens.colors.dataViz.obligasiFr },
+                    { id: 'aggressive', label: 'Aggressive', sub: 'Aggressive', color: tokens.colors.dataViz.localStocks }
+                  ].map((opt) => {
+                    const isActive = catalogFilter === opt.id;
+                    return (
+                      <div
+                        key={opt.id}
+                        onClick={() => setCatalogFilter(opt.id)}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 6,
+                          minWidth: "fit-content",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "100px",
+                            fontSize: 13,
+                            fontWeight: 700,
+                            whiteSpace: "nowrap",
+                            transition: "all 0.2s",
+                            background: isActive ? tokens.colors.semantic.brand : tokens.colors.surface.input,
+                            color: isActive ? "#FFFFFF" : tokens.colors.text.secondary,
+                            textAlign: "center"
+                          }}
+                        >
+                          {opt.label}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Modal Body */}
@@ -1061,116 +1148,157 @@ export default function InputTab({
                     gap: 12,
                   }}
                 >
-                  {ASSET_CLASSES.filter((cls) => !activeAssetIds.includes(cls.id)).map((cls) => (
-                    <div
-                      key={cls.id}
-                      onClick={() => addAsset(cls.id)}
-                      style={{
-                        background: tokens.colors.surface.card,
-                        border: `1.5px solid ${tokens.colors.border.subtle}`,
-                        borderTop: `4px solid ${cls.color}`,
-                        borderRadius: 14,
-                        padding: "14px 16px",
-                        cursor: "pointer",
-                        transition: "all .18s",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.borderColor = cls.color;
-                        e.currentTarget.style.boxShadow = `0 4px 16px ${cls.color}28`;
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.borderColor = tokens.colors.border.subtle;
-                        e.currentTarget.style.boxShadow = "none";
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.borderTopColor = cls.color;
-                      }}
-                    >
+                  {(() => {
+                    const categoryGroups = {
+                      safe: ['cash', 'bankDigital', 'rdpu', 'rdpu_usd', 'usd'],
+                      stable: ['sbn_ritel', 'obligasi_fr', 'rdo', 'gold', 'rd_campuran'],
+                      aggressive: ['sp500', 'rdSaham', 'saham', 'nasdaq', 'us_stocks', 'kripto']
+                    };
+
+                    const filteredAssets = ASSET_CLASSES.filter((cls) => {
+                      if (activeAssetIds.includes(cls.id)) return false;
+                      if (catalogFilter === 'all') return true;
+                      return categoryGroups[catalogFilter]?.includes(cls.id);
+                    });
+
+                    if (filteredAssets.length === 0) {
+                      return (
+                        <div
+                          style={{
+                            gridColumn: "1/-1",
+                            textAlign: "center",
+                            padding: "60px 20px",
+                            color: tokens.colors.text.tertiary,
+                          }}
+                        >
+                          <div style={{ fontSize: 40, marginBottom: 12 }}>✨</div>
+                          <div style={{ fontSize: 14, fontWeight: 600 }}>
+                            {catalogFilter === 'all'
+                              ? "Semua instrumen sudah aktif di portofoliomu!"
+                              : "Tidak ada instrumen di kategori ini"}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return filteredAssets.map((cls) => (
                       <div
+                        key={cls.id}
+                        onClick={() => addAsset(cls.id)}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                          marginBottom: 6,
+                          background: tokens.colors.surface.card,
+                          border: `1.5px solid ${tokens.colors.border.subtle}`,
+                          borderTop: `4px solid ${cls.color}`,
+                          borderRadius: 14,
+                          padding: "14px 16px",
+                          cursor: "pointer",
+                          transition: "all .18s",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.borderColor = cls.color;
+                          e.currentTarget.style.boxShadow = `0 4px 16px ${cls.color}28`;
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                          e.currentTarget.style.boxShadow = "none";
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.borderTopColor = cls.color;
                         }}
                       >
                         <div
                           style={{
-                            fontWeight: 700,
-                            fontSize: 13,
-                            color: tokens.colors.text.primary,
-                          }}
-                        >
-                          {cls.name}
-                        </div>
-                        <div
-                          style={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: "50%",
-                            background: `${cls.color}18`,
-                            color: cls.color,
                             display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 14,
-                            fontWeight: 700,
-                            flexShrink: 0,
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            marginBottom: 6,
                           }}
                         >
-                          +
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 13,
+                              color: tokens.colors.text.primary,
+                            }}
+                          >
+                            {cls.name}
+                          </div>
+                          <div
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: "50%",
+                              background: `${cls.color}18`,
+                              color: cls.color,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 14,
+                              fontWeight: 700,
+                              flexShrink: 0,
+                            }}
+                          >
+                            +
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: tokens.colors.text.tertiary,
+                            lineHeight: 1.45,
+                            marginBottom: 10,
+                          }}
+                        >
+                          {cls.description}
+                        </div>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
+                          {(() => {
+                            const normalizedRisk = () => {
+                              const r = cls.risk.toLowerCase();
+                              if (r.includes("rendah") && !r.includes("sedang") && !r.includes("menengah")) return { label: "RENDAH", color: tokens.colors.dataViz.cash };
+                              if (r.includes("sedang") || r.includes("menengah") || r.includes("menengah-tinggi")) {
+                                if (r === "menengah-tinggi") return { label: "TINGGI", color: tokens.colors.semantic.danger };
+                                return { label: "SEDANG", color: tokens.colors.dataViz.obligasiFr };
+                              }
+                              if (r.includes("tinggi")) return { label: "TINGGI", color: tokens.colors.semantic.danger };
+                              return { label: "SEDANG", color: tokens.colors.dataViz.obligasiFr };
+                            };
+                            const risk = normalizedRisk();
+                            return (
+                              <>
+                                <span
+                                  className="tag"
+                                  style={{
+                                    background: `${risk.color}14`,
+                                    color: risk.color,
+                                    border: `1px solid ${risk.color}22`
+                                  }}
+                                >
+                                  {risk.label}
+                                </span>
+                                <span
+                                  className="tag"
+                                  style={{
+                                    background: `${tokens.colors.semantic.brand}08`,
+                                    color: tokens.colors.text.secondary,
+                                    border: `1px solid ${tokens.colors.border.subtle}`
+                                  }}
+                                >
+                                  {cls.return}% gross
+                                </span>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          color: tokens.colors.text.tertiary,
-                          lineHeight: 1.45,
-                          marginBottom: 10,
-                        }}
-                      >
-                        {cls.description}
-                      </div>
-                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        <span
-                          className="tag"
-                          style={{ background: `${cls.color}14`, color: cls.color }}
-                        >
-                          {cls.liquidity}
-                        </span>
-                        <span
-                          className="tag"
-                          style={{ background: tokens.colors.surface.input, color: tokens.colors.text.secondary }}
-                        >
-                          {cls.risk}
-                        </span>
-                        <span
-                          className="tag"
-                          style={{ background: tokens.colors.semantic.successBg, color: tokens.colors.semantic.success }}
-                        >
-                          {cls.return}% gross
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  {ASSET_CLASSES.filter((cls) => !activeAssetIds.includes(cls.id)).length === 0 && (
-                    <div
-                      style={{
-                        gridColumn: "1/-1",
-                        textAlign: "center",
-                        padding: 40,
-                        color: tokens.colors.text.tertiary,
-                        fontSize: 13,
-                      }}
-                    >
-                      ✅ Semua instrumen sudah aktif di portofoliomu!
-                    </div>
-                  )}
+                    ));
+                  })()}
                 </div>
               </div>
             </div>
           </div>
         )}
+
       </div>
 
       {/* ══════════════════════════════════════════════
@@ -1455,7 +1583,8 @@ export default function InputTab({
         <div
           style={{
             position: "fixed",
-            top: 0, left: 0, right: 0, bottom: 0,
+            inset: 0,
+            pointerEvents: "auto",
             zIndex: 9999,
             display: "flex",
             alignItems: "center",
@@ -1463,7 +1592,8 @@ export default function InputTab({
             backgroundColor: tokens.colors.overlay,
             backdropFilter: "blur(4px)",
             padding: "16px",
-            WebkitTapHighlightColor: "transparent"
+            WebkitTapHighlightColor: "transparent",
+            transition: "all 0.3s ease"
           }}
         >
           <div
@@ -1515,11 +1645,14 @@ export default function InputTab({
       {showDeleteConfirm && (
         <div
           style={{
-            position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+            position: "fixed",
+            inset: 0,
+            pointerEvents: "auto",
             zIndex: 10000, // Lebih tinggi dari modal editor
             display: "flex", alignItems: "center", justifyContent: "center",
             backgroundColor: tokens.colors.overlay, backdropFilter: "blur(4px)", padding: "16px",
-            WebkitTapHighlightColor: "transparent"
+            WebkitTapHighlightColor: "transparent",
+            transition: "all 0.3s ease"
           }}
         >
           <div
