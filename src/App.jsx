@@ -16,7 +16,7 @@ import ProjectionTab from "./components/ProjectionTab";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-const DEFAULT_USD_RATE = 17000;
+const DEFAULT_USD_RATE = 17100;
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const tokens = {
