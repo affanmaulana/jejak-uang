@@ -444,7 +444,7 @@ export default function WealthTracker() {
   useEffect(() => {
     const isAnyModalOpen = isModalOpen || modalAction.isOpen;
     const scrollBarWidth = window.innerWidth - document.body.clientWidth;
-    
+
     if (isAnyModalOpen) {
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
@@ -874,10 +874,15 @@ export default function WealthTracker() {
 /* Android Chrome Ultimate Kill-Switch */
         .recharts-responsive-container,
         .recharts-wrapper, 
-        .recharts-surface {
-          outline: none !important;
-          -webkit-tap-highlight-color: transparent !important;
-        }
+.recharts-surface {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  user-select: none;
+}
+  .recharts-tooltip-wrapper {
+  transition: transform 0.1s ease-out !important;
+  pointer-events: none; /* Agar tidak menghalangi scroll */
+}
 
         .recharts-responsive-container:focus,
         .recharts-responsive-container:active,

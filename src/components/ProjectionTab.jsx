@@ -266,10 +266,10 @@ export default function ProjectionTab({
           </div>
         </div>
 
-        <ResponsiveContainer width="99%" height={320}>
+        <ResponsiveContainer width="100%" height={320}>
           <ComposedChart
             data={chartData}
-            margin={{ top: 20, right: 10, left: 10, bottom: 0 }}
+            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
             style={{ outline: "none", WebkitTapHighlightColor: "transparent", userSelect: "none", touchAction: "manipulation" }}
             tabIndex={-1}
           >
