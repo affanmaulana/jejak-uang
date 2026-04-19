@@ -13,7 +13,6 @@ import {
 } from "recharts";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
-import AllocationTab from "./components/AllocationTab";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -1352,7 +1351,6 @@ export default function WealthTracker() {
           {[
             ["input", "Input Aset"],
             ["projection", "Proyeksi"],
-            ["allocation", "Alokasi"],
           ].map(([id, lbl]) => (
             <button
               key={id}
@@ -1410,7 +1408,7 @@ export default function WealthTracker() {
         )}
 
         {/* ══════════════════════════════════════════════
-            TAB: PROYEKSI
+            TAB: PROYEKSI & ALOKASI
         ══════════════════════════════════════════════ */}
         {activeTab === "projection" && (
           <ProjectionTab
@@ -1425,18 +1423,8 @@ export default function WealthTracker() {
             formatCompact={formatCompact}
             totalAssets={totalAssets}
             worstCase={worstCase}
-          />
-        )}
-
-        {/* ══════════════════════════════════════════════
-            TAB: ALOKASI
-        ══════════════════════════════════════════════ */}
-        {activeTab === "allocation" && (
-          <AllocationTab
-            tokens={tokens}
             allocData={allocData}
             monthlyContribs={monthlyContribs}
-            formatCompact={formatCompact}
             afterTaxReturn={afterTaxReturn}
           />
         )}
@@ -1466,7 +1454,6 @@ export default function WealthTracker() {
           {[
             ["input", "", "Input"],
             ["projection", "", "Proyeksi"],
-            ["allocation", "", "Alokasi"],
           ].map(([id, icon, lbl]) => (
             <button
               key={id}
