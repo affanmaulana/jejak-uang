@@ -1093,7 +1093,7 @@ export default function WealthTracker() {
               tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
             },
             {
-              label: "Worst Case",
+              label: "Market Crash",
               value: formatCompact(worstCase - totalAssets),
               sub: `Aset jadi ${formatCompact(worstCase)} (${totalAssets > 0 ? ((worstCase / totalAssets - 1) * 100).toFixed(1) : 0}%)`,
               color: tokens.colors.semantic.danger,
