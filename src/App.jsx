@@ -28,13 +28,13 @@ const tokens = {
   },
   typography: {
     fontFamily: "'Plus Jakarta Sans', sans-serif",
-    display: { fontSize: '48px', fontWeight: 700, lineHeight: '1.1', letterSpacing: '-0.02em' },
-    h1: { fontSize: '32px', fontWeight: 700, lineHeight: '1.2', letterSpacing: '-0.01em' },
-    h2: { fontSize: '24px', fontWeight: 600, lineHeight: '1.3', letterSpacing: '0' },
-    eyebrow: { fontSize: '12px', fontWeight: 700, lineHeight: '1.4', letterSpacing: '0.05em', textTransform: 'uppercase' },
-    bodyRegular: { fontSize: '16px', fontWeight: 400, lineHeight: '1.5', letterSpacing: '0' },
-    bodyBold: { fontSize: '16px', fontWeight: 600, lineHeight: '1.5', letterSpacing: '0' },
-    interactive: { fontSize: '14px', fontWeight: 600, lineHeight: '1.2', letterSpacing: '0' },
+    display: { fontSize: "var(--text-display-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-display-line-height)", letterSpacing: "var(--text-display-letter-spacing)" },
+    h1: { fontSize: "var(--text-h1-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-h1-line-height)", letterSpacing: "var(--text-h1-letter-spacing)" },
+    h2: { fontSize: "var(--text-h2-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-h2-line-height)", letterSpacing: "0" },
+    eyebrow: { fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-caption-line-height)", letterSpacing: "var(--text-eyebrow-letter-spacing)", textTransform: "uppercase" },
+    bodyRegular: { fontSize: "var(--text-subtitle-size)", fontWeight: "400", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
+    bodyBold: { fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
+    interactive: { fontSize: "var(--text-body-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-h1-line-height)", letterSpacing: "0" },
   },
 };
 
@@ -922,10 +922,10 @@ export default function WealthTracker() {
           <h1
             className="header-title"
             style={{
-              fontSize: 32,
-              fontWeight: 800,
+              fontSize: "var(--text-h1-size)",
+              fontWeight: "var(--text-h1-weight)",
               margin: 0,
-              letterSpacing: "-0.01em",
+              letterSpacing: "var(--text-h1-letter-spacing)",
               color: "var(--color-text-primary)",
             }}
           >
@@ -934,7 +934,7 @@ export default function WealthTracker() {
           <p
             className="header-sub"
             style={{
-              fontSize: 16,
+              fontSize: "var(--text-subtitle-size)",
               color: "var(--color-text-tertiary)",
               marginTop: 5,
               marginBottom: 0,
@@ -972,8 +972,8 @@ export default function WealthTracker() {
             >
               <span
                 style={{
-                  fontSize: 13,
-                  fontWeight: 700,
+                  fontSize: "var(--text-body-size)",
+                  fontWeight: "var(--text-subtitle-weight)",
                   color: stats.realReturn >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
                 }}
               >
@@ -992,7 +992,7 @@ export default function WealthTracker() {
                   style={{ transform: showAfterTax ? "translateX(16px)" : "translateX(0)" }}
                 />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", cursor: "pointer" }}
+              <span style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-caption-weight)", color: "var(--color-text-secondary)", cursor: "pointer" }}
                 onClick={() => setShowAfterTax((v) => !v)}
               >
                 After-tax
@@ -1006,15 +1006,15 @@ export default function WealthTracker() {
             </div>
             <div
               style={{
-                fontSize: 28,
-                fontWeight: 800,
+                fontSize: "var(--text-h2-size)",
+                fontWeight: "var(--text-h1-weight)",
                 fontFamily: tokens.typography.fontFamily,
                 color: "var(--color-text-primary)",
               }}
             >
               {formatCompact(totalAssets)}
             </div>
-            <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
+            <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-secondary)", marginTop: 2 }}>
               {formatIDR(totalAssets)}
             </div>
           </div>
@@ -1056,7 +1056,7 @@ export default function WealthTracker() {
               <div
                 style={{
                   ...tokens.typography.eyebrow,
-                  fontSize: 10,
+                  fontSize: "var(--text-eyebrow-size)",
                   color: "var(--color-text-tertiary)",
                   marginBottom: 5,
                 }}
@@ -1087,15 +1087,15 @@ export default function WealthTracker() {
               </div>
               <div
                 style={{
-                  fontSize: 17,
-                  fontWeight: 800,
+                  fontSize: "var(--text-h3-size)",
+                  fontWeight: "var(--text-h1-weight)",
                   fontFamily: tokens.typography.fontFamily,
                   color: s.color,
                 }}
               >
                 {s.value}
               </div>
-              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 3 }}>
+              <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 3 }}>
                 {s.sub}
               </div>
             </div>
@@ -1103,11 +1103,11 @@ export default function WealthTracker() {
         </div>
 
         {/* ── PROFIL ALOKASI KAMU (naked, selalu tampil) ── */}
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 12 }}>
           <div
             style={{
               ...tokens.typography.eyebrow,
-              fontSize: 11,
+              fontSize: "var(--text-eyebrow-size)",
               color: "var(--color-text-tertiary)",
               marginBottom: 12,
             }}
@@ -1152,8 +1152,8 @@ export default function WealthTracker() {
                 >
                   <span
                     style={{
-                      fontSize: 13,
-                      fontWeight: 700,
+                      fontSize: "var(--text-body-size)",
+                      fontWeight: "var(--text-subtitle-weight)",
                       color: "var(--color-text-primary)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
@@ -1163,7 +1163,7 @@ export default function WealthTracker() {
                   >
                     {t.name}
                   </span>
-                  <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+                  <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>
                     {new Date(t.updatedAt).toLocaleDateString("id-ID")}
                   </span>
                 </div>
@@ -1236,8 +1236,8 @@ export default function WealthTracker() {
                     background: "transparent",
                     border: "none",
                     outline: "none",
-                    fontSize: 12,
-                    fontWeight: 600,
+                    fontSize: "var(--text-caption-size)",
+                    fontWeight: "var(--text-caption-weight)",
                     color: "var(--color-text-primary)",
                   }}
                   placeholder="Nama Profil..."
@@ -1271,15 +1271,15 @@ export default function WealthTracker() {
                   border: `1.5px solid var(--color-border-subtle)`,
                   background: "var(--color-surface-app)",
                   color: "var(--color-text-tertiary)",
-                  fontSize: 12,
-                  fontWeight: 600,
+                  fontSize: "var(--text-caption-size)",
+                  fontWeight: "var(--text-caption-weight)",
                   flexShrink: 0,
                   userSelect: "none",
                   cursor: "default",
                   letterSpacing: ".02em",
                 }}
               >
-                <span style={{ fontSize: 14 }}>🔒</span>
+                <span style={{ fontSize: "var(--text-body-size)" }}>🔒</span>
                 <span>3 / 3</span>
               </div>
             )}
@@ -1442,7 +1442,7 @@ export default function WealthTracker() {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <p style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+              <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
                 {modalAction.title}
               </p>
               <div style={{ display: "flex", gap: "8px", width: "100%" }}>
@@ -1452,7 +1452,7 @@ export default function WealthTracker() {
                     style={{
                       width: "100%",
                       padding: "14px 0", borderRadius: "10px", border: "none",
-                      background: "var(--color-semantic-brand)", color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                      background: "var(--color-semantic-brand)", color: "#FFFFFF", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                       cursor: "pointer", fontFamily: tokens.typography.fontFamily
                     }}
                   >
@@ -1465,7 +1465,7 @@ export default function WealthTracker() {
                       style={{
                         flex: 1,
                         padding: "12px 0", borderRadius: "8px", border: `1.5px solid var(--color-border-subtle)`,
-                        background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: "14px",
+                        background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                         cursor: "pointer", fontFamily: tokens.typography.fontFamily
                       }}
                     >
@@ -1500,7 +1500,7 @@ export default function WealthTracker() {
                         flex: 1,
                         padding: "12px 0", borderRadius: "8px", border: "none",
                         background: modalAction.type === "delete" ? "var(--color-semantic-danger)" : "var(--color-semantic-brand)",
-                        color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                        color: "#FFFFFF", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                         cursor: "pointer", fontFamily: tokens.typography.fontFamily
                       }}
                     >

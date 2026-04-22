@@ -139,7 +139,7 @@ export default function InputTab({
             marginBottom: 10,
           }}
         >
-          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--color-text-secondary)" }}>
+          <div style={{ fontSize: "var(--text-h3-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)" }}>
             {activeAssetIds.length > 0
               ? `${activeAssetIds.length} instrumen aktif`
               : "Belum ada instrumen dipilih"}
@@ -155,8 +155,8 @@ export default function InputTab({
               padding: "8px 16px",
               borderRadius: 12,
               border: "none",
-              fontWeight: 700,
-              fontSize: 13,
+              fontWeight: "var(--text-subtitle-weight)",
+              fontSize: "var(--text-body-size)",
               cursor: activeAssetIds.length >= ASSET_CLASSES.length ? "not-allowed" : "pointer",
               background: activeAssetIds.length >= ASSET_CLASSES.length ? "var(--color-surface-input)" : "var(--color-semantic-brand)",
               color: activeAssetIds.length >= ASSET_CLASSES.length ? "var(--color-text-tertiary)" : "var(--color-surface-card)",
@@ -165,7 +165,7 @@ export default function InputTab({
               fontFamily: tokens.typography.fontFamily,
             }}
           >
-            <span style={{ fontSize: 18, lineHeight: 1 }}>＋</span>
+            <span style={{ fontSize: "var(--text-h3-size)", lineHeight: "1" }}>＋</span>
             Instrumen Baru
           </button>
         </div>
@@ -186,14 +186,14 @@ export default function InputTab({
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 48, marginBottom: 16, filter: "grayscale(1)", opacity: 0.7 }}>🏦</div>
+            <div style={{ fontSize: "var(--text-display-size)", marginBottom: 16, filter: "grayscale(1)", opacity: 0.7 }}>🏦</div>
             <div
               style={{
-                fontSize: 22,
-                fontWeight: 800,
+                fontSize: "var(--text-h2-size)",
+                fontWeight: "var(--text-h1-weight)",
                 color: "var(--color-text-primary)",
                 marginBottom: 8,
-                lineHeight: 1.35,
+                lineHeight: "var(--text-h2-line-height)",
               }}
             >
               Harta yang tak tercatat,
@@ -202,11 +202,11 @@ export default function InputTab({
             </div>
             <div
               style={{
-                fontSize: 13,
+                fontSize: "var(--text-body-size)",
                 color: "var(--color-text-tertiary)",
                 marginBottom: 28,
                 maxWidth: 360,
-                lineHeight: 1.6,
+                lineHeight: "var(--text-body-line-height)",
               }}
             >
               Mulai lacak portofoliomu. Pilih instrumen investasi yang kamu miliki dan simulasikan pertumbuhannya.
@@ -220,8 +220,8 @@ export default function InputTab({
                 padding: "12px 28px",
                 borderRadius: 12,
                 border: "none",
-                fontWeight: 800,
-                fontSize: 14,
+                fontWeight: "var(--text-h1-weight)",
+                fontSize: "var(--text-body-size)",
                 cursor: "pointer",
                 background: "var(--color-semantic-brand)",
                 color: "var(--color-surface-card)",
@@ -232,7 +232,7 @@ export default function InputTab({
               onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
               onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}
             >
-              <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>
+              <span style={{ fontSize: "var(--text-h3-size)", lineHeight: "1" }}>＋</span>
               Tambah Instrumen Pertamamu
             </button>
           </div>
@@ -283,8 +283,8 @@ export default function InputTab({
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                       <span
                         style={{
-                          fontSize: 14,
-                          fontWeight: 700,
+                          fontSize: "var(--text-body-size)",
+                          fontWeight: "var(--text-subtitle-weight)",
                           color: "var(--color-text-primary)",
                         }}
                       >
@@ -292,7 +292,7 @@ export default function InputTab({
                       </span>
                       <span
                         style={{
-                          fontSize: 11,
+                          fontSize: "var(--text-eyebrow-size)",
                           color: "var(--color-text-tertiary)",
                         }}
                       >
@@ -305,8 +305,8 @@ export default function InputTab({
                     <div style={{ textAlign: "right", display: "flex", flexDirection: "column", gap: 4 }}>
                       <div
                         style={{
-                          fontSize: 14,
-                          fontWeight: 800,
+                          fontSize: "var(--text-body-size)",
+                          fontWeight: "var(--text-h1-weight)",
                           color: "var(--color-text-primary)",
                           fontFamily: tokens.typography.fontFamily,
                         }}
@@ -315,8 +315,8 @@ export default function InputTab({
                       </div>
                       <div
                         style={{
-                          fontSize: 11,
-                          fontWeight: 700,
+                          fontSize: "var(--text-eyebrow-size)",
+                          fontWeight: "var(--text-subtitle-weight)",
                           color: cls.color,
                         }}
                       >
@@ -471,8 +471,8 @@ export default function InputTab({
                           <h3
                             style={{
                               margin: 0,
-                              fontSize: 18,
-                              fontWeight: 800,
+                              fontSize: "var(--text-h3-size)",
+                              fontWeight: "var(--text-h1-weight)",
                               color: "var(--color-text-primary)",
                             }}
                           >
@@ -482,9 +482,9 @@ export default function InputTab({
                         <p
                           style={{
                             margin: 0,
-                            fontSize: 13,
+                            fontSize: "var(--text-body-size)",
                             color: "var(--color-text-tertiary)",
-                            lineHeight: 1.5,
+                            lineHeight: "var(--text-subtitle-line-height)",
                           }}
                         >
                           {cls.description}
@@ -496,7 +496,7 @@ export default function InputTab({
                           background: "none",
                           border: "none",
                           cursor: "pointer",
-                          fontSize: 20,
+                          fontSize: "var(--text-h3-size)",
                           color: "var(--color-text-tertiary)",
                         }}
                       >
@@ -520,8 +520,8 @@ export default function InputTab({
                           marginBottom: 4
                         }}>
                           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text-primary)" }}>Input dalam USD?</span>
-                            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Ubah konversi USD-IDR di 'Valas USD'</span>
+                            <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)" }}>Input dalam USD?</span>
+                            <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>Ubah konversi USD-IDR di 'Valas USD'</span>
                           </div>
                           <label className="ios-toggle-wrap">
                             <input
@@ -555,8 +555,8 @@ export default function InputTab({
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <label
                           style={{
-                            fontSize: 13,
-                            fontWeight: 700,
+                            fontSize: "var(--text-body-size)",
+                            fontWeight: "var(--text-subtitle-weight)",
                             color: "var(--color-text-secondary)",
                           }}
                         >
@@ -570,8 +570,8 @@ export default function InputTab({
                               top: "50%",
                               transform: "translateY(-50%)",
                               color: "var(--color-text-tertiary)",
-                              fontWeight: 700,
-                              fontSize: 14,
+                              fontWeight: "var(--text-subtitle-weight)",
+                              fontSize: "var(--text-body-size)",
                             }}
                           >
                             {currencyPref === 'USD' ? "$" : "Rp"}
@@ -610,7 +610,7 @@ export default function InputTab({
 
 
                         </div>
-                        <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)", marginLeft: "4px" }}>
+                        <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginLeft: "4px" }}>
                           Bisa operasi matematika (+ dan -)
                         </div>
                       </div>
@@ -619,8 +619,8 @@ export default function InputTab({
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         <label
                           style={{
-                            fontSize: 13,
-                            fontWeight: 700,
+                            fontSize: "var(--text-body-size)",
+                            fontWeight: "var(--text-subtitle-weight)",
                             color: "var(--color-text-secondary)",
                           }}
                         >
@@ -634,8 +634,8 @@ export default function InputTab({
                               top: "50%",
                               transform: "translateY(-50%)",
                               color: "var(--color-text-tertiary)",
-                              fontWeight: 700,
-                              fontSize: 13,
+                              fontWeight: "var(--text-subtitle-weight)",
+                              fontSize: "var(--text-body-size)",
                             }}
                           >
                             {currencyPref === 'USD' ? "$" : "Rp"}
@@ -686,8 +686,8 @@ export default function InputTab({
                             gap: 6,
                             padding: "4px 0",
                             cursor: "pointer",
-                            fontSize: 13,
-                            fontWeight: 700,
+                            fontSize: "var(--text-body-size)",
+                            fontWeight: "var(--text-subtitle-weight)",
                             color: "var(--color-text-secondary)",
                           }}
                         >
@@ -720,13 +720,13 @@ export default function InputTab({
                           >
                             {/* Custom Return Rate */}
                             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>
+                              <label style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
                                 Custom Return Rate (%)
                               </label>
                               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                 <button
                                   className="stepbtn"
-                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  style={{ width: 44, height: 44, fontSize: "var(--text-h3-size)", flexShrink: 0 }}
                                   onClick={() => setDraftReturn(prev => Math.max(0, parseFloat((prev - 0.1).toFixed(1))))}
                                 >
                                   −
@@ -740,13 +740,13 @@ export default function InputTab({
                                     value={draftReturn}
                                     onChange={(e) => setDraftReturn(Number(e.target.value))}
                                   />
-                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: "var(--color-text-tertiary)" }}>
+                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)" }}>
                                     %
                                   </span>
                                 </div>
                                 <button
                                   className="stepbtn"
-                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  style={{ width: 44, height: 44, fontSize: "var(--text-h3-size)", flexShrink: 0 }}
                                   onClick={() => setDraftReturn(prev => parseFloat((prev + 0.1).toFixed(1)))}
                                 >
                                   +
@@ -756,13 +756,13 @@ export default function InputTab({
 
                             {/* Stress Test Drawdown */}
                             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>
+                              <label style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
                                 Stress Test Drawdown (%)
                               </label>
                               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                 <button
                                   className="stepbtn"
-                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  style={{ width: 44, height: 44, fontSize: "var(--text-h3-size)", flexShrink: 0 }}
                                   onClick={() => setDraftDrawdown(prev => Math.max(0, prev - 1))}
                                 >
                                   −
@@ -775,19 +775,19 @@ export default function InputTab({
                                     value={draftDrawdown}
                                     onChange={(e) => setDraftDrawdown(Number(e.target.value))}
                                   />
-                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: "var(--color-text-tertiary)" }}>
+                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)" }}>
                                     %
                                   </span>
                                 </div>
                                 <button
                                   className="stepbtn"
-                                  style={{ width: 44, height: 44, fontSize: 20, flexShrink: 0 }}
+                                  style={{ width: 44, height: 44, fontSize: "var(--text-h3-size)", flexShrink: 0 }}
                                   onClick={() => setDraftDrawdown(prev => Math.min(100, prev + 1))}
                                 >
                                   +
                                 </button>
                               </div>
-                              <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>
+                              <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 2 }}>
                                 Estimasi penurunan (%) saat skenario terburuk (crash).
                               </span>
                             </div>
@@ -795,7 +795,7 @@ export default function InputTab({
                             {/* Custom Kurs USD (Specifically for Valas USD) */}
                             {cls.id === 'usd' && (
                               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>
+                                <label style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
                                   Custom Kurs USD (Rp)
                                 </label>
                                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -807,7 +807,7 @@ export default function InputTab({
                                       value={new Intl.NumberFormat("id-ID").format(customUSDRate)}
                                       onChange={(e) => setCustomUSDRate(Number(e.target.value.replace(/\D/g, "")))}
                                     />
-                                    <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 12, fontWeight: 700, color: "var(--color-text-tertiary)" }}>
+                                    <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)" }}>
                                       Rp
                                     </span>
                                   </div>
@@ -830,8 +830,8 @@ export default function InputTab({
                                 border: `1.5px solid ${"var(--color-border-subtle)"}`,
                                 background: "none",
                                 color: "var(--color-text-secondary)",
-                                fontWeight: 800,
-                                fontSize: 13,
+                                fontWeight: "var(--text-h1-weight)",
+                                fontSize: "var(--text-body-size)",
                                 cursor: "pointer",
                                 transition: "all 0.2s",
                                 fontFamily: tokens.typography.fontFamily,
@@ -867,18 +867,18 @@ export default function InputTab({
                       >
                         {/* THE FIX: flex: 1 memaksa kontainer ini memakan semua sisa ruang */}
                         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                          <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>
                             Proyeksi Imbal Hasil (Net)
                           </div>
                           <div style={{ display: "flex", gap: 6, alignItems: "baseline", flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 18, fontWeight: 800, color: "var(--color-semantic-success)" }}>
+                            <span style={{ fontSize: "var(--text-h3-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-semantic-success)" }}>
                               {netR}%
                             </span>
-                            <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>/ thn</span>
+                            <span style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>/ thn</span>
                           </div>
 
                           {/* INFO PAJAK */}
-                          <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontStyle: "italic", opacity: 0.8 }}>
+                          <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", fontStyle: "italic", opacity: 0.8 }}>
                             {cls.id === "gold"
                               ? "*Incl. biaya spread & admin ~1.5%"
                               : cls.taxRate === 0
@@ -889,10 +889,10 @@ export default function InputTab({
 
                         {((cls.isUSD || cls.canSwitchCurrency) && draftAsset > 0) && (
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
-                            <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginBottom: 4, whiteSpace: "nowrap" }}>
+                            <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)", marginBottom: 4, whiteSpace: "nowrap" }}>
                               {currencyPref === 'USD' ? 'Setara Rupiah' : 'Setara USD'}
                             </div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text-secondary)" }}>
+                            <div style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
                               {currencyPref === 'USD' ? formatCompact(idr) : `$${(draftAsset / customUSDRate).toFixed(2)}`}
                             </div>
                           </div>
@@ -915,8 +915,8 @@ export default function InputTab({
                             border: "none",
                             background: "var(--color-semantic-brand)",
                             color: "var(--color-surface-card)",
-                            fontWeight: 800,
-                            fontSize: 16,
+                            fontWeight: "var(--text-h1-weight)",
+                            fontSize: "var(--text-subtitle-size)",
                             cursor: "pointer",
                             boxShadow: "var(--shadow-medium)",
                             transition: "transform 0.15s",
@@ -935,8 +935,8 @@ export default function InputTab({
                             border: `1.5px solid ${"var(--color-border-subtle)"}`,
                             background: "none",
                             color: "var(--color-semantic-danger)",
-                            fontWeight: 700,
-                            fontSize: 13,
+                            fontWeight: "var(--text-subtitle-weight)",
+                            fontSize: "var(--text-body-size)",
                             cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
@@ -1003,15 +1003,15 @@ export default function InputTab({
                   <div>
                     <div
                       style={{
-                        fontWeight: 800,
-                        fontSize: 18,
+                        fontWeight: "var(--text-h1-weight)",
+                        fontSize: "var(--text-h3-size)",
                         color: "var(--color-text-primary)",
                         marginBottom: 3,
                       }}
                     >
                       📦 Katalog Instrumen Investasi
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>
+                    <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
                       Pilih instrumen untuk ditambahkan ke simulasi portofoliomu.
                     </div>
                   </div>
@@ -1024,7 +1024,7 @@ export default function InputTab({
                       border: `1.5px solid ${"var(--color-border-subtle)"}`,
                       background: "var(--color-surface-app)",
                       color: "var(--color-text-secondary)",
-                      fontSize: 16,
+                      fontSize: "var(--text-subtitle-size)",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
@@ -1084,8 +1084,8 @@ export default function InputTab({
                           style={{
                             padding: "8px 16px",
                             borderRadius: "100px",
-                            fontSize: 13,
-                            fontWeight: 700,
+                            fontSize: "var(--text-body-size)",
+                            fontWeight: "var(--text-subtitle-weight)",
                             whiteSpace: "nowrap",
                             transition: "all 0.2s",
                             background: isActive ? "var(--color-semantic-brand)" : "var(--color-surface-input)",
@@ -1140,8 +1140,8 @@ export default function InputTab({
                             color: "var(--color-text-tertiary)",
                           }}
                         >
-                          <div style={{ fontSize: 40, marginBottom: 12 }}>✨</div>
-                          <div style={{ fontSize: 14, fontWeight: 600 }}>
+                          <div style={{ fontSize: "var(--text-display-size)", marginBottom: 12 }}>✨</div>
+                          <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-caption-weight)" }}>
                             {catalogFilter === 'all'
                               ? "Semua instrumen sudah aktif di portofoliomu!"
                               : "Tidak ada instrumen di kategori ini"}
@@ -1185,8 +1185,8 @@ export default function InputTab({
                         >
                           <div
                             style={{
-                              fontWeight: 700,
-                              fontSize: 13,
+                              fontWeight: "var(--text-subtitle-weight)",
+                              fontSize: "var(--text-body-size)",
                               color: "var(--color-text-primary)",
                             }}
                           >
@@ -1202,8 +1202,8 @@ export default function InputTab({
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              fontSize: 14,
-                              fontWeight: 700,
+                              fontSize: "var(--text-body-size)",
+                              fontWeight: "var(--text-subtitle-weight)",
                               flexShrink: 0,
                             }}
                           >
@@ -1212,9 +1212,9 @@ export default function InputTab({
                         </div>
                         <div
                           style={{
-                            fontSize: 11,
+                            fontSize: "var(--text-eyebrow-size)",
                             color: "var(--color-text-tertiary)",
-                            lineHeight: 1.45,
+                            lineHeight: "var(--text-caption-line-height)",
                             marginBottom: 10,
                           }}
                         >
@@ -1277,7 +1277,7 @@ export default function InputTab({
         style={{
           border: 0,
           borderTop: `1.5px dashed ${"var(--color-border-input)"}`,
-          margin: "32px 0",
+          margin: "16px 0",
         }}
       />
 
@@ -1295,8 +1295,8 @@ export default function InputTab({
         >
           <h2
             style={{
-              fontSize: 18,
-              fontWeight: 800,
+              fontSize: "var(--text-h3-size)",
+              fontWeight: "var(--text-h1-weight)",
               color: "var(--color-text-primary)",
               margin: 0,
             }}
@@ -1317,7 +1317,7 @@ export default function InputTab({
                   style={{ transform: includeEmergencyInTotal ? "translateX(16px)" : "translateX(0)" }}
                 />
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", cursor: "pointer" }}
+              <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-caption-weight)", color: "var(--color-text-secondary)", cursor: "pointer" }}
                 onClick={() => setIncludeEmergencyInTotal((v) => !v)}
               >
                 Gabungkan ke Total Aset
@@ -1347,7 +1347,7 @@ export default function InputTab({
                       top: "50%",
                       transform: "translateY(-50%)",
                       color: "var(--color-text-tertiary)",
-                      fontSize: 13,
+                      fontSize: "var(--text-body-size)",
                       fontFamily: tokens.typography.fontFamily,
                     }}
                   >
@@ -1381,7 +1381,7 @@ export default function InputTab({
                   />
 
                 </div>
-                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4, letterSpacing: ".01em" }}>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 4, letterSpacing: ".01em" }}>
                   Bisa operasi matematika (+ dan -)
                 </div>
               </div>
@@ -1427,8 +1427,8 @@ export default function InputTab({
                   <span
                     style={{
                       fontFamily: tokens.typography.fontFamily,
-                      fontSize: 16,
-                      fontWeight: 800,
+                      fontSize: "var(--text-subtitle-size)",
+                      fontWeight: "var(--text-h1-weight)",
                       color: "var(--color-semantic-brand)",
                       minWidth: 55,
                       textAlign: "right",
@@ -1452,15 +1452,15 @@ export default function InputTab({
                 <div
                   style={{
                     fontFamily: tokens.typography.fontFamily,
-                    fontSize: 26,
-                    fontWeight: 800,
+                    fontSize: "var(--text-h2-size)",
+                    fontWeight: "var(--text-h1-weight)",
                     color: "var(--color-text-primary)",
                     marginTop: 4,
                   }}
                 >
                   {formatCompact(monthlyExpense * targetMonths)}
                 </div>
-                <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginTop: 2 }}>
+                <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)", marginTop: 2 }}>
                   {formatIDR(monthlyExpense * targetMonths)}
                 </div>
               </div>
@@ -1480,15 +1480,15 @@ export default function InputTab({
                 {/* Indikator Warna Sesuai Token DataViz */}
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--color-viz-cash)", flexShrink: 0 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)" }}>Lapis 1: Cash / Bank</span>
-                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Target {t1Months} Bulan • Likuiditas Instan</span>
+                  <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-primary)" }}>Lapis 1: Cash / Bank</span>
+                  <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>Target {t1Months} Bulan • Likuiditas Instan</span>
                 </div>
               </div>
               <div style={{ textAlign: "right", gap: 4 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
+                <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t1Months)}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)" }}>Target Dana</div>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)" }}>Target Dana</div>
               </div>
             </div>
 
@@ -1501,15 +1501,15 @@ export default function InputTab({
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--color-viz-digital-bank)", flexShrink: 0 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)" }}>Lapis 2: Bank Digital</span>
-                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Target {t2Months} Bulan • Yield Lebih Baik</span>
+                  <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-primary)" }}>Lapis 2: Bank Digital</span>
+                  <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>Target {t2Months} Bulan • Yield Lebih Baik</span>
                 </div>
               </div>
               <div style={{ textAlign: "right", gap: 4 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
+                <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t2Months)}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)" }}>Target Dana</div>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)" }}>Target Dana</div>
               </div>
             </div>
 
@@ -1522,15 +1522,15 @@ export default function InputTab({
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                 <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--color-viz-rdpu)", flexShrink: 0 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)" }}>Lapis 3: RDPU</span>
-                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Target {t3Months} Bulan • Pelindung Inflasi</span>
+                  <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-primary)" }}>Lapis 3: RDPU</span>
+                  <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>Target {t3Months} Bulan • Pelindung Inflasi</span>
                 </div>
               </div>
               <div style={{ textAlign: "right", gap: 4 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
+                <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t3Months)}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)" }}>Target Dana</div>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)" }}>Target Dana</div>
               </div>
             </div>
 
@@ -1577,7 +1577,7 @@ export default function InputTab({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+            <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
               Angka yang kamu ubah belum disimpan. Yakin ingin membuang perubahan ini?
             </p>
             <div style={{ display: "flex", gap: "8px", width: "100%" }}>
@@ -1586,7 +1586,7 @@ export default function InputTab({
                 style={{
                   flex: 1,
                   padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
-                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: "14px",
+                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >
@@ -1600,7 +1600,7 @@ export default function InputTab({
                 style={{
                   flex: 1,
                   padding: "12px 0", borderRadius: "8px", border: "none",
-                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: 700, fontSize: "14px",
+                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >
@@ -1632,7 +1632,7 @@ export default function InputTab({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+            <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
               Hapus <strong>{ASSET_CLASSES.find(c => c.id === editingAssetId)?.name}</strong> dari portofolio? Semua data nilai dan kontribusi akan hilang permanen.
             </p>
             <div style={{ display: "flex", gap: "8px", width: "100%" }}>
@@ -1640,7 +1640,7 @@ export default function InputTab({
                 onClick={() => setShowDeleteConfirm(false)}
                 style={{
                   flex: 1, padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
-                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: "14px",
+                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >
@@ -1654,7 +1654,7 @@ export default function InputTab({
                 }}
                 style={{
                   flex: 1, padding: "12px 0", borderRadius: "8px", border: "none",
-                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: 700, fontSize: "14px",
+                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >

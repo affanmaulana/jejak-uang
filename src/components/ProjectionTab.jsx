@@ -111,26 +111,26 @@ export default function ProjectionTab({
             {/* Profile Info */}
             <div style={{ flex: "1 1 340px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <span style={{ fontSize: 16, fontWeight: 800, color: "var(--color-text-tertiary)", }}>
+                <span style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-tertiary)", }}>
                   Profil Risiko
                 </span>
               </div>
 
               <h3 style={{
-                fontSize: 32,
-                fontWeight: 900,
+                fontSize: "var(--text-h1-size)",
+                fontWeight: "var(--text-display-weight)",
                 color: riskProfile.color,
                 margin: "0 0 12px",
-                letterSpacing: "-1px",
-                lineHeight: 1
+                letterSpacing: "var(--text-display-letter-spacing)",
+                lineHeight: "1"
               }}>
                 {riskProfile.profile}
               </h3>
 
               <p style={{
-                fontSize: 14,
+                fontSize: "var(--text-body-size)",
                 color: "var(--color-text-secondary)",
-                lineHeight: "1.6",
+                lineHeight: "var(--text-body-line-height)",
                 margin: 0,
                 maxWidth: "520px"
               }}>
@@ -153,11 +153,11 @@ export default function ProjectionTab({
                   { label: "High", value: riskProfile.high, color: "var(--color-semantic-danger)" },
                 ].map((stat, idx) => (
                   <div key={idx} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                    <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: "0.5px" }}>
+                    <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", fontWeight: "var(--text-h1-weight)", textTransform: "uppercase", marginBottom: 4, letterSpacing: "var(--text-eyebrow-letter-spacing)" }}>
                       {stat.label}
                     </span>
-                    <span style={{ fontSize: 18, fontWeight: 900, color: stat.color, fontFamily: tokens.typography.fontFamily }}>
-                      {stat.value.toFixed(1)}<span style={{ fontSize: 12, fontWeight: 700, marginLeft: 1 }}>%</span>
+                    <span style={{ fontSize: "var(--text-h3-size)", fontWeight: "var(--text-display-weight)", color: stat.color, fontFamily: tokens.typography.fontFamily }}>
+                      {stat.value.toFixed(1)}<span style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", marginLeft: 1 }}>%</span>
                     </span>
                   </div>
                 ))}
@@ -191,8 +191,8 @@ export default function ProjectionTab({
         >
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 700,
+              fontSize: "var(--text-eyebrow-size)",
+              fontWeight: "var(--text-subtitle-weight)",
               color: "var(--color-text-tertiary)",
               textTransform: "uppercase",
               letterSpacing: ".1em",
@@ -232,11 +232,11 @@ export default function ProjectionTab({
               <div>
                 <label
                   style={{
-                    fontSize: 11,
-                    fontWeight: 700,
+                    fontSize: "var(--text-eyebrow-size)",
+                    fontWeight: "var(--text-subtitle-weight)",
                     color: "var(--color-text-secondary)",
                     textTransform: "uppercase",
-                    letterSpacing: ".08em",
+                    letterSpacing: "var(--text-eyebrow-letter-spacing)",
                     display: "block",
                     marginBottom: 8,
                   }}
@@ -265,8 +265,8 @@ export default function ProjectionTab({
                   <span
                     style={{
                       fontFamily: tokens.typography.fontFamily,
-                      fontWeight: 800,
-                      fontSize: 16,
+                      fontWeight: "var(--text-h1-weight)",
+                      fontSize: "var(--text-subtitle-size)",
                       color: "var(--color-semantic-danger)",
                       minWidth: 42,
                     }}
@@ -274,18 +274,18 @@ export default function ProjectionTab({
                     {inflationRate}%
                   </span>
                 </div>
-                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 4 }}>
                   Historis Indonesia: 2–8%/tahun
                 </div>
               </div>
               <div>
                 <label
                   style={{
-                    fontSize: 11,
-                    fontWeight: 700,
+                    fontSize: "var(--text-eyebrow-size)",
+                    fontWeight: "var(--text-subtitle-weight)",
                     color: "var(--color-text-secondary)",
                     textTransform: "uppercase",
-                    letterSpacing: ".08em",
+                    letterSpacing: "var(--text-eyebrow-letter-spacing)",
                     display: "block",
                     marginBottom: 8,
                   }}
@@ -295,14 +295,14 @@ export default function ProjectionTab({
                 <div
                   style={{
                     fontFamily: tokens.typography.fontFamily,
-                    fontSize: 20,
-                    fontWeight: 800,
+                    fontSize: "var(--text-h3-size)",
+                    fontWeight: "var(--text-h1-weight)",
                     color: "var(--color-viz-rdpu)",
                   }}
                 >
                   {formatCompact(totalMonthlyContrib)}
                 </div>
-                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 4 }}>
                   Isi di tab "Input Aset" → tiap kartu aset. Proyeksi dihitung
                   per aset.
                 </div>
@@ -311,11 +311,11 @@ export default function ProjectionTab({
               <div>
                 <label
                   style={{
-                    fontSize: 11,
-                    fontWeight: 700,
+                    fontSize: "var(--text-eyebrow-size)",
+                    fontWeight: "var(--text-subtitle-weight)",
                     color: "var(--color-text-secondary)",
                     textTransform: "uppercase",
-                    letterSpacing: ".08em",
+                    letterSpacing: "var(--text-eyebrow-letter-spacing)",
                     display: "block",
                     marginBottom: 8,
                   }}
@@ -335,7 +335,7 @@ export default function ProjectionTab({
                     }
                   />
                 </div>
-                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 4 }}>
                   Garis acuan saat proyeksi menyentuh target.
                 </div>
               </div>
@@ -358,8 +358,8 @@ export default function ProjectionTab({
           <div>
             <h2
               style={{
-                fontSize: 16,
-                fontWeight: 800,
+                fontSize: "var(--text-subtitle-size)",
+                fontWeight: "var(--text-h1-weight)",
                 margin: 0,
                 color: "var(--color-text-primary)",
               }}
@@ -368,7 +368,7 @@ export default function ProjectionTab({
             </h2>
             <p
               style={{
-                fontSize: 12,
+                fontSize: "var(--text-caption-size)",
                 color: "var(--color-text-tertiary)",
                 margin: "4px 0 0",
               }}
@@ -394,7 +394,7 @@ export default function ProjectionTab({
                     borderTop: leg.dashed ? `2.5px dashed ${leg.color}` : "none",
                   }}
                 />
-                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-secondary)" }}>
+                <span style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
                   {leg.label}
                 </span>
               </div>
@@ -426,16 +426,16 @@ export default function ProjectionTab({
                 border: `1.5px solid ${"var(--color-border-subtle)"}`,
                 borderRadius: 10,
                 color: "var(--color-text-primary)",
-                fontSize: 13,
+                fontSize: "var(--text-body-size)",
               }}
-              labelStyle={{ color: "var(--color-text-tertiary)", fontSize: 11 }}
+              labelStyle={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-eyebrow-size)" }}
             />
             <Area type="monotone" dataKey="portfolio" name="Portofolio Nominal" stroke={"var(--color-semantic-success)"} strokeWidth={2.5} fill="url(#lg_portfolio)" />
             <Line type="monotone" dataKey="real" name="Nilai Riil (Daya Beli)" stroke={"var(--color-semantic-brand)"} strokeWidth={3} dot={false} />
             <Line type="monotone" dataKey="inflation" name="Garis Inflasi" stroke={"var(--color-semantic-danger)"} strokeWidth={2} strokeDasharray="4 4" dot={false} />
             <ReferenceLine
               y={fireTarget}
-              label={{ position: "top", value: "Target", fill: "var(--color-viz-rdpu)", fontSize: 11, fontWeight: "bold" }}
+              label={{ position: "top", value: "Target", fill: "var(--color-viz-rdpu)", fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)" }}
               stroke={"var(--color-viz-rdpu)"}
               strokeDasharray="3 3"
             />
@@ -500,11 +500,11 @@ export default function ProjectionTab({
                 <div
                   style={{
                     padding: "12px 16px",
-                    fontSize: 11,
-                    fontWeight: 700,
+                    fontSize: "var(--text-eyebrow-size)",
+                    fontWeight: "var(--text-subtitle-weight)",
                     color: "var(--color-text-tertiary)",
                     textTransform: "uppercase",
-                    letterSpacing: ".08em",
+                    letterSpacing: "var(--text-eyebrow-letter-spacing)",
                     borderBottom: `1px solid ${"var(--color-border-subtle)"}`,
                     background: "var(--color-surface-app)",
                   }}
@@ -533,26 +533,26 @@ export default function ProjectionTab({
 
                         return (
                           <tr key={idx}>
-                            <td style={{ fontWeight: 700, color: "var(--color-semantic-brand)", whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-brand)", whiteSpace: "nowrap" }}>
                               Tahun ke-{realIdx}
                             </td>
-                            <td style={{ fontWeight: 800, color: "var(--color-semantic-success)", whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: "var(--text-h1-weight)", color: "var(--color-semantic-success)", whiteSpace: "nowrap" }}>
                               {formatCompact(yearData.portfolio)}
                             </td>
-                            <td style={{ fontWeight: 700, color: isProfit ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", whiteSpace: "nowrap" }}>
-                              {isProfit ? "+" : ""}{formatCompact(profitNominal)} <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.8 }}>({isProfit ? "+" : ""}{profitPct}%)</span>
+                            <td style={{ fontWeight: "var(--text-subtitle-weight)", color: isProfit ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", whiteSpace: "nowrap" }}>
+                              {isProfit ? "+" : ""}{formatCompact(profitNominal)} <span style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-caption-weight)", opacity: 0.8 }}>({isProfit ? "+" : ""}{profitPct}%)</span>
                             </td>
-                            <td style={{ fontWeight: 600, color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: "var(--text-caption-weight)", color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>
                               {formatIDR(yearData.real)}
                             </td>
-                            <td style={{ fontWeight: 600, color: "var(--color-semantic-danger)", whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: "var(--text-caption-weight)", color: "var(--color-semantic-danger)", whiteSpace: "nowrap" }}>
                               {formatIDR(yearData.inflation)}
                             </td>
                             <td style={{ whiteSpace: "nowrap" }}>
-                              <span style={{ fontWeight: 700, color: "var(--color-semantic-danger)" }}>
+                              <span style={{ fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-danger)" }}>
                                 {formatCompact(yearData.portfolio * (1 - crashRatio))}
                               </span>
-                              <span style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-tertiary)", marginLeft: 6 }}>
+                              <span style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-tertiary)", marginLeft: 6 }}>
                                 (-{(crashRatio * 100).toFixed(0)}%)
                               </span>
                             </td>
@@ -578,11 +578,11 @@ export default function ProjectionTab({
                 <div
                   style={{
                     padding: "12px 16px",
-                    fontSize: 11,
-                    fontWeight: 700,
+                    fontSize: "var(--text-eyebrow-size)",
+                    fontWeight: "var(--text-subtitle-weight)",
                     color: "var(--color-text-tertiary)",
                     textTransform: "uppercase",
-                    letterSpacing: ".08em",
+                    letterSpacing: "var(--text-eyebrow-letter-spacing)",
                     borderBottom: `1px solid ${"var(--color-border-subtle)"}`,
                     background: "var(--color-surface-app)",
                   }}
@@ -620,17 +620,17 @@ export default function ProjectionTab({
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-semantic-brand)" }}>
+                          <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-brand)" }}>
                             Tahun ke-{realIdx}
                           </span>
                         </div>
 
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                           <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 2 }}>
+                            <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 2 }}>
                               Total Aset
                             </div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-semantic-success)" }}>
+                            <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-semantic-success)" }}>
                               {formatCompact(yearData.portfolio)}
                             </div>
                           </div>
@@ -668,18 +668,18 @@ export default function ProjectionTab({
                             <div>
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Nilai Riil (Daya Beli)
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-semantic-brand)" }}>
+                                  <div style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-brand)" }}>
                                     {formatIDR(yearData.real)}
                                   </div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Acuan Inflasi
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-semantic-danger)" }}>
+                                  <div style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-danger)" }}>
                                     {formatIDR(yearData.inflation)}
                                   </div>
                                 </div>
@@ -690,24 +690,24 @@ export default function ProjectionTab({
                             <div>
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Keuntungan Tahun Ini
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: isProfit ? "var(--color-semantic-success)" : "var(--color-semantic-danger)" }}>
+                                  <div style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: isProfit ? "var(--color-semantic-success)" : "var(--color-semantic-danger)" }}>
                                     {isProfit ? "+" : ""}{formatCompact(profitNominal)} ({isProfit ? "+" : ""}{profitPct}%)
                                   </div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Simulasi Market Crash
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-semantic-danger)" }}>
+                                  <div style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-danger)" }}>
                                     {formatCompact(yearData.portfolio * (1 - crashRatio))}
-                                    <span style={{ fontSize: 10, fontWeight: 500, marginLeft: 6, opacity: 0.8 }}>
+                                    <span style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-body-weight)", marginLeft: 6, opacity: 0.8 }}>
                                       (-{(crashRatio * 100).toFixed(0)}%)
                                     </span>
                                   </div>
-                                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>
+                                  <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 2 }}>
                                     Jika terjadi koreksi tajam sesuai profil risiko Anda.
                                   </div>
                                 </div>
@@ -730,8 +730,8 @@ export default function ProjectionTab({
         <div className="card" style={{ padding: 20, marginTop: 14 }}>
           <h2
             style={{
-              fontSize: 16,
-              fontWeight: 800,
+              fontSize: "var(--text-subtitle-size)",
+              fontWeight: "var(--text-h1-weight)",
               margin: "0 0 16px",
               color: "var(--color-text-primary)",
             }}
@@ -741,7 +741,7 @@ export default function ProjectionTab({
 
           {allocData.length === 0 ? (
             <div
-              style={{ color: "var(--color-text-tertiary)", fontSize: 14, padding: "20px 0" }}
+              style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-body-size)", padding: "20px 0" }}
             >
               Belum ada aset yang diinput.
             </div>
@@ -776,8 +776,8 @@ export default function ProjectionTab({
                       />
                       <span
                         style={{
-                          fontSize: 13,
-                          fontWeight: 600,
+                          fontSize: "var(--text-body-size)",
+                          fontWeight: "var(--text-caption-weight)",
                           color: "var(--color-text-primary)",
                         }}
                       >
@@ -794,7 +794,7 @@ export default function ProjectionTab({
                       <span
                         style={{
                           fontFamily: tokens.typography.fontFamily,
-                          fontSize: 12,
+                          fontSize: "var(--text-caption-size)",
                           color: "var(--color-text-tertiary)",
                         }}
                       >
@@ -803,8 +803,8 @@ export default function ProjectionTab({
                       <span
                         style={{
                           fontFamily: tokens.typography.fontFamily,
-                          fontSize: 14,
-                          fontWeight: 800,
+                          fontSize: "var(--text-body-size)",
+                          fontWeight: "var(--text-h1-weight)",
                           color: d.color,
                           minWidth: 44,
                           textAlign: "right",
@@ -834,19 +834,19 @@ export default function ProjectionTab({
                       alignItems: "center",
                     }}
                   >
-                    <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+                    <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>
                       Gross: {d.return}% → Net:{" "}
                       {afterTaxReturn(d).toFixed(1)}%
                     </span>
-                    <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+                    <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>
                       Likuid: {d.liquidity} · {d.risk}
                     </span>
                     {(monthlyContribs[d.id] || 0) > 0 && (
                       <span
                         style={{
-                          fontSize: 10,
+                          fontSize: "var(--text-eyebrow-size)",
                           color: "var(--color-viz-rdpu)",
-                          fontWeight: 700,
+                          fontWeight: "var(--text-subtitle-weight)",
                           background: "var(--color-surface-active)",
                           padding: "1px 7px",
                           borderRadius: 20,
@@ -910,7 +910,7 @@ export default function ProjectionTab({
               <div key={i} className="stat">
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: "var(--text-eyebrow-size)",
                     color: "var(--color-text-tertiary)",
                     marginBottom: 4,
                   }}
@@ -920,8 +920,8 @@ export default function ProjectionTab({
                 <div
                   style={{
                     fontFamily: tokens.typography.fontFamily,
-                    fontSize: 18,
-                    fontWeight: 800,
+                    fontSize: "var(--text-h3-size)",
+                    fontWeight: "var(--text-h1-weight)",
                     color: s.color,
                   }}
                 >
@@ -947,10 +947,10 @@ export default function ProjectionTab({
             }}
           >
             <div className="card" style={{ padding: 18, background: "var(--color-surface-card)" }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 8 }}>
+              <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)", marginBottom: 8 }}>
                 Mengapa riil selalu lebih rendah?
               </div>
-              <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+              <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)", lineHeight: "var(--text-body-line-height)" }}>
                 Inflasi menggerus daya beli — {formatCompact(300000000)} di thn ke-10 setara hanya ~{formatCompact(184000000)} uang hari ini. "Nilai Riil" adalah angka jujur yang sudah dikoreksi inflasi.
               </div>
             </div>
@@ -964,8 +964,8 @@ export default function ProjectionTab({
               }}
             >
               <div style={{
-                fontSize: 14,
-                fontWeight: 800,
+                fontSize: "var(--text-body-size)",
+                fontWeight: "var(--text-h1-weight)",
                 color: isWinning ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
                 marginBottom: 8,
                 display: "flex",
@@ -974,7 +974,7 @@ export default function ProjectionTab({
               }}>
                 {isWinning ? "Kamu menang vs inflasi" : "Nilai Riil Kekayaanmu tergerus inflasi"} {isWinning ? "✅" : "❌"}
               </div>
-              <div style={{ fontSize: 12, color: isWinning ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", lineHeight: 1.6, opacity: 0.8 }}>
+              <div style={{ fontSize: "var(--text-caption-size)", color: isWinning ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", lineHeight: "var(--text-body-line-height)", opacity: 0.8 }}>
                 {isWinning
                   ? "Nilai Riil di atas Garis Inflasi = kekayaan nyata bertambah secara riil."
                   : "Nilai Riil di bawah Garis Inflasi = pertumbuhan asetmu tidak cukup menutupi kenaikan harga barang."}
