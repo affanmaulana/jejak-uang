@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import "./designtoken.css";
 import {
   ComposedChart,
   Area,
@@ -62,16 +63,16 @@ export default function ProjectionTab({
     }
 
     let profile = "Moderat";
-    let color = tokens.colors.dataViz.obligasiFr;
+    let color = "var(--color-viz-obligasi-fr)";
     let description = "Porfotolio saat ini seimbang. Kamu memiliki diversifikasi yang merata untuk menjaga stabilitas sembari tetap mengejar pertumbuhan.";
 
     if (high > Math.max(low, medium)) {
       profile = "Agresif";
-      color = tokens.colors.semantic.danger;
+      color = "var(--color-semantic-danger)";
       description = "Portofolio saat ini didominasi oleh instrumen risiko tinggi. Fokus pada pertumbuhan modal maksimal dengan menoleransi tingkat fluktuasi yang signifikan.";
     } else if (low > Math.max(medium, high)) {
       profile = "Konservatif";
-      color = tokens.colors.dataViz.cash;
+      color = "var(--color-viz-cash)";
       description = "Portofolio saat ini lebih dominan ke instrumen risiko rendah. Mengutamakan stabilitas dan keamanan modal dibandingkan pertumbuhan yang agresif.";
     }
 
@@ -86,8 +87,8 @@ export default function ProjectionTab({
           style={{
             padding: "24px",
             borderRadius: "20px",
-            background: tokens.colors.surface.card,
-            border: `1.5px solid ${tokens.colors.border.subtle}`,
+            background: "var(--color-surface-card)",
+            border: `1.5px solid ${"var(--color-border-subtle)"}`,
             marginBottom: "16px",
             position: "relative",
             overflow: "hidden",
@@ -110,7 +111,7 @@ export default function ProjectionTab({
             {/* Profile Info */}
             <div style={{ flex: "1 1 340px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <span style={{ fontSize: 16, fontWeight: 800, color: tokens.colors.text.tertiary, }}>
+                <span style={{ fontSize: 16, fontWeight: 800, color: "var(--color-text-tertiary)", }}>
                   Profil Risiko
                 </span>
               </div>
@@ -128,7 +129,7 @@ export default function ProjectionTab({
 
               <p style={{
                 fontSize: 14,
-                color: tokens.colors.text.secondary,
+                color: "var(--color-text-secondary)",
                 lineHeight: "1.6",
                 margin: 0,
                 maxWidth: "520px"
@@ -139,20 +140,20 @@ export default function ProjectionTab({
 
             {/* Stats & Bar Integrated */}
             <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", gap: 20 }}>
-              <div style={{ display: "flex", height: 12, borderRadius: 12, overflow: "hidden", background: tokens.colors.surface.active, border: `1px solid ${tokens.colors.border.subtle}` }}>
-                {riskProfile.low > 0 && <div style={{ width: `${riskProfile.low}%`, background: tokens.colors.dataViz.cash, transition: "width .6s ease" }} />}
-                {riskProfile.medium > 0 && <div style={{ width: `${riskProfile.medium}%`, background: tokens.colors.dataViz.obligasiFr, transition: "width .6s ease" }} />}
-                {riskProfile.high > 0 && <div style={{ width: `${riskProfile.high}%`, background: tokens.colors.semantic.danger, transition: "width .6s ease" }} />}
+              <div style={{ display: "flex", height: 12, borderRadius: 12, overflow: "hidden", background: "var(--color-surface-active)", border: `1px solid ${"var(--color-border-subtle)"}` }}>
+                {riskProfile.low > 0 && <div style={{ width: `${riskProfile.low}%`, background: "var(--color-viz-cash)", transition: "width .6s ease" }} />}
+                {riskProfile.medium > 0 && <div style={{ width: `${riskProfile.medium}%`, background: "var(--color-viz-obligasi-fr)", transition: "width .6s ease" }} />}
+                {riskProfile.high > 0 && <div style={{ width: `${riskProfile.high}%`, background: "var(--color-semantic-danger)", transition: "width .6s ease" }} />}
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
                 {[
-                  { label: "Low", value: riskProfile.low, color: tokens.colors.dataViz.cash },
-                  { label: "Medium", value: riskProfile.medium, color: tokens.colors.dataViz.obligasiFr },
-                  { label: "High", value: riskProfile.high, color: tokens.colors.semantic.danger },
+                  { label: "Low", value: riskProfile.low, color: "var(--color-viz-cash)" },
+                  { label: "Medium", value: riskProfile.medium, color: "var(--color-viz-obligasi-fr)" },
+                  { label: "High", value: riskProfile.high, color: "var(--color-semantic-danger)" },
                 ].map((stat, idx) => (
                   <div key={idx} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                    <span style={{ fontSize: 10, color: tokens.colors.text.tertiary, fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: "0.5px" }}>
+                    <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontWeight: 800, textTransform: "uppercase", marginBottom: 4, letterSpacing: "0.5px" }}>
                       {stat.label}
                     </span>
                     <span style={{ fontSize: 18, fontWeight: 900, color: stat.color, fontFamily: tokens.typography.fontFamily }}>
@@ -173,7 +174,7 @@ export default function ProjectionTab({
           padding: 0,
           marginBottom: 14,
           overflow: "hidden",
-          border: `1px solid ${tokens.colors.border.subtle}`
+          border: `1px solid ${"var(--color-border-subtle)"}`
         }}
       >
         <div
@@ -184,7 +185,7 @@ export default function ProjectionTab({
             justifyContent: "space-between",
             alignItems: "center",
             cursor: "pointer",
-            background: isSettingsExpanded ? tokens.colors.surface.input : tokens.colors.surface.card,
+            background: isSettingsExpanded ? "var(--color-surface-input)" : "var(--color-surface-card)",
             transition: "background 0.2s",
           }}
         >
@@ -192,7 +193,7 @@ export default function ProjectionTab({
             style={{
               fontSize: 11,
               fontWeight: 700,
-              color: tokens.colors.text.tertiary,
+              color: "var(--color-text-tertiary)",
               textTransform: "uppercase",
               letterSpacing: ".1em",
             }}
@@ -204,7 +205,7 @@ export default function ProjectionTab({
             transition: "transform 0.3s ease",
             display: "flex",
             alignItems: "center",
-            color: tokens.colors.text.tertiary
+            color: "var(--color-text-tertiary)"
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -225,7 +226,7 @@ export default function ProjectionTab({
                 gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))",
                 gap: 16,
                 padding: 16,
-                borderTop: `1px solid ${tokens.colors.border.subtle}`,
+                borderTop: `1px solid ${"var(--color-border-subtle)"}`,
               }}
             >
               <div>
@@ -233,7 +234,7 @@ export default function ProjectionTab({
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    color: tokens.colors.text.secondary,
+                    color: "var(--color-text-secondary)",
                     textTransform: "uppercase",
                     letterSpacing: ".08em",
                     display: "block",
@@ -256,9 +257,9 @@ export default function ProjectionTab({
                     }
                     style={{
                       flex: 1,
-                      accentColor: tokens.colors.semantic.danger,
-                      background: `linear-gradient(to right,${tokens.colors.semantic.danger} ${((inflationRate - 1) / 14) * 100
-                        }%,${tokens.colors.border.subtle} 0%)`,
+                      accentColor: "var(--color-semantic-danger)",
+                      background: `linear-gradient(to right,${"var(--color-semantic-danger)"} ${((inflationRate - 1) / 14) * 100
+                        }%,${"var(--color-border-subtle)"} 0%)`,
                     }}
                   />
                   <span
@@ -266,14 +267,14 @@ export default function ProjectionTab({
                       fontFamily: tokens.typography.fontFamily,
                       fontWeight: 800,
                       fontSize: 16,
-                      color: tokens.colors.semantic.danger,
+                      color: "var(--color-semantic-danger)",
                       minWidth: 42,
                     }}
                   >
                     {inflationRate}%
                   </span>
                 </div>
-                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
                   Historis Indonesia: 2–8%/tahun
                 </div>
               </div>
@@ -282,7 +283,7 @@ export default function ProjectionTab({
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    color: tokens.colors.text.secondary,
+                    color: "var(--color-text-secondary)",
                     textTransform: "uppercase",
                     letterSpacing: ".08em",
                     display: "block",
@@ -296,12 +297,12 @@ export default function ProjectionTab({
                     fontFamily: tokens.typography.fontFamily,
                     fontSize: 20,
                     fontWeight: 800,
-                    color: tokens.colors.dataViz.rdpu,
+                    color: "var(--color-viz-rdpu)",
                   }}
                 >
                   {formatCompact(totalMonthlyContrib)}
                 </div>
-                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
                   Isi di tab "Input Aset" → tiap kartu aset. Proyeksi dihitung
                   per aset.
                 </div>
@@ -312,7 +313,7 @@ export default function ProjectionTab({
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    color: tokens.colors.text.secondary,
+                    color: "var(--color-text-secondary)",
                     textTransform: "uppercase",
                     letterSpacing: ".08em",
                     display: "block",
@@ -334,7 +335,7 @@ export default function ProjectionTab({
                     }
                   />
                 </div>
-                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4 }}>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
                   Garis acuan saat proyeksi menyentuh target.
                 </div>
               </div>
@@ -360,7 +361,7 @@ export default function ProjectionTab({
                 fontSize: 16,
                 fontWeight: 800,
                 margin: 0,
-                color: tokens.colors.text.primary,
+                color: "var(--color-text-primary)",
               }}
             >
               Proyeksi 10 Tahun
@@ -368,7 +369,7 @@ export default function ProjectionTab({
             <p
               style={{
                 fontSize: 12,
-                color: tokens.colors.text.tertiary,
+                color: "var(--color-text-tertiary)",
                 margin: "4px 0 0",
               }}
             >
@@ -379,9 +380,9 @@ export default function ProjectionTab({
           {/* Legend Row */}
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
             {[
-              { label: "Portofolio Nominal", color: tokens.colors.semantic.success, dashed: false },
-              { label: "Nilai Riil", color: tokens.colors.semantic.brand, dashed: false },
-              { label: "Garis Inflasi", color: tokens.colors.semantic.danger, dashed: true },
+              { label: "Portofolio Nominal", color: "var(--color-semantic-success)", dashed: false },
+              { label: "Nilai Riil", color: "var(--color-semantic-brand)", dashed: false },
+              { label: "Garis Inflasi", color: "var(--color-semantic-danger)", dashed: true },
             ].map((leg, idx) => (
               <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <div
@@ -393,7 +394,7 @@ export default function ProjectionTab({
                     borderTop: leg.dashed ? `2.5px dashed ${leg.color}` : "none",
                   }}
                 />
-                <span style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-secondary)" }}>
                   {leg.label}
                 </span>
               </div>
@@ -410,32 +411,32 @@ export default function ProjectionTab({
           >
             <defs>
               <linearGradient id="lg_portfolio" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={tokens.colors.semantic.success} stopOpacity={0.15} />
-                <stop offset="95%" stopColor={tokens.colors.semantic.success} stopOpacity={0} />
+                <stop offset="5%" stopColor={"var(--color-semantic-success)"} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={"var(--color-semantic-success)"} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={tokens.colors.surface.input} vertical={false} />
-            <XAxis dataKey="year" stroke={tokens.colors.border.input} fontSize={11} tickLine={false} axisLine={false} />
-            <YAxis tickFormatter={formatCompact} stroke={tokens.colors.border.input} fontSize={11} tickLine={false} axisLine={false} dx={-5} />
+            <CartesianGrid strokeDasharray="3 3" stroke={"var(--color-surface-input)"} vertical={false} />
+            <XAxis dataKey="year" stroke={"var(--color-border-input)"} fontSize={11} tickLine={false} axisLine={false} />
+            <YAxis tickFormatter={formatCompact} stroke={"var(--color-border-input)"} fontSize={11} tickLine={false} axisLine={false} dx={-5} />
             <Tooltip
               itemSorter={(item) => -item.value}
               formatter={(v, name) => [formatIDR(v), name]}
               contentStyle={{
-                background: tokens.colors.surface.card,
-                border: `1.5px solid ${tokens.colors.border.subtle}`,
+                background: "var(--color-surface-card)",
+                border: `1.5px solid ${"var(--color-border-subtle)"}`,
                 borderRadius: 10,
-                color: tokens.colors.text.primary,
+                color: "var(--color-text-primary)",
                 fontSize: 13,
               }}
-              labelStyle={{ color: tokens.colors.text.tertiary, fontSize: 11 }}
+              labelStyle={{ color: "var(--color-text-tertiary)", fontSize: 11 }}
             />
-            <Area type="monotone" dataKey="portfolio" name="Portofolio Nominal" stroke={tokens.colors.semantic.success} strokeWidth={2.5} fill="url(#lg_portfolio)" />
-            <Line type="monotone" dataKey="real" name="Nilai Riil (Daya Beli)" stroke={tokens.colors.semantic.brand} strokeWidth={3} dot={false} />
-            <Line type="monotone" dataKey="inflation" name="Garis Inflasi" stroke={tokens.colors.semantic.danger} strokeWidth={2} strokeDasharray="4 4" dot={false} />
+            <Area type="monotone" dataKey="portfolio" name="Portofolio Nominal" stroke={"var(--color-semantic-success)"} strokeWidth={2.5} fill="url(#lg_portfolio)" />
+            <Line type="monotone" dataKey="real" name="Nilai Riil (Daya Beli)" stroke={"var(--color-semantic-brand)"} strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="inflation" name="Garis Inflasi" stroke={"var(--color-semantic-danger)"} strokeWidth={2} strokeDasharray="4 4" dot={false} />
             <ReferenceLine
               y={fireTarget}
-              label={{ position: "top", value: "Target", fill: tokens.colors.dataViz.rdpu, fontSize: 11, fontWeight: "bold" }}
-              stroke={tokens.colors.dataViz.rdpu}
+              label={{ position: "top", value: "Target", fill: "var(--color-viz-rdpu)", fontSize: 11, fontWeight: "bold" }}
+              stroke={"var(--color-viz-rdpu)"}
               strokeDasharray="3 3"
             />
           </ComposedChart>
@@ -463,15 +464,15 @@ export default function ProjectionTab({
                   padding: 12px 16px;
                   font-size: 11px;
                   font-weight: 700;
-                  color: ${tokens.colors.text.tertiary};
+                  color: ${"var(--color-text-tertiary)"};
                   text-transform: uppercase;
                   letter-spacing: .08em;
-                  border-bottom: 1px solid ${tokens.colors.border.subtle};
-                  background: ${tokens.colors.surface.app};
+                  border-bottom: 1px solid ${"var(--color-border-subtle)"};
+                  background: ${"var(--color-surface-app)"};
                 }
                 .proj-table td {
                   padding: 14px 16px;
-                  border-bottom: 1px solid ${tokens.colors.border.subtle};
+                  border-bottom: 1px solid ${"var(--color-border-subtle)"};
                   vertical-align: middle;
                 }
                 .proj-table tr:last-child td {
@@ -481,7 +482,7 @@ export default function ProjectionTab({
                   transition: background 0.2s;
                 }
                 .proj-table tbody tr:hover {
-                  background: ${tokens.colors.surface.input};
+                  background: ${"var(--color-surface-input)"};
                 }
               `}</style>
 
@@ -490,10 +491,10 @@ export default function ProjectionTab({
                 className="proj-table-container"
                 style={{
                   marginTop: 24,
-                  border: `1px solid ${tokens.colors.border.subtle}`,
+                  border: `1px solid ${"var(--color-border-subtle)"}`,
                   borderRadius: 12,
                   overflow: "hidden",
-                  background: tokens.colors.surface.card,
+                  background: "var(--color-surface-card)",
                 }}
               >
                 <div
@@ -501,11 +502,11 @@ export default function ProjectionTab({
                     padding: "12px 16px",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: tokens.colors.text.tertiary,
+                    color: "var(--color-text-tertiary)",
                     textTransform: "uppercase",
                     letterSpacing: ".08em",
-                    borderBottom: `1px solid ${tokens.colors.border.subtle}`,
-                    background: tokens.colors.surface.app,
+                    borderBottom: `1px solid ${"var(--color-border-subtle)"}`,
+                    background: "var(--color-surface-app)",
                   }}
                 >
                   Rincian Proyeksi Tahunan
@@ -532,26 +533,26 @@ export default function ProjectionTab({
 
                         return (
                           <tr key={idx}>
-                            <td style={{ fontWeight: 700, color: tokens.colors.semantic.brand, whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: 700, color: "var(--color-semantic-brand)", whiteSpace: "nowrap" }}>
                               Tahun ke-{realIdx}
                             </td>
-                            <td style={{ fontWeight: 800, color: tokens.colors.semantic.success, whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: 800, color: "var(--color-semantic-success)", whiteSpace: "nowrap" }}>
                               {formatCompact(yearData.portfolio)}
                             </td>
-                            <td style={{ fontWeight: 700, color: isProfit ? tokens.colors.semantic.success : tokens.colors.semantic.danger, whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: 700, color: isProfit ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", whiteSpace: "nowrap" }}>
                               {isProfit ? "+" : ""}{formatCompact(profitNominal)} <span style={{ fontSize: 11, fontWeight: 600, opacity: 0.8 }}>({isProfit ? "+" : ""}{profitPct}%)</span>
                             </td>
-                            <td style={{ fontWeight: 600, color: tokens.colors.text.secondary, whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: 600, color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>
                               {formatIDR(yearData.real)}
                             </td>
-                            <td style={{ fontWeight: 600, color: tokens.colors.semantic.danger, whiteSpace: "nowrap" }}>
+                            <td style={{ fontWeight: 600, color: "var(--color-semantic-danger)", whiteSpace: "nowrap" }}>
                               {formatIDR(yearData.inflation)}
                             </td>
                             <td style={{ whiteSpace: "nowrap" }}>
-                              <span style={{ fontWeight: 700, color: tokens.colors.semantic.danger }}>
+                              <span style={{ fontWeight: 700, color: "var(--color-semantic-danger)" }}>
                                 {formatCompact(yearData.portfolio * (1 - crashRatio))}
                               </span>
-                              <span style={{ fontSize: 11, fontWeight: 500, color: tokens.colors.text.tertiary, marginLeft: 6 }}>
+                              <span style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-tertiary)", marginLeft: 6 }}>
                                 (-{(crashRatio * 100).toFixed(0)}%)
                               </span>
                             </td>
@@ -568,10 +569,10 @@ export default function ProjectionTab({
                 className="proj-accordion"
                 style={{
                   marginTop: 24,
-                  border: `1px solid ${tokens.colors.border.subtle}`,
+                  border: `1px solid ${"var(--color-border-subtle)"}`,
                   borderRadius: 12,
                   overflow: "hidden",
-                  background: tokens.colors.surface.card,
+                  background: "var(--color-surface-card)",
                 }}
               >
                 <div
@@ -579,11 +580,11 @@ export default function ProjectionTab({
                     padding: "12px 16px",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: tokens.colors.text.tertiary,
+                    color: "var(--color-text-tertiary)",
                     textTransform: "uppercase",
                     letterSpacing: ".08em",
-                    borderBottom: `1px solid ${tokens.colors.border.subtle}`,
-                    background: tokens.colors.surface.app,
+                    borderBottom: `1px solid ${"var(--color-border-subtle)"}`,
+                    background: "var(--color-surface-app)",
                   }}
                 >
                   Rincian Proyeksi Tahunan
@@ -602,7 +603,7 @@ export default function ProjectionTab({
                     <div
                       key={idx}
                       style={{
-                        borderBottom: realIdx === chartData.length - 1 ? "none" : `1px solid ${tokens.colors.border.subtle}`,
+                        borderBottom: realIdx === chartData.length - 1 ? "none" : `1px solid ${"var(--color-border-subtle)"}`,
                       }}
                     >
                       {/* Header / Collapsed State */}
@@ -615,21 +616,21 @@ export default function ProjectionTab({
                           alignItems: "center",
                           cursor: "pointer",
                           transition: "background 0.2s",
-                          background: isExpanded ? tokens.colors.surface.card : "transparent",
+                          background: isExpanded ? "var(--color-surface-card)" : "transparent",
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.semantic.brand }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-semantic-brand)" }}>
                             Tahun ke-{realIdx}
                           </span>
                         </div>
 
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                           <div style={{ textAlign: "right" }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 2 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 2 }}>
                               Total Aset
                             </div>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.semantic.success }}>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-semantic-success)" }}>
                               {formatCompact(yearData.portfolio)}
                             </div>
                           </div>
@@ -638,7 +639,7 @@ export default function ProjectionTab({
                             transition: "transform 0.3s ease",
                             display: "flex",
                             alignItems: "center",
-                            color: tokens.colors.text.tertiary
+                            color: "var(--color-text-tertiary)"
                           }}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="6 9 12 15 18 9"></polyline>
@@ -657,8 +658,8 @@ export default function ProjectionTab({
                         <div style={{ minHeight: 0, overflow: "hidden" }}>
                           <div style={{
                             padding: "16px",
-                            background: tokens.colors.surface.input,
-                            borderTop: `1px solid ${tokens.colors.border.subtle}`,
+                            background: "var(--color-surface-input)",
+                            borderTop: `1px solid ${"var(--color-border-subtle)"}`,
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
                             gap: 16
@@ -667,18 +668,18 @@ export default function ProjectionTab({
                             <div>
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Nilai Riil (Daya Beli)
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.semantic.brand }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-semantic-brand)" }}>
                                     {formatIDR(yearData.real)}
                                   </div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Acuan Inflasi
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.semantic.danger }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-semantic-danger)" }}>
                                     {formatIDR(yearData.inflation)}
                                   </div>
                                 </div>
@@ -689,24 +690,24 @@ export default function ProjectionTab({
                             <div>
                               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Keuntungan Tahun Ini
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: isProfit ? tokens.colors.semantic.success : tokens.colors.semantic.danger }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: isProfit ? "var(--color-semantic-success)" : "var(--color-semantic-danger)" }}>
                                     {isProfit ? "+" : ""}{formatCompact(profitNominal)} ({isProfit ? "+" : ""}{profitPct}%)
                                   </div>
                                 </div>
                                 <div>
-                                  <div style={{ fontSize: 10, fontWeight: 700, color: tokens.colors.text.tertiary, textTransform: "uppercase", marginBottom: 4 }}>
+                                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>
                                     Simulasi Market Crash
                                   </div>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.semantic.danger }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-semantic-danger)" }}>
                                     {formatCompact(yearData.portfolio * (1 - crashRatio))}
                                     <span style={{ fontSize: 10, fontWeight: 500, marginLeft: 6, opacity: 0.8 }}>
                                       (-{(crashRatio * 100).toFixed(0)}%)
                                     </span>
                                   </div>
-                                  <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 2 }}>
+                                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>
                                     Jika terjadi koreksi tajam sesuai profil risiko Anda.
                                   </div>
                                 </div>
@@ -732,7 +733,7 @@ export default function ProjectionTab({
               fontSize: 16,
               fontWeight: 800,
               margin: "0 0 16px",
-              color: tokens.colors.text.primary,
+              color: "var(--color-text-primary)",
             }}
           >
             Distribusi Aset
@@ -740,7 +741,7 @@ export default function ProjectionTab({
 
           {allocData.length === 0 ? (
             <div
-              style={{ color: tokens.colors.text.tertiary, fontSize: 14, padding: "20px 0" }}
+              style={{ color: "var(--color-text-tertiary)", fontSize: 14, padding: "20px 0" }}
             >
               Belum ada aset yang diinput.
             </div>
@@ -777,7 +778,7 @@ export default function ProjectionTab({
                         style={{
                           fontSize: 13,
                           fontWeight: 600,
-                          color: tokens.colors.text.primary,
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         {d.name}
@@ -794,7 +795,7 @@ export default function ProjectionTab({
                         style={{
                           fontFamily: tokens.typography.fontFamily,
                           fontSize: 12,
-                          color: tokens.colors.text.tertiary,
+                          color: "var(--color-text-tertiary)",
                         }}
                       >
                         {formatCompact(d.idr)}
@@ -833,20 +834,20 @@ export default function ProjectionTab({
                       alignItems: "center",
                     }}
                   >
-                    <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
+                    <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
                       Gross: {d.return}% → Net:{" "}
                       {afterTaxReturn(d).toFixed(1)}%
                     </span>
-                    <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
+                    <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
                       Likuid: {d.liquidity} · {d.risk}
                     </span>
                     {(monthlyContribs[d.id] || 0) > 0 && (
                       <span
                         style={{
                           fontSize: 10,
-                          color: tokens.colors.dataViz.rdpu,
+                          color: "var(--color-viz-rdpu)",
                           fontWeight: 700,
-                          background: tokens.colors.surface.active,
+                          background: "var(--color-surface-active)",
                           padding: "1px 7px",
                           borderRadius: 20,
                         }}
@@ -868,7 +869,7 @@ export default function ProjectionTab({
           {/* Breakdown */}
           <div
             style={{
-              borderTop: `1px solid ${tokens.colors.border.subtle}`,
+              borderTop: `1px solid ${"var(--color-border-subtle)"}`,
               paddingTop: 16,
               marginTop: 16,
               display: "grid",
@@ -882,35 +883,35 @@ export default function ProjectionTab({
                 value: allocData
                   .filter((d) => !d.isEquity)
                   .reduce((s, d) => s + d.pct, 0),
-                color: tokens.colors.semantic.brand,
+                color: "var(--color-semantic-brand)",
               },
               {
                 label: "Aset Ekuitas",
                 value: allocData
                   .filter((d) => d.isEquity)
                   .reduce((s, d) => s + d.pct, 0),
-                color: tokens.colors.semantic.warning,
+                color: "var(--color-semantic-warning)",
               },
               {
                 label: "Aset IDR",
                 value: allocData
                   .filter((d) => !d.isUSD)
                   .reduce((s, d) => s + d.pct, 0),
-                color: tokens.colors.semantic.success,
+                color: "var(--color-semantic-success)",
               },
               {
                 label: "Aset USD",
                 value: allocData
                   .filter((d) => d.isUSD)
                   .reduce((s, d) => s + d.pct, 0),
-                color: tokens.colors.dataViz.usd,
+                color: "var(--color-viz-usd)",
               },
             ].map((s, i) => (
               <div key={i} className="stat">
                 <div
                   style={{
                     fontSize: 10,
-                    color: tokens.colors.text.tertiary,
+                    color: "var(--color-text-tertiary)",
                     marginBottom: 4,
                   }}
                 >
@@ -945,11 +946,11 @@ export default function ProjectionTab({
               marginTop: 16,
             }}
           >
-            <div className="card" style={{ padding: 18, background: tokens.colors.surface.card }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, marginBottom: 8 }}>
+            <div className="card" style={{ padding: 18, background: "var(--color-surface-card)" }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 8 }}>
                 Mengapa riil selalu lebih rendah?
               </div>
-              <div style={{ fontSize: 12, color: tokens.colors.text.secondary, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
                 Inflasi menggerus daya beli — {formatCompact(300000000)} di thn ke-10 setara hanya ~{formatCompact(184000000)} uang hari ini. "Nilai Riil" adalah angka jujur yang sudah dikoreksi inflasi.
               </div>
             </div>
@@ -958,14 +959,14 @@ export default function ProjectionTab({
               className="card"
               style={{
                 padding: 18,
-                background: isWinning ? tokens.colors.semantic.successBg : tokens.colors.semantic.dangerBg,
-                borderColor: isWinning ? tokens.colors.semantic.successBorder : tokens.colors.semantic.dangerBorder,
+                background: isWinning ? "var(--color-semantic-success-bg)" : "var(--color-semantic-danger-bg)",
+                borderColor: isWinning ? "var(--color-semantic-success-border)" : "var(--color-semantic-danger-border)",
               }}
             >
               <div style={{
                 fontSize: 14,
                 fontWeight: 800,
-                color: isWinning ? tokens.colors.semantic.success : tokens.colors.semantic.danger,
+                color: isWinning ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
                 marginBottom: 8,
                 display: "flex",
                 alignItems: "center",
@@ -973,7 +974,7 @@ export default function ProjectionTab({
               }}>
                 {isWinning ? "Kamu menang vs inflasi" : "Nilai Riil Kekayaanmu tergerus inflasi"} {isWinning ? "✅" : "❌"}
               </div>
-              <div style={{ fontSize: 12, color: isWinning ? tokens.colors.semantic.success : tokens.colors.semantic.danger, lineHeight: 1.6, opacity: 0.8 }}>
+              <div style={{ fontSize: 12, color: isWinning ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", lineHeight: 1.6, opacity: 0.8 }}>
                 {isWinning
                   ? "Nilai Riil di atas Garis Inflasi = kekayaan nyata bertambah secara riil."
                   : "Nilai Riil di bawah Garis Inflasi = pertumbuhan asetmu tidak cukup menutupi kenaikan harga barang."}

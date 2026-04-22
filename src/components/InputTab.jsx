@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "./designtoken.css";
 
 export default function InputTab({
   // Global & Asset Data
@@ -138,7 +139,7 @@ export default function InputTab({
             marginBottom: 10,
           }}
         >
-          <div style={{ fontSize: 18, fontWeight: 800, color: tokens.colors.text.secondary }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--color-text-secondary)" }}>
             {activeAssetIds.length > 0
               ? `${activeAssetIds.length} instrumen aktif`
               : "Belum ada instrumen dipilih"}
@@ -157,9 +158,9 @@ export default function InputTab({
               fontWeight: 700,
               fontSize: 13,
               cursor: activeAssetIds.length >= ASSET_CLASSES.length ? "not-allowed" : "pointer",
-              background: activeAssetIds.length >= ASSET_CLASSES.length ? tokens.colors.surface.input : tokens.colors.semantic.brand,
-              color: activeAssetIds.length >= ASSET_CLASSES.length ? tokens.colors.text.tertiary : tokens.colors.surface.card,
-              boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : tokens.shadows.medium,
+              background: activeAssetIds.length >= ASSET_CLASSES.length ? "var(--color-surface-input)" : "var(--color-semantic-brand)",
+              color: activeAssetIds.length >= ASSET_CLASSES.length ? "var(--color-text-tertiary)" : "var(--color-surface-card)",
+              boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : "var(--shadow-medium)",
               transition: "all .2s",
               fontFamily: tokens.typography.fontFamily,
             }}
@@ -178,8 +179,8 @@ export default function InputTab({
               alignItems: "center",
               justifyContent: "center",
               minHeight: 320,
-              background: tokens.colors.surface.card,
-              border: `2px dashed ${tokens.colors.border.subtle}`,
+              background: "var(--color-surface-card)",
+              border: `2px dashed ${"var(--color-border-subtle)"}`,
               borderRadius: 20,
               padding: "48px 24px",
               textAlign: "center",
@@ -190,19 +191,19 @@ export default function InputTab({
               style={{
                 fontSize: 22,
                 fontWeight: 800,
-                color: tokens.colors.text.primary,
+                color: "var(--color-text-primary)",
                 marginBottom: 8,
                 lineHeight: 1.35,
               }}
             >
               Harta yang tak tercatat,
               <br />
-              <span style={{ color: tokens.colors.text.tertiary }}>adalah harta yang tak terjaga.</span>
+              <span style={{ color: "var(--color-text-tertiary)" }}>adalah harta yang tak terjaga.</span>
             </div>
             <div
               style={{
                 fontSize: 13,
-                color: tokens.colors.text.tertiary,
+                color: "var(--color-text-tertiary)",
                 marginBottom: 28,
                 maxWidth: 360,
                 lineHeight: 1.6,
@@ -222,8 +223,8 @@ export default function InputTab({
                 fontWeight: 800,
                 fontSize: 14,
                 cursor: "pointer",
-                background: tokens.colors.semantic.brand,
-                color: tokens.colors.surface.card,
+                background: "var(--color-semantic-brand)",
+                color: "var(--color-surface-card)",
                 boxShadow: "0 8px 24px rgba(15,23,42,.15)",
                 fontFamily: tokens.typography.fontFamily,
                 transition: "transform .15s",
@@ -253,19 +254,19 @@ export default function InputTab({
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: "16px 16px",
-                    background: tokens.colors.surface.card,
+                    background: "var(--color-surface-card)",
                     borderRadius: 16,
                     cursor: "pointer",
                     boxShadow: tokens.shadows.small || "0 2px 8px rgba(0,0,0,0.05)",
-                    border: `1px solid ${tokens.colors.border.subtle}`,
+                    border: `1px solid ${"var(--color-border-subtle)"}`,
                     transition: "transform 0.15s, border-color 0.15s",
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = tokens.colors.border.input;
+                    e.currentTarget.style.borderColor = "var(--color-border-input)";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                    e.currentTarget.style.borderColor = "var(--color-border-subtle)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
@@ -284,7 +285,7 @@ export default function InputTab({
                         style={{
                           fontSize: 14,
                           fontWeight: 700,
-                          color: tokens.colors.text.primary,
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         {cls.name}
@@ -292,7 +293,7 @@ export default function InputTab({
                       <span
                         style={{
                           fontSize: 11,
-                          color: tokens.colors.text.tertiary,
+                          color: "var(--color-text-tertiary)",
                         }}
                       >
                         {tokens.typography.fontFamily.includes("Inter") ? "Portfolio Component" : cls.risk}
@@ -306,7 +307,7 @@ export default function InputTab({
                         style={{
                           fontSize: 14,
                           fontWeight: 800,
-                          color: tokens.colors.text.primary,
+                          color: "var(--color-text-primary)",
                           fontFamily: tokens.typography.fontFamily,
                         }}
                       >
@@ -327,7 +328,7 @@ export default function InputTab({
                         width: 32,
                         height: 32,
                         borderRadius: 8,
-                        background: tokens.colors.surface.app,
+                        background: "var(--color-surface-app)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -339,7 +340,7 @@ export default function InputTab({
                         viewBox="0 0 24 24"
                         strokeWidth={1.5}
                         stroke="currentColor"
-                        style={{ width: 18, height: 18, color: tokens.colors.text.secondary }}
+                        style={{ width: 18, height: 18, color: "var(--color-text-secondary)" }}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                       </svg>
@@ -359,7 +360,7 @@ export default function InputTab({
               position: "fixed",
               inset: 0,
               pointerEvents: "auto",
-              background: tokens.colors.overlay,
+              background: "var(--color-overlay)",
               backdropFilter: "blur(4px)",
               zIndex: 9000,
               display: "flex",
@@ -391,9 +392,9 @@ export default function InputTab({
                   align-items: center;
                   justify-content: center;
                   border-radius: 12px;
-                  border: 1.5px solid ${tokens.colors.border.subtle};
-                  background: ${tokens.colors.surface.card};
-                  color: ${tokens.colors.text.primary};
+                  border: 1.5px solid ${"var(--color-border-subtle)"};
+                  background: ${"var(--color-surface-card)"};
+                  color: ${"var(--color-text-primary)"};
                   font-weight: 800;
                   cursor: pointer;
                   transition: all 0.2s;
@@ -401,13 +402,13 @@ export default function InputTab({
                   font-family: ${tokens.typography.fontFamily};
                 }
                 .stepbtn:hover {
-                  background: ${tokens.colors.surface.input};
-                  border-color: ${tokens.colors.border.input};
+                  background: ${"var(--color-surface-input)"};
+                  border-color: ${"var(--color-border-input)"};
                   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
                 }
                 .stepbtn:active {
                   transform: translateY(1px) scale(0.96);
-                  background: ${tokens.colors.surface.input};
+                  background: ${"var(--color-surface-input)"};
                 }
                   .floating-modal-container > div::-webkit-scrollbar {
                   display: none;
@@ -422,7 +423,7 @@ export default function InputTab({
               className="floating-modal-container"
               onClick={(e) => e.stopPropagation()}
               style={{
-                background: tokens.colors.surface.card,
+                background: "var(--color-surface-card)",
                 borderRadius: 20,
                 boxShadow: "0 24px 60px rgba(15, 23, 42, 0.3)",
                 width: "100%",
@@ -450,7 +451,7 @@ export default function InputTab({
                     <div
                       style={{
                         padding: "20px 24px 16px",
-                        borderBottom: `1px solid ${tokens.colors.border.subtle}`,
+                        borderBottom: `1px solid ${"var(--color-border-subtle)"}`,
                         flexShrink: 0,
                         display: "flex",
                         justifyContent: "space-between",
@@ -472,7 +473,7 @@ export default function InputTab({
                               margin: 0,
                               fontSize: 18,
                               fontWeight: 800,
-                              color: tokens.colors.text.primary,
+                              color: "var(--color-text-primary)",
                             }}
                           >
                             Edit {cls.name}
@@ -482,7 +483,7 @@ export default function InputTab({
                           style={{
                             margin: 0,
                             fontSize: 13,
-                            color: tokens.colors.text.tertiary,
+                            color: "var(--color-text-tertiary)",
                             lineHeight: 1.5,
                           }}
                         >
@@ -496,7 +497,7 @@ export default function InputTab({
                           border: "none",
                           cursor: "pointer",
                           fontSize: 20,
-                          color: tokens.colors.text.tertiary,
+                          color: "var(--color-text-tertiary)",
                         }}
                       >
                         ✕
@@ -512,15 +513,15 @@ export default function InputTab({
                           alignItems: "center",
                           justifyContent: "space-between",
                           padding: "12px 14px",
-                          background: tokens.colors.surface.app,
+                          background: "var(--color-surface-app)",
                           borderRadius: 14,
                           gap: 16,
-                          border: `1.5px solid ${tokens.colors.border.subtle}`,
+                          border: `1.5px solid ${"var(--color-border-subtle)"}`,
                           marginBottom: 4
                         }}>
                           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: tokens.colors.text.primary }}>Input dalam USD?</span>
-                            <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Ubah konversi USD-IDR di 'Valas USD'</span>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text-primary)" }}>Input dalam USD?</span>
+                            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Ubah konversi USD-IDR di 'Valas USD'</span>
                           </div>
                           <label className="ios-toggle-wrap">
                             <input
@@ -533,7 +534,7 @@ export default function InputTab({
                               }))}
                             />
                             <div className="ios-track" style={{
-                              background: currencyPref === 'USD' ? tokens.colors.semantic.brand : tokens.colors.border.subtle,
+                              background: currencyPref === 'USD' ? "var(--color-semantic-brand)" : "var(--color-border-subtle)",
                               width: 42,
                               height: 24,
                               borderRadius: 12
@@ -556,7 +557,7 @@ export default function InputTab({
                           style={{
                             fontSize: 13,
                             fontWeight: 700,
-                            color: tokens.colors.text.secondary,
+                            color: "var(--color-text-secondary)",
                           }}
                         >
                           Berapa total nilai {cls.name} saat ini? ({currencyPref})
@@ -568,7 +569,7 @@ export default function InputTab({
                               left: 14,
                               top: "50%",
                               transform: "translateY(-50%)",
-                              color: tokens.colors.text.tertiary,
+                              color: "var(--color-text-tertiary)",
                               fontWeight: 700,
                               fontSize: 14,
                             }}
@@ -577,14 +578,7 @@ export default function InputTab({
                           </span>
                           <input
                             type="text"
-                            className="ifield"
-                            style={{
-                              paddingLeft: 42,
-                              height: 52,
-                              fontSize: 18,
-                              fontWeight: 800,
-                              background: tokens.colors.surface.app,
-                            }}
+                            className="ifield-lg"
                             value={
                               rawInputs[cls.id] !== undefined
                                 ? rawInputs[cls.id]
@@ -616,7 +610,7 @@ export default function InputTab({
 
 
                         </div>
-                        <div style={{ fontSize: "11px", color: tokens.colors.text.tertiary, marginLeft: "4px" }}>
+                        <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)", marginLeft: "4px" }}>
                           Bisa operasi matematika (+ dan -)
                         </div>
                       </div>
@@ -627,7 +621,7 @@ export default function InputTab({
                           style={{
                             fontSize: 13,
                             fontWeight: 700,
-                            color: tokens.colors.text.secondary,
+                            color: "var(--color-text-secondary)",
                           }}
                         >
                           Tambahan investasi rutin setiap bulan (DCA)?
@@ -639,7 +633,7 @@ export default function InputTab({
                               left: 14,
                               top: "50%",
                               transform: "translateY(-50%)",
-                              color: tokens.colors.text.tertiary,
+                              color: "var(--color-text-tertiary)",
                               fontWeight: 700,
                               fontSize: 13,
                             }}
@@ -649,13 +643,6 @@ export default function InputTab({
                           <input
                             type="text"
                             className="ifield"
-                            style={{
-                              paddingLeft: 42,
-                              height: 48,
-                              fontSize: 16,
-                              fontWeight: 700,
-                              background: tokens.colors.surface.app,
-                            }}
                             value={
                               rawContribs[cls.id] !== undefined
                                 ? rawContribs[cls.id]
@@ -701,7 +688,7 @@ export default function InputTab({
                             cursor: "pointer",
                             fontSize: 13,
                             fontWeight: 700,
-                            color: tokens.colors.text.secondary,
+                            color: "var(--color-text-secondary)",
                           }}
                         >
                           <span>Setup Tambahan</span>
@@ -733,7 +720,7 @@ export default function InputTab({
                           >
                             {/* Custom Return Rate */}
                             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                              <label style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>
                                 Custom Return Rate (%)
                               </label>
                               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -748,18 +735,12 @@ export default function InputTab({
                                   <input
                                     type="number"
                                     step="0.1"
-                                    className="ifield"
-                                    style={{
-                                      height: 44,
-                                      textAlign: "center",
-                                      padding: "0 40px",
-                                      fontSize: 16,
-                                      background: tokens.colors.surface.app,
-                                    }}
+                                    className="ifield-sm"
+                                    style={{ textAlign: "center", padding: "0 32px" }}
                                     value={draftReturn}
                                     onChange={(e) => setDraftReturn(Number(e.target.value))}
                                   />
-                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: tokens.colors.text.tertiary }}>
+                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: "var(--color-text-tertiary)" }}>
                                     %
                                   </span>
                                 </div>
@@ -775,7 +756,7 @@ export default function InputTab({
 
                             {/* Stress Test Drawdown */}
                             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                              <label style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>
                                 Stress Test Drawdown (%)
                               </label>
                               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -789,18 +770,12 @@ export default function InputTab({
                                 <div style={{ position: "relative", flex: 1 }}>
                                   <input
                                     type="number"
-                                    className="ifield"
-                                    style={{
-                                      height: 44,
-                                      textAlign: "center",
-                                      padding: "0 40px",
-                                      fontSize: 16,
-                                      background: tokens.colors.surface.app,
-                                    }}
+                                    className="ifield-sm"
+                                    style={{ textAlign: "center", padding: "0 32px" }}
                                     value={draftDrawdown}
                                     onChange={(e) => setDraftDrawdown(Number(e.target.value))}
                                   />
-                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: tokens.colors.text.tertiary }}>
+                                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, fontWeight: 700, color: "var(--color-text-tertiary)" }}>
                                     %
                                   </span>
                                 </div>
@@ -812,7 +787,7 @@ export default function InputTab({
                                   +
                                 </button>
                               </div>
-                              <span style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 2 }}>
+                              <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>
                                 Estimasi penurunan (%) saat skenario terburuk (crash).
                               </span>
                             </div>
@@ -820,25 +795,19 @@ export default function InputTab({
                             {/* Custom Kurs USD (Specifically for Valas USD) */}
                             {cls.id === 'usd' && (
                               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                <label style={{ fontSize: 12, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                                <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>
                                   Custom Kurs USD (Rp)
                                 </label>
                                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                   <div style={{ position: "relative", flex: 1 }}>
                                     <input
                                       type="text"
-                                      className="ifield"
-                                      style={{
-                                        height: 44,
-                                        textAlign: "left",
-                                        padding: "0 40px",
-                                        fontSize: 16,
-                                        background: tokens.colors.surface.app,
-                                      }}
+                                      className="ifield-sm"
+                                      style={{ paddingLeft: 34 }}
                                       value={new Intl.NumberFormat("id-ID").format(customUSDRate)}
                                       onChange={(e) => setCustomUSDRate(Number(e.target.value.replace(/\D/g, "")))}
                                     />
-                                    <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 12, fontWeight: 700, color: tokens.colors.text.tertiary }}>
+                                    <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 12, fontWeight: 700, color: "var(--color-text-tertiary)" }}>
                                       Rp
                                     </span>
                                   </div>
@@ -858,9 +827,9 @@ export default function InputTab({
                                 width: "100%",
                                 padding: "12px",
                                 borderRadius: 12,
-                                border: `1.5px solid ${tokens.colors.border.subtle}`,
+                                border: `1.5px solid ${"var(--color-border-subtle)"}`,
                                 background: "none",
-                                color: tokens.colors.text.secondary,
+                                color: "var(--color-text-secondary)",
                                 fontWeight: 800,
                                 fontSize: 13,
                                 cursor: "pointer",
@@ -868,12 +837,12 @@ export default function InputTab({
                                 fontFamily: tokens.typography.fontFamily,
                               }}
                               onMouseOver={(e) => {
-                                e.currentTarget.style.background = tokens.colors.surface.app;
-                                e.currentTarget.style.borderColor = tokens.colors.border.input;
+                                e.currentTarget.style.background = "var(--color-surface-app)";
+                                e.currentTarget.style.borderColor = "var(--color-border-input)";
                               }}
                               onMouseOut={(e) => {
                                 e.currentTarget.style.background = "none";
-                                e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                                e.currentTarget.style.borderColor = "var(--color-border-subtle)";
                               }}
                             >
                               Reset ke Default
@@ -888,7 +857,7 @@ export default function InputTab({
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          background: tokens.colors.surface.app,
+                          background: "var(--color-surface-app)",
                           padding: "16px",
                           borderRadius: 12,
                           width: "100%",
@@ -898,18 +867,18 @@ export default function InputTab({
                       >
                         {/* THE FIX: flex: 1 memaksa kontainer ini memakan semua sisa ruang */}
                         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                          <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>
                             Proyeksi Imbal Hasil (Net)
                           </div>
                           <div style={{ display: "flex", gap: 6, alignItems: "baseline", flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 18, fontWeight: 800, color: tokens.colors.semantic.success }}>
+                            <span style={{ fontSize: 18, fontWeight: 800, color: "var(--color-semantic-success)" }}>
                               {netR}%
                             </span>
-                            <span style={{ fontSize: 12, color: tokens.colors.text.tertiary, whiteSpace: "nowrap" }}>/ thn</span>
+                            <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>/ thn</span>
                           </div>
 
                           {/* INFO PAJAK */}
-                          <div style={{ fontSize: 11, color: tokens.colors.text.tertiary, fontStyle: "italic", opacity: 0.8 }}>
+                          <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontStyle: "italic", opacity: 0.8 }}>
                             {cls.id === "gold"
                               ? "*Incl. biaya spread & admin ~1.5%"
                               : cls.taxRate === 0
@@ -920,10 +889,10 @@ export default function InputTab({
 
                         {((cls.isUSD || cls.canSwitchCurrency) && draftAsset > 0) && (
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
-                            <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, marginBottom: 4, whiteSpace: "nowrap" }}>
+                            <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginBottom: 4, whiteSpace: "nowrap" }}>
                               {currencyPref === 'USD' ? 'Setara Rupiah' : 'Setara USD'}
                             </div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: tokens.colors.text.secondary }}>
+                            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--color-text-secondary)" }}>
                               {currencyPref === 'USD' ? formatCompact(idr) : `$${(draftAsset / customUSDRate).toFixed(2)}`}
                             </div>
                           </div>
@@ -944,12 +913,12 @@ export default function InputTab({
                             padding: "16px",
                             borderRadius: 12,
                             border: "none",
-                            background: tokens.colors.semantic.brand,
-                            color: tokens.colors.surface.card,
+                            background: "var(--color-semantic-brand)",
+                            color: "var(--color-surface-card)",
                             fontWeight: 800,
                             fontSize: 16,
                             cursor: "pointer",
-                            boxShadow: tokens.shadows.medium,
+                            boxShadow: "var(--shadow-medium)",
                             transition: "transform 0.15s",
                           }}
                           onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
@@ -963,9 +932,9 @@ export default function InputTab({
                           style={{
                             padding: "12px",
                             borderRadius: 12,
-                            border: `1.5px solid ${tokens.colors.border.subtle}`,
+                            border: `1.5px solid ${"var(--color-border-subtle)"}`,
                             background: "none",
-                            color: tokens.colors.semantic.danger,
+                            color: "var(--color-semantic-danger)",
                             fontWeight: 700,
                             fontSize: 13,
                             cursor: "pointer",
@@ -994,7 +963,7 @@ export default function InputTab({
               position: "fixed",
               inset: 0,
               pointerEvents: "auto",
-              background: tokens.colors.overlay,
+              background: "var(--color-overlay)",
               backdropFilter: "blur(4px)",
               zIndex: 8000,
               display: "flex",
@@ -1007,7 +976,7 @@ export default function InputTab({
             <div
               onClick={(e) => e.stopPropagation()}
               style={{
-                background: tokens.colors.surface.card,
+                background: "var(--color-surface-card)",
                 borderRadius: 20,
                 boxShadow: "0 24px 80px rgba(0,0,0,.22)",
                 width: "100%",
@@ -1023,10 +992,10 @@ export default function InputTab({
               <div
                 style={{
                   padding: "20px 24px 16px",
-                  borderBottom: `1.5px solid ${tokens.colors.surface.input}`,
+                  borderBottom: `1.5px solid ${"var(--color-surface-input)"}`,
                   display: "flex",
                   flexDirection: "column",
-                  background: tokens.colors.surface.card,
+                  background: "var(--color-surface-card)",
                   flexShrink: 0,
                 }}
               >
@@ -1036,13 +1005,13 @@ export default function InputTab({
                       style={{
                         fontWeight: 800,
                         fontSize: 18,
-                        color: tokens.colors.text.primary,
+                        color: "var(--color-text-primary)",
                         marginBottom: 3,
                       }}
                     >
                       📦 Katalog Instrumen Investasi
                     </div>
-                    <div style={{ fontSize: 12, color: tokens.colors.text.tertiary }}>
+                    <div style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>
                       Pilih instrumen untuk ditambahkan ke simulasi portofoliomu.
                     </div>
                   </div>
@@ -1052,9 +1021,9 @@ export default function InputTab({
                       width: 34,
                       height: 34,
                       borderRadius: "50%",
-                      border: `1.5px solid ${tokens.colors.border.subtle}`,
-                      background: tokens.colors.surface.app,
-                      color: tokens.colors.text.secondary,
+                      border: `1.5px solid ${"var(--color-border-subtle)"}`,
+                      background: "var(--color-surface-app)",
+                      color: "var(--color-text-secondary)",
                       fontSize: 16,
                       cursor: "pointer",
                       display: "flex",
@@ -1063,14 +1032,14 @@ export default function InputTab({
                       transition: "all .15s",
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.background = tokens.colors.semantic.dangerBg;
-                      e.currentTarget.style.color = tokens.colors.semantic.danger;
-                      e.currentTarget.style.borderColor = tokens.colors.semantic.dangerBorder;
+                      e.currentTarget.style.background = "var(--color-semantic-danger-bg)";
+                      e.currentTarget.style.color = "var(--color-semantic-danger)";
+                      e.currentTarget.style.borderColor = "var(--color-semantic-danger-border)";
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.background = tokens.colors.surface.app;
-                      e.currentTarget.style.color = tokens.colors.text.secondary;
-                      e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                      e.currentTarget.style.background = "var(--color-surface-app)";
+                      e.currentTarget.style.color = "var(--color-text-secondary)";
+                      e.currentTarget.style.borderColor = "var(--color-border-subtle)";
                     }}
                   >
                     ✕
@@ -1093,10 +1062,10 @@ export default function InputTab({
                     .filter-chip::-webkit-scrollbar { display: none; }
                   `}</style>
                   {[
-                    { id: 'all', label: 'Semua', sub: 'Semua', color: tokens.colors.text.tertiary },
-                    { id: 'safe', label: 'Safe Haven', sub: 'Safe', color: tokens.colors.dataViz.cash },
-                    { id: 'stable', label: 'Stable Growth', sub: 'Stable', color: tokens.colors.dataViz.obligasiFr },
-                    { id: 'aggressive', label: 'Aggressive', sub: 'Aggressive', color: tokens.colors.dataViz.localStocks }
+                    { id: 'all', label: 'Semua', sub: 'Semua', color: "var(--color-text-tertiary)" },
+                    { id: 'safe', label: 'Safe Haven', sub: 'Safe', color: "var(--color-viz-cash)" },
+                    { id: 'stable', label: 'Stable Growth', sub: 'Stable', color: "var(--color-viz-obligasi-fr)" },
+                    { id: 'aggressive', label: 'Aggressive', sub: 'Aggressive', color: "var(--color-viz-local-stocks)" }
                   ].map((opt) => {
                     const isActive = catalogFilter === opt.id;
                     return (
@@ -1119,8 +1088,8 @@ export default function InputTab({
                             fontWeight: 700,
                             whiteSpace: "nowrap",
                             transition: "all 0.2s",
-                            background: isActive ? tokens.colors.semantic.brand : tokens.colors.surface.input,
-                            color: isActive ? "#FFFFFF" : tokens.colors.text.secondary,
+                            background: isActive ? "var(--color-semantic-brand)" : "var(--color-surface-input)",
+                            color: isActive ? "var(--color-surface-card)" : "var(--color-text-secondary)",
                             textAlign: "center"
                           }}
                         >
@@ -1137,7 +1106,7 @@ export default function InputTab({
                 style={{
                   padding: 20,
                   overflowY: "auto",
-                  background: tokens.colors.surface.app,
+                  background: "var(--color-surface-app)",
                   flexGrow: 1,
                 }}
               >
@@ -1168,7 +1137,7 @@ export default function InputTab({
                             gridColumn: "1/-1",
                             textAlign: "center",
                             padding: "60px 20px",
-                            color: tokens.colors.text.tertiary,
+                            color: "var(--color-text-tertiary)",
                           }}
                         >
                           <div style={{ fontSize: 40, marginBottom: 12 }}>✨</div>
@@ -1186,8 +1155,8 @@ export default function InputTab({
                         key={cls.id}
                         onClick={() => addAsset(cls.id)}
                         style={{
-                          background: tokens.colors.surface.card,
-                          border: `1.5px solid ${tokens.colors.border.subtle}`,
+                          background: "var(--color-surface-card)",
+                          border: `1.5px solid ${"var(--color-border-subtle)"}`,
                           borderTop: `4px solid ${cls.color}`,
                           borderRadius: 14,
                           padding: "14px 16px",
@@ -1200,7 +1169,7 @@ export default function InputTab({
                           e.currentTarget.style.transform = "translateY(-2px)";
                         }}
                         onMouseOut={(e) => {
-                          e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                          e.currentTarget.style.borderColor = "var(--color-border-subtle)";
                           e.currentTarget.style.boxShadow = "none";
                           e.currentTarget.style.transform = "translateY(0)";
                           e.currentTarget.style.borderTopColor = cls.color;
@@ -1218,7 +1187,7 @@ export default function InputTab({
                             style={{
                               fontWeight: 700,
                               fontSize: 13,
-                              color: tokens.colors.text.primary,
+                              color: "var(--color-text-primary)",
                             }}
                           >
                             {cls.name}
@@ -1244,7 +1213,7 @@ export default function InputTab({
                         <div
                           style={{
                             fontSize: 11,
-                            color: tokens.colors.text.tertiary,
+                            color: "var(--color-text-tertiary)",
                             lineHeight: 1.45,
                             marginBottom: 10,
                           }}
@@ -1255,13 +1224,13 @@ export default function InputTab({
                           {(() => {
                             const normalizedRisk = () => {
                               const r = cls.risk.toLowerCase();
-                              if (r.includes("rendah") && !r.includes("sedang") && !r.includes("menengah")) return { label: "RENDAH", color: tokens.colors.dataViz.cash };
+                              if (r.includes("rendah") && !r.includes("sedang") && !r.includes("menengah")) return { label: "RENDAH", color: "var(--color-viz-cash)" };
                               if (r.includes("sedang") || r.includes("menengah") || r.includes("menengah-tinggi")) {
-                                if (r === "menengah-tinggi") return { label: "TINGGI", color: tokens.colors.semantic.danger };
-                                return { label: "SEDANG", color: tokens.colors.dataViz.obligasiFr };
+                                if (r === "menengah-tinggi") return { label: "TINGGI", color: "var(--color-semantic-danger)" };
+                                return { label: "SEDANG", color: "var(--color-viz-obligasi-fr)" };
                               }
-                              if (r.includes("tinggi")) return { label: "TINGGI", color: tokens.colors.semantic.danger };
-                              return { label: "SEDANG", color: tokens.colors.dataViz.obligasiFr };
+                              if (r.includes("tinggi")) return { label: "TINGGI", color: "var(--color-semantic-danger)" };
+                              return { label: "SEDANG", color: "var(--color-viz-obligasi-fr)" };
                             };
                             const risk = normalizedRisk();
                             return (
@@ -1279,9 +1248,9 @@ export default function InputTab({
                                 <span
                                   className="tag"
                                   style={{
-                                    background: `${tokens.colors.semantic.brand}08`,
-                                    color: tokens.colors.text.secondary,
-                                    border: `1px solid ${tokens.colors.border.subtle}`
+                                    background: `${"var(--color-semantic-brand)"}08`,
+                                    color: "var(--color-text-secondary)",
+                                    border: `1px solid ${"var(--color-border-subtle)"}`
                                   }}
                                 >
                                   {cls.return}% gross
@@ -1307,7 +1276,7 @@ export default function InputTab({
       <hr
         style={{
           border: 0,
-          borderTop: `1.5px dashed ${tokens.colors.border.input}`,
+          borderTop: `1.5px dashed ${"var(--color-border-input)"}`,
           margin: "32px 0",
         }}
       />
@@ -1328,7 +1297,7 @@ export default function InputTab({
             style={{
               fontSize: 18,
               fontWeight: 800,
-              color: tokens.colors.text.primary,
+              color: "var(--color-text-primary)",
               margin: 0,
             }}
           >
@@ -1340,7 +1309,7 @@ export default function InputTab({
             <label className="ios-toggle-wrap">
               <div
                 className="ios-track"
-                style={{ background: includeEmergencyInTotal ? tokens.colors.semantic.brand : tokens.colors.border.input }}
+                style={{ background: includeEmergencyInTotal ? "var(--color-semantic-brand)" : "var(--color-border-input)" }}
                 onClick={() => setIncludeEmergencyInTotal((v) => !v)}
               >
                 <div
@@ -1348,7 +1317,7 @@ export default function InputTab({
                   style={{ transform: includeEmergencyInTotal ? "translateX(16px)" : "translateX(0)" }}
                 />
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: tokens.colors.text.secondary, cursor: "pointer" }}
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", cursor: "pointer" }}
                 onClick={() => setIncludeEmergencyInTotal((v) => !v)}
               >
                 Gabungkan ke Total Aset
@@ -1369,7 +1338,7 @@ export default function InputTab({
             >
               {/* Kolom 1: Pengeluaran Bulanan */}
               <div>
-                <div className="cl" style={{ color: tokens.colors.text.secondary }}>Pengeluaran Bulanan</div>
+                <div className="cl" style={{ color: "var(--color-text-secondary)" }}>Pengeluaran Bulanan</div>
                 <div style={{ position: "relative", marginTop: 4 }}>
                   <span
                     style={{
@@ -1377,7 +1346,7 @@ export default function InputTab({
                       left: 14,
                       top: "50%",
                       transform: "translateY(-50%)",
-                      color: tokens.colors.text.tertiary,
+                      color: "var(--color-text-tertiary)",
                       fontSize: 13,
                       fontFamily: tokens.typography.fontFamily,
                     }}
@@ -1412,7 +1381,7 @@ export default function InputTab({
                   />
 
                 </div>
-                <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 4, letterSpacing: ".01em" }}>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4, letterSpacing: ".01em" }}>
                   Bisa operasi matematika (+ dan -)
                 </div>
               </div>
@@ -1428,7 +1397,7 @@ export default function InputTab({
               >
                 <div
                   className="cl"
-                  style={{ width: "100%", textAlign: "center", color: tokens.colors.text.secondary }}
+                  style={{ width: "100%", textAlign: "center", color: "var(--color-text-secondary)" }}
                 >
                   Target Dana Darurat
                 </div>
@@ -1450,9 +1419,9 @@ export default function InputTab({
                     onChange={(e) => setTargetMonths(Number(e.target.value))}
                     style={{
                       flex: 1,
-                      accentColor: tokens.colors.semantic.brand,
-                      background: `linear-gradient(to right,${tokens.colors.semantic.brand} ${((targetMonths - 3) / 9) * 100
-                        }%,${tokens.colors.border.subtle} 0%)`,
+                      accentColor: "var(--color-semantic-brand)",
+                      background: `linear-gradient(to right,${"var(--color-semantic-brand)"} ${((targetMonths - 3) / 9) * 100
+                        }%,${"var(--color-border-subtle)"} 0%)`,
                     }}
                   />
                   <span
@@ -1460,7 +1429,7 @@ export default function InputTab({
                       fontFamily: tokens.typography.fontFamily,
                       fontSize: 16,
                       fontWeight: 800,
-                      color: tokens.colors.semantic.brand,
+                      color: "var(--color-semantic-brand)",
                       minWidth: 55,
                       textAlign: "right",
                     }}
@@ -1479,19 +1448,19 @@ export default function InputTab({
                   textAlign: "right",
                 }}
               >
-                <div className="cl" style={{ color: tokens.colors.text.secondary }}>Total Kebutuhan</div>
+                <div className="cl" style={{ color: "var(--color-text-secondary)" }}>Total Kebutuhan</div>
                 <div
                   style={{
                     fontFamily: tokens.typography.fontFamily,
                     fontSize: 26,
                     fontWeight: 800,
-                    color: tokens.colors.text.primary,
+                    color: "var(--color-text-primary)",
                     marginTop: 4,
                   }}
                 >
                   {formatCompact(monthlyExpense * targetMonths)}
                 </div>
-                <div style={{ fontSize: 12, color: tokens.colors.text.tertiary, marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", marginTop: 2 }}>
                   {formatIDR(monthlyExpense * targetMonths)}
                 </div>
               </div>
@@ -1504,64 +1473,64 @@ export default function InputTab({
             {/* ── Lapis 1: Cash/Bank ── */}
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px",
-              background: tokens.colors.surface.card, borderRadius: 16,
-              border: `1px solid ${tokens.colors.border.subtle}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+              background: "var(--color-surface-card)", borderRadius: 16,
+              border: `1px solid ${"var(--color-border-subtle)"}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                 {/* Indikator Warna Sesuai Token DataViz */}
-                <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.cash, flexShrink: 0 }} />
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--color-viz-cash)", flexShrink: 0 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 1: Cash / Bank</span>
-                  <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t1Months} Bulan • Likuiditas Instan</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)" }}>Lapis 1: Cash / Bank</span>
+                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Target {t1Months} Bulan • Likuiditas Instan</span>
                 </div>
               </div>
               <div style={{ textAlign: "right", gap: 4 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t1Months)}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}>Target Dana</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)" }}>Target Dana</div>
               </div>
             </div>
 
             {/* ── Lapis 2: Bank Digital ── */}
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px",
-              background: tokens.colors.surface.card, borderRadius: 16,
-              border: `1px solid ${tokens.colors.border.subtle}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+              background: "var(--color-surface-card)", borderRadius: 16,
+              border: `1px solid ${"var(--color-border-subtle)"}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
-                <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.digitalBank, flexShrink: 0 }} />
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--color-viz-digital-bank)", flexShrink: 0 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 2: Bank Digital</span>
-                  <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t2Months} Bulan • Yield Lebih Baik</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)" }}>Lapis 2: Bank Digital</span>
+                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Target {t2Months} Bulan • Yield Lebih Baik</span>
                 </div>
               </div>
               <div style={{ textAlign: "right", gap: 4 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t2Months)}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}>Target Dana</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)" }}>Target Dana</div>
               </div>
             </div>
 
             {/* ── Lapis 3: RDPU ── */}
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px",
-              background: tokens.colors.surface.card, borderRadius: 16,
-              border: `1px solid ${tokens.colors.border.subtle}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+              background: "var(--color-surface-card)", borderRadius: 16,
+              border: `1px solid ${"var(--color-border-subtle)"}`, boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
-                <div style={{ width: 10, height: 10, borderRadius: "50%", background: tokens.colors.dataViz.rdpu, flexShrink: 0 }} />
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--color-viz-rdpu)", flexShrink: 0 }} />
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: tokens.colors.text.primary }}>Lapis 3: RDPU</span>
-                  <span style={{ fontSize: 11, color: tokens.colors.text.tertiary }}>Target {t3Months} Bulan • Pelindung Inflasi</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-primary)" }}>Lapis 3: RDPU</span>
+                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>Target {t3Months} Bulan • Pelindung Inflasi</span>
                 </div>
               </div>
               <div style={{ textAlign: "right", gap: 4 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: tokens.colors.text.primary, fontFamily: tokens.typography.fontFamily }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)", fontFamily: tokens.typography.fontFamily }}>
                   {formatIDR(monthlyExpense * t3Months)}
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: tokens.colors.text.tertiary }}>Target Dana</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)" }}>Target Dana</div>
               </div>
             </div>
 
@@ -1589,7 +1558,7 @@ export default function InputTab({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: tokens.colors.overlay,
+            backgroundColor: "var(--color-overlay)",
             backdropFilter: "blur(4px)",
             padding: "16px",
             WebkitTapHighlightColor: "transparent",
@@ -1598,7 +1567,7 @@ export default function InputTab({
         >
           <div
             style={{
-              backgroundColor: tokens.colors.surface.card,
+              backgroundColor: "var(--color-surface-card)",
               borderRadius: "16px",
               boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
               width: "100%",
@@ -1608,7 +1577,7 @@ export default function InputTab({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+            <p style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
               Angka yang kamu ubah belum disimpan. Yakin ingin membuang perubahan ini?
             </p>
             <div style={{ display: "flex", gap: "8px", width: "100%" }}>
@@ -1616,8 +1585,8 @@ export default function InputTab({
                 onClick={() => setShowDiscardConfirm(false)}
                 style={{
                   flex: 1,
-                  padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
-                  background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                  padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
+                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: "14px",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >
@@ -1631,7 +1600,7 @@ export default function InputTab({
                 style={{
                   flex: 1,
                   padding: "12px 0", borderRadius: "8px", border: "none",
-                  background: tokens.colors.semantic.danger, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: 700, fontSize: "14px",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >
@@ -1650,28 +1619,28 @@ export default function InputTab({
             pointerEvents: "auto",
             zIndex: 10000, // Lebih tinggi dari modal editor
             display: "flex", alignItems: "center", justifyContent: "center",
-            backgroundColor: tokens.colors.overlay, backdropFilter: "blur(4px)", padding: "16px",
+            backgroundColor: "var(--color-overlay)", backdropFilter: "blur(4px)", padding: "16px",
             WebkitTapHighlightColor: "transparent",
             transition: "all 0.3s ease"
           }}
         >
           <div
             style={{
-              backgroundColor: tokens.colors.surface.card, borderRadius: "16px",
+              backgroundColor: "var(--color-surface-card)", borderRadius: "16px",
               boxShadow: "0 24px 50px rgba(0,0,0,0.2)", width: "100%", maxWidth: "360px",
               padding: "20px", textAlign: "center"
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+            <p style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
               Hapus <strong>{ASSET_CLASSES.find(c => c.id === editingAssetId)?.name}</strong> dari portofolio? Semua data nilai dan kontribusi akan hilang permanen.
             </p>
             <div style={{ display: "flex", gap: "8px", width: "100%" }}>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 style={{
-                  flex: 1, padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
-                  background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                  flex: 1, padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
+                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: "14px",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >
@@ -1685,7 +1654,7 @@ export default function InputTab({
                 }}
                 style={{
                   flex: 1, padding: "12px 0", borderRadius: "8px", border: "none",
-                  background: tokens.colors.semantic.danger, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: 700, fontSize: "14px",
                   cursor: "pointer", fontFamily: tokens.typography.fontFamily
                 }}
               >

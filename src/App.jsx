@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
+import "./components/designtoken.css";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -20,62 +21,6 @@ const DEFAULT_USD_RATE = 17100;
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const tokens = {
-  colors: {
-    surface: {
-      app: '#F8FAFC',
-      card: '#FFFFFF',
-      input: '#F1F5F9',
-      active: '#E2E8F0',
-    },
-    overlay: 'rgba(15, 23, 42, 0.6)',
-    border: {
-      subtle: '#E2E8F0',
-      input: '#CBD5E1',
-      active: '#0F172A',
-    },
-    text: {
-      primary: '#0F172A',
-      secondary: '#475569',
-      tertiary: '#94A3B8',
-    },
-    semantic: {
-      success: '#4F46E5',
-      danger: '#EF4444',
-      warning: '#F59E0B',
-      brand: '#0F172A',
-      successBg: '#f0f0fdff',
-      dangerBg: '#FEF2F2',
-      successBorder: '#c1bbf7ff',
-      dangerBorder: '#FECACA',
-    },
-    dataViz: {
-      // 🟩 KELOMPOK 1: KAS & VALAS (Nuansa Hijau/Teal - Likuiditas Instan)
-      cash: '#10B981',        // Emerald
-      digitalBank: '#14B8A6', // Teal
-      usd: '#0D9488',         // Dark Teal
-
-      // 🟦 KELOMPOK 2: PENDAPATAN TETAP (Nuansa Biru - Stabil)
-      sbnRitel: '#38BDF8',    // Light Sky Blue
-      obligasiFr: '#3B82F6',  // Blue
-      bonds: '#1D4ED8',       // Dark Blue (Reksadana Obligasi)
-
-      // 🟪 KELOMPOK 3: REKSADANA (Nuansa Ungu - Terkelola)
-      rdpu: '#C084FC',        // Light Purple
-      rdCampuran: '#A855F7',  // Purple
-      rdSaham: '#8B5CF6',     // Violet
-      rdpuUsd: '#5c0596', // Emerald Gelap (Turunan warna uang/USD)
-
-      // 🟥 KELOMPOK 4: SAHAM & ETF (Nuansa Oranye/Merah - Agresif)
-      localStocks: '#EF4444', // Red (Saham IDX)
-      sp500: '#F97316',       // Orange
-      nasdaq: '#F43F5E',      // Rose
-      usStocks: '#BE123C', // Rose Gelap (Kontras dari Saham Lokal & NASDAQ)
-
-      // 🟨 KELOMPOK 5: ALTERNATIF (Emas & Kripto)
-      gold: '#EAB308',        // Gold
-      kripto: '#4338CA',      // Indigo (Gelap & Kontras)
-    },
-  },
   shadows: {
     soft: "0 4px 12px rgba(15, 23, 42, 0.08)",
     medium: "0 8px 24px rgba(15, 23, 42, 0.12)",
@@ -98,7 +43,7 @@ const ASSET_CLASSES = [
     id: "cash",
     name: "Cash / Bank",
     return: 1.0,
-    color: tokens.colors.dataViz.cash,
+    color: "var(--color-viz-cash)",
     isEquity: false,
     isUSD: false,
     taxRate: 0.2,
@@ -112,7 +57,7 @@ const ASSET_CLASSES = [
     id: "bankDigital",
     name: "Bank Digital",
     return: 4.0,
-    color: tokens.colors.dataViz.digitalBank,
+    color: "var(--color-viz-digital-bank)",
     isEquity: false,
     isUSD: false,
     taxRate: 0.2,
@@ -131,14 +76,14 @@ const ASSET_CLASSES = [
     return: 6.0,
     isEquity: false,
     taxRate: 0.10,
-    color: tokens.colors.dataViz.sbnRitel,
+    color: "var(--color-viz-sbn-ritel)",
     defaultDrawdown: 3,
   },
   {
     id: "rdpu",
     name: "Reksadana Pasar Uang",
     return: 5.1,
-    color: tokens.colors.dataViz.rdpu,
+    color: "var(--color-viz-rdpu)",
     isEquity: false,
     isUSD: false,
     taxRate: 0.1,
@@ -151,7 +96,7 @@ const ASSET_CLASSES = [
     id: "usd",
     name: "Valas USD",
     return: 3.5,
-    color: tokens.colors.dataViz.usd,
+    color: "var(--color-viz-usd)",
     isEquity: false,
     isUSD: true,
     taxRate: 0,
@@ -170,7 +115,7 @@ const ASSET_CLASSES = [
     return: 4.8,
     isEquity: false,
     taxRate: 0,
-    color: tokens.colors.dataViz.rdpuUsd,
+    color: "var(--color-viz-rdpu-usd)",
     isUSD: false,
     defaultDrawdown: 1,
     canSwitchCurrency: true,
@@ -185,13 +130,13 @@ const ASSET_CLASSES = [
     isEquity: false,
     taxRate: 0.10,
     defaultDrawdown: 8,
-    color: tokens.colors.dataViz.obligasiFr,
+    color: "var(--color-viz-obligasi-fr)",
   },
   {
     id: "rdo",
     name: "Reksadana Obligasi",
     return: 6.5,
-    color: tokens.colors.dataViz.bonds,
+    color: "var(--color-viz-bonds)",
     isEquity: false,
     isUSD: false,
     taxRate: 0.1,
@@ -204,7 +149,7 @@ const ASSET_CLASSES = [
     id: "gold",
     name: "Emas / Gold",
     return: 9.0,
-    color: tokens.colors.dataViz.gold,
+    color: "var(--color-viz-gold)",
     isEquity: false,
     isUSD: false,
     taxRate: 0,
@@ -225,13 +170,13 @@ const ASSET_CLASSES = [
     isEquity: true,
     taxRate: 0,
     defaultDrawdown: 25,
-    color: tokens.colors.dataViz.rdCampuran,
+    color: "var(--color-viz-rd-campuran)",
   },
   {
     id: "sp500",
     name: "S&P 500 ETF",
     return: 10.5,
-    color: tokens.colors.dataViz.sp500,
+    color: "var(--color-viz-sp500)",
     isEquity: true,
     isUSD: false,
     canSwitchCurrency: true,
@@ -246,7 +191,7 @@ const ASSET_CLASSES = [
     id: "rdSaham",
     name: "Reksadana Saham",
     return: 11.0,
-    color: tokens.colors.dataViz.rdSaham,
+    color: "var(--color-viz-rd-saham)",
     isEquity: true,
     isUSD: false,
     taxRate: 0,
@@ -260,7 +205,7 @@ const ASSET_CLASSES = [
     id: "saham",
     name: "Saham IDX",
     return: 12.0,
-    color: tokens.colors.dataViz.localStocks,
+    color: "var(--color-viz-local-stocks)",
     isEquity: true,
     isUSD: false,
     taxRate: 0.001,
@@ -279,7 +224,7 @@ const ASSET_CLASSES = [
     return: 15.0,
     isEquity: true,
     taxRate: 0.10,
-    color: tokens.colors.dataViz.nasdaq,
+    color: "var(--color-viz-nasdaq)",
     isUSD: false,
     defaultDrawdown: 65,
     canSwitchCurrency: true,
@@ -293,7 +238,7 @@ const ASSET_CLASSES = [
     return: 12.0,
     isEquity: true,
     taxRate: 0.10,
-    color: tokens.colors.dataViz.usStocks,
+    color: "var(--color-viz-us-stocks)",
     isUSD: false,
     defaultDrawdown: 75,
     canSwitchCurrency: true,
@@ -307,7 +252,7 @@ const ASSET_CLASSES = [
     return: 25.0,
     isEquity: true,
     taxRate: 0.0021, // Pajak kripto Indo: 0.1% PPh + 0.11% PPN
-    color: tokens.colors.dataViz.kripto,
+    color: "var(--color-viz-kripto)",
     isUSD: false,
     defaultDrawdown: 90,
     canSwitchCurrency: true,
@@ -801,11 +746,11 @@ export default function WealthTracker() {
   }, [effectiveAssets, totalAssets, customDrawdowns, customUSDRate, assetCurrencyPrefs]);
 
   const getRiskInfo = (eq) => {
-    if (eq < 20) return { label: "Sangat Konservatif", color: tokens.colors.semantic.brand };
-    if (eq < 40) return { label: "Konservatif", color: tokens.colors.semantic.success };
-    if (eq < 60) return { label: "Moderat", color: tokens.colors.semantic.warning };
-    if (eq < 80) return { label: "Agresif", color: "#f97316" };
-    return { label: "Sangat Agresif", color: tokens.colors.semantic.danger };
+    if (eq < 20) return { label: "Sangat Konservatif", color: "var(--color-semantic-brand)" };
+    if (eq < 40) return { label: "Konservatif", color: "var(--color-semantic-success)" };
+    if (eq < 60) return { label: "Moderat", color: "var(--color-semantic-warning)" };
+    if (eq < 80) return { label: "Agresif", color: "var(--color-viz-sp500)" };
+    return { label: "Sangat Agresif", color: "var(--color-semantic-danger)" };
   };
   const riskInfo = getRiskInfo(stats.equityPct);
 
@@ -815,29 +760,20 @@ export default function WealthTracker() {
       style={{
         fontFamily: tokens.typography.fontFamily,
         minHeight: "100vh",
-        background: tokens.colors.surface.app,
-        color: tokens.colors.text.primary,
+        background: "var(--color-surface-app)",
+        color: "var(--color-text-primary)",
         padding: "24px 16px",
       }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        * { box-sizing:border-box; }
-        body, html { margin: 0; padding: 0; background: #f8fafc; overflow-x: hidden; width: 100%; height: 100%; }
+        body, html { margin: 0; padding: 0; background: var(--color-surface-app); overflow-x: hidden; width: 100%; height: 100%; }
+        * { box-sizing: border-box; }
         button, input, select, textarea { font-family: inherit; }
         :root {
-          --color-surface-app: ${tokens.colors.surface.app};
-          --color-surface-card: ${tokens.colors.surface.card};
-          --color-surface-input: ${tokens.colors.surface.input};
-          --color-border-subtle: ${tokens.colors.border.subtle};
-          --color-border-input: ${tokens.colors.border.input};
-          --color-border-active: ${tokens.colors.border.active};
-          --color-text-primary: ${tokens.colors.text.primary};
-          --color-text-secondary: ${tokens.colors.text.secondary};
-          --color-text-tertiary: ${tokens.colors.text.tertiary};
-          --color-brand: ${tokens.colors.semantic.brand};
-          --color-success: ${tokens.colors.semantic.success};
-          --color-danger: ${tokens.colors.semantic.danger};
+          --color-brand: var(--color-semantic-brand);
+          --color-success: var(--color-semantic-success);
+          --color-danger: var(--color-semantic-danger);
           --font-family: ${tokens.typography.fontFamily};
         }
         ::-webkit-scrollbar { width:4px; }
@@ -849,9 +785,25 @@ export default function WealthTracker() {
         .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
         .stat  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:14px 16px; flex-shrink:0; min-width:148px; }
-        .ifield { width:100%; background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:8px; padding:9px 80px 9px 34px; color:var(--color-text-primary); font-family:var(--font-family); font-size:13px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
-        .ifield:focus { border-color:var(--color-border-active); background:var(--color-surface-card); }
-        .ifield-sm { width:100%; background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:8px; padding:7px 60px 7px 30px; color:var(--color-text-primary); font-family:var(--font-family); font-size:12px; font-weight:600; outline:none; transition:border-color .2s, background .2s; }
+        .ifield, .ifield-sm, .ifield-lg { 
+            width:100%; 
+            background:var(--color-surface-input); 
+            border:1.5px solid var(--color-border-subtle); 
+            border-radius:12px; 
+            color:var(--color-text-primary); 
+            font-family:var(--font-family); 
+            outline:none; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+        .ifield:focus, .ifield-sm:focus, .ifield-lg:focus { 
+            border-color:var(--color-border-active); 
+            background:var(--color-surface-card); 
+            box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+        }
+        .ifield-lg { padding: 14px 16px 14px 44px; font-size: 18px; font-weight: 800; }
+        .ifield    { padding: 12px 16px 12px 42px; font-size: 16px; font-weight: 700; height: 48px; }
+        .ifield-sm { padding: 9px 12px; font-size: 13px; font-weight: 600; border-radius: 8px; }
         .stepbtn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:6px; cursor:pointer; font-size:15px; transition:all .15s; }
         .stepbtn:hover { background:var(--color-border-subtle); color:var(--color-text-primary); border-color:var(--color-border-input); }
         .stepbtn-sm { width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:5px; cursor:pointer; font-size:13px; transition:all .15s; }
@@ -861,9 +813,9 @@ export default function WealthTracker() {
         .tab.on { background:var(--color-brand); color: var(--color-surface-card); box-shadow:0 4px 12px rgba(15,23,42,.15); }
         .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
         .tmplbtn:hover { border-color:var(--color-border-active); color: var(--color-brand); background: var(--color-surface-active); }
-        .warn { background: ${tokens.colors.semantic.dangerBg}; border:1.5px solid ${tokens.colors.semantic.dangerBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-danger); display:flex; align-items:center; gap:10px; }
-        .ok   { background: ${tokens.colors.semantic.successBg}; border:1.5px solid ${tokens.colors.semantic.successBorder}; border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
-        .note { background: ${tokens.colors.surface.active}; border:1.5px solid ${tokens.colors.border.subtle}; border-radius:10px; padding:12px 14px; font-size:11.5px; color: ${tokens.colors.text.secondary}; margin-top:10px; line-height:1.65; }
+        .warn { background: var(--color-semantic-danger-bg); border:1.5px solid var(--color-semantic-danger-border); border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-danger); display:flex; align-items:center; gap:10px; }
+        .ok   { background: var(--color-semantic-success-bg); border:1.5px solid var(--color-semantic-success-border); border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
+        .note { background: var(--color-surface-active); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:12px 14px; font-size:11.5px; color: var(--color-text-secondary); margin-top:10px; line-height:1.65; }
         .pgbar { background:var(--color-border-subtle); border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
         .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-top:20px; margin-bottom:120px; }
         .contrib-row { border-top:1px solid var(--color-surface-input); margin-top:10px; padding-top:10px; }
@@ -907,7 +859,7 @@ export default function WealthTracker() {
         /* ── iOS-style toggle ── */
         .ios-toggle-wrap { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
         .ios-track { position:relative; width:38px; height:22px; border-radius:11px; transition:background .25s; flex-shrink:0; }
-        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:${tokens.colors.surface.card}; box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .25s; }
+        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:var(--color-surface-card); box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .25s; }
 @media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
 .fab { display:none; }
@@ -944,7 +896,7 @@ export default function WealthTracker() {
     z-index:999;
     background: var(--color-surface-card);
     backdrop-filter: blur(12px);
-    border: 1.5px solid ${tokens.colors.border.subtle};
+    border: 1.5px solid var(--color-border-subtle);
     border-radius: 20px;
     display:flex;
     padding:8px;
@@ -974,7 +926,7 @@ export default function WealthTracker() {
               fontWeight: 800,
               margin: 0,
               letterSpacing: "-0.01em",
-              color: tokens.colors.text.primary,
+              color: "var(--color-text-primary)",
             }}
           >
             Jejak Harta
@@ -983,7 +935,7 @@ export default function WealthTracker() {
             className="header-sub"
             style={{
               fontSize: 16,
-              color: tokens.colors.text.tertiary,
+              color: "var(--color-text-tertiary)",
               marginTop: 5,
               marginBottom: 0,
             }}
@@ -1013,8 +965,8 @@ export default function WealthTracker() {
                 gap: 6,
                 padding: "5px 12px",
                 borderRadius: 999,
-                background: stats.realReturn >= 0 ? tokens.colors.semantic.successBg : tokens.colors.semantic.dangerBg,
-                border: `1.5px solid ${stats.realReturn >= 0 ? tokens.colors.semantic.successBorder : tokens.colors.semantic.dangerBorder}`,
+                background: stats.realReturn >= 0 ? "var(--color-semantic-success-bg)" : "var(--color-semantic-danger-bg)",
+                border: `1.5px solid ${stats.realReturn >= 0 ? "var(--color-semantic-success-border)" : "var(--color-semantic-danger-border)"}`,
                 width: "fit-content",
               }}
             >
@@ -1022,7 +974,7 @@ export default function WealthTracker() {
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: stats.realReturn >= 0 ? tokens.colors.semantic.success : tokens.colors.semantic.danger,
+                  color: stats.realReturn >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
                 }}
               >
                 {stats.realReturn >= 0 ? "+" : ""}{stats.realReturn}% vs inflasi {inflationRate}%/thn
@@ -1032,7 +984,7 @@ export default function WealthTracker() {
             <label className="ios-toggle-wrap">
               <div
                 className="ios-track"
-                style={{ background: showAfterTax ? tokens.colors.semantic.brand : tokens.colors.border.input }}
+                style={{ background: showAfterTax ? "var(--color-semantic-brand)" : "var(--color-border-input)" }}
                 onClick={() => setShowAfterTax((v) => !v)}
               >
                 <div
@@ -1040,7 +992,7 @@ export default function WealthTracker() {
                   style={{ transform: showAfterTax ? "translateX(16px)" : "translateX(0)" }}
                 />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: tokens.colors.text.secondary, cursor: "pointer" }}
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", cursor: "pointer" }}
                 onClick={() => setShowAfterTax((v) => !v)}
               >
                 After-tax
@@ -1049,7 +1001,7 @@ export default function WealthTracker() {
           </div>
           {/* RIGHT: Total Aset */}
           <div style={{ textAlign: "right" }}>
-            <div style={{ ...tokens.typography.eyebrow, color: tokens.colors.text.tertiary, marginBottom: 4 }}>
+            <div style={{ ...tokens.typography.eyebrow, color: "var(--color-text-tertiary)", marginBottom: 4 }}>
               Total Aset
             </div>
             <div
@@ -1057,12 +1009,12 @@ export default function WealthTracker() {
                 fontSize: 28,
                 fontWeight: 800,
                 fontFamily: tokens.typography.fontFamily,
-                color: tokens.colors.text.primary,
+                color: "var(--color-text-primary)",
               }}
             >
               {formatCompact(totalAssets)}
             </div>
-            <div style={{ fontSize: 11, color: tokens.colors.text.secondary, marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
               {formatIDR(totalAssets)}
             </div>
           </div>
@@ -1075,7 +1027,7 @@ export default function WealthTracker() {
               label: showAfterTax ? "Return After-Tax" : "Return Bruto",
               value: `${showAfterTax ? stats.weightedNet : stats.weightedGross}%`,
               sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
-              color: tokens.colors.semantic.success,
+              color: "var(--color-semantic-success)",
               tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
             },
             {
@@ -1089,14 +1041,14 @@ export default function WealthTracker() {
               label: "Kontribusi/Bln",
               value: formatCompact(totalMonthlyContrib),
               sub: "semua aset digabung",
-              color: tokens.colors.dataViz.rdpu,
+              color: "var(--color-viz-rdpu)",
               tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
             },
             {
               label: "Market Crash",
               value: formatCompact(worstCase - totalAssets),
               sub: `Aset jadi ${formatCompact(worstCase)} (${totalAssets > 0 ? ((worstCase / totalAssets - 1) * 100).toFixed(1) : 0}%)`,
-              color: tokens.colors.semantic.danger,
+              color: "var(--color-semantic-danger)",
               tip: "Simulasi saat aset mengalami worst drawdown sekaligus. Ini potensi nilai kerugian (dalam minus) dan nilai akhir portofoliomu.",
             },
           ].map((s, i) => (
@@ -1105,7 +1057,7 @@ export default function WealthTracker() {
                 style={{
                   ...tokens.typography.eyebrow,
                   fontSize: 10,
-                  color: tokens.colors.text.tertiary,
+                  color: "var(--color-text-tertiary)",
                   marginBottom: 5,
                 }}
               >
@@ -1143,7 +1095,7 @@ export default function WealthTracker() {
               >
                 {s.value}
               </div>
-              <div style={{ fontSize: 10, color: tokens.colors.text.tertiary, marginTop: 3 }}>
+              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 3 }}>
                 {s.sub}
               </div>
             </div>
@@ -1156,7 +1108,7 @@ export default function WealthTracker() {
             style={{
               ...tokens.typography.eyebrow,
               fontSize: 11,
-              color: tokens.colors.text.tertiary,
+              color: "var(--color-text-tertiary)",
               marginBottom: 12,
             }}
           >
@@ -1174,21 +1126,21 @@ export default function WealthTracker() {
                   cursor: "pointer",
                   border:
                     activeTemplateId === t.id
-                      ? `1.5px solid ${tokens.colors.border.active}`
-                      : `1.5px solid ${tokens.colors.border.subtle}`,
+                      ? `1.5px solid var(--color-border-active)`
+                      : `1.5px solid var(--color-border-subtle)`,
                   backgroundColor:
-                    activeTemplateId === t.id ? tokens.colors.surface.card : tokens.colors.surface.card,
+                    activeTemplateId === t.id ? "var(--color-surface-card)" : "var(--color-surface-card)",
                   borderRadius: 10,
                   transition: "all 0.2s",
                 }}
                 onClick={() => loadUserTemplate(t)}
                 onMouseOver={(e) => {
                   if (activeTemplateId !== t.id)
-                    e.currentTarget.style.borderColor = tokens.colors.border.active;
+                    e.currentTarget.style.borderColor = "var(--color-border-active)";
                 }}
                 onMouseOut={(e) => {
                   if (activeTemplateId !== t.id)
-                    e.currentTarget.style.borderColor = tokens.colors.border.subtle;
+                    e.currentTarget.style.borderColor = "var(--color-border-subtle)";
                 }}
               >
                 <div
@@ -1202,7 +1154,7 @@ export default function WealthTracker() {
                     style={{
                       fontSize: 13,
                       fontWeight: 700,
-                      color: tokens.colors.text.primary,
+                      color: "var(--color-text-primary)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -1211,7 +1163,7 @@ export default function WealthTracker() {
                   >
                     {t.name}
                   </span>
-                  <span style={{ fontSize: 10, color: tokens.colors.text.tertiary }}>
+                  <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
                     {new Date(t.updatedAt).toLocaleDateString("id-ID")}
                   </span>
                 </div>
@@ -1219,14 +1171,14 @@ export default function WealthTracker() {
                   style={{
                     display: "flex",
                     gap: 4,
-                    borderLeft: `1.5px solid ${tokens.colors.surface.input}`,
+                    borderLeft: `1.5px solid var(--color-surface-input)`,
                     paddingLeft: 10,
                   }}
                 >
                   <button
                     onClick={(e) => updateExistingTemplate(t.id, e)}
                     style={{
-                      background: tokens.colors.surface.input,
+                      background: "var(--color-surface-input)",
                       border: "none",
                       borderRadius: 6,
                       padding: "4px 6px",
@@ -1237,15 +1189,15 @@ export default function WealthTracker() {
                     }}
                     title="Timpa template ini"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16, color: tokens.colors.text.secondary }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16, color: "var(--color-text-secondary)" }}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
                   </button>
                   <button
                     onClick={(e) => deleteTemplate(t.id, e)}
                     style={{
-                      background: tokens.colors.semantic.dangerBg,
-                      color: tokens.colors.semantic.danger,
+                      background: "var(--color-semantic-danger-bg)",
+                      color: "var(--color-semantic-danger)",
                       border: "none",
                       borderRadius: 6,
                       padding: "4px 6px",
@@ -1269,10 +1221,10 @@ export default function WealthTracker() {
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
-                  background: tokens.colors.surface.app,
+                  background: "var(--color-surface-app)",
                   padding: 6,
                   borderRadius: 10,
-                  border: `1.5px dashed ${tokens.colors.border.input}`,
+                  border: `1.5px dashed var(--color-border-input)`,
                   flexShrink: 0,
                 }}
               >
@@ -1286,7 +1238,7 @@ export default function WealthTracker() {
                     outline: "none",
                     fontSize: 12,
                     fontWeight: 600,
-                    color: tokens.colors.text.primary,
+                    color: "var(--color-text-primary)",
                   }}
                   placeholder="Nama Profil..."
                   value={templateNameInput}
@@ -1316,9 +1268,9 @@ export default function WealthTracker() {
                   gap: 6,
                   padding: "8px 14px",
                   borderRadius: 10,
-                  border: `1.5px solid ${tokens.colors.border.subtle}`,
-                  background: tokens.colors.surface.app,
-                  color: tokens.colors.text.tertiary,
+                  border: `1.5px solid var(--color-border-subtle)`,
+                  background: "var(--color-surface-app)",
+                  color: "var(--color-text-tertiary)",
                   fontSize: 12,
                   fontWeight: 600,
                   flexShrink: 0,
@@ -1341,8 +1293,8 @@ export default function WealthTracker() {
             display: "flex",
             gap: 4,
             marginBottom: 12,
-            background: tokens.colors.surface.input,
-            border: `1.5px solid ${tokens.colors.border.subtle}`,
+            background: "var(--color-surface-input)",
+            border: `1.5px solid var(--color-border-subtle)`,
             borderRadius: 10,
             padding: 4,
             width: "fit-content",
@@ -1429,11 +1381,6 @@ export default function WealthTracker() {
           />
         )}
 
-        {/* ══════════════════════════════════════════════
-            MODUL DANA DARURAT (DEFENSIF)
-        ══════════════════════════════════════════════ */}
-
-
         <div className="mobile-bottom-spacer" />
 
         {/* ── DISCLAIMER ── */}
@@ -1446,22 +1393,19 @@ export default function WealthTracker() {
           keuangan profesional sebelum mengambil keputusan investasi.
         </div>
 
-        {/* ── MOBILE FAB ── */}
-
-
         {/* ── MOBILE STICKY TAB BAR ── */}
-        <div className="tab-bar-sticky" style={{ background: tokens.colors.surface.card, borderTop: `1.5px solid ${tokens.colors.border.subtle}` }}>
+        <div className="tab-bar-sticky" style={{ background: "var(--color-surface-card)", borderTop: `1.5px solid var(--color-border-subtle)` }}>
           {[
-            ["input", "", "Input"],
-            ["projection", "", "Proyeksi"],
-          ].map(([id, icon, lbl]) => (
+            ["input", "Input"],
+            ["projection", "Proyeksi"],
+          ].map(([id, lbl]) => (
             <button
               key={id}
               className={`tab ${activeTab === id ? "on" : ""}`}
               onClick={() => setActiveTab(id)}
-              style={{ color: activeTab === id ? "#fff" : tokens.colors.text.tertiary }}
+              style={{ color: activeTab === id ? "var(--color-surface-card)" : "var(--color-text-tertiary)" }}
             >
-              {icon} {lbl}
+              {lbl}
             </button>
           ))}
         </div>
@@ -1479,7 +1423,7 @@ export default function WealthTracker() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: tokens.colors.overlay,
+              backgroundColor: "var(--color-overlay)",
               backdropFilter: "blur(4px)",
               padding: "16px",
               transition: "all 0.3s ease"
@@ -1488,7 +1432,7 @@ export default function WealthTracker() {
           >
             <div
               style={{
-                backgroundColor: tokens.colors.surface.card,
+                backgroundColor: "var(--color-surface-card)",
                 borderRadius: "16px",
                 boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
                 width: "100%",
@@ -1498,7 +1442,7 @@ export default function WealthTracker() {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <p style={{ fontSize: "14px", fontWeight: 500, color: tokens.colors.text.primary, lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+              <p style={{ fontSize: "14px", fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.65, marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
                 {modalAction.title}
               </p>
               <div style={{ display: "flex", gap: "8px", width: "100%" }}>
@@ -1508,7 +1452,7 @@ export default function WealthTracker() {
                     style={{
                       width: "100%",
                       padding: "14px 0", borderRadius: "10px", border: "none",
-                      background: tokens.colors.semantic.brand, color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
+                      background: "var(--color-semantic-brand)", color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
                       cursor: "pointer", fontFamily: tokens.typography.fontFamily
                     }}
                   >
@@ -1520,8 +1464,8 @@ export default function WealthTracker() {
                       onClick={closeModal}
                       style={{
                         flex: 1,
-                        padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${tokens.colors.border.subtle}`,
-                        background: tokens.colors.surface.input, color: tokens.colors.text.secondary, fontWeight: 700, fontSize: "14px",
+                        padding: "12px 0", borderRadius: "8px", border: `1.5px solid var(--color-border-subtle)`,
+                        background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: "14px",
                         cursor: "pointer", fontFamily: tokens.typography.fontFamily
                       }}
                     >
@@ -1555,7 +1499,7 @@ export default function WealthTracker() {
                       style={{
                         flex: 1,
                         padding: "12px 0", borderRadius: "8px", border: "none",
-                        background: modalAction.type === "delete" ? tokens.colors.semantic.danger : tokens.colors.semantic.brand,
+                        background: modalAction.type === "delete" ? "var(--color-semantic-danger)" : "var(--color-semantic-brand)",
                         color: "#FFFFFF", fontWeight: 700, fontSize: "14px",
                         cursor: "pointer", fontFamily: tokens.typography.fontFamily
                       }}

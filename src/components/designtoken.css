@@ -1,0 +1,46 @@
+:root {
+  --color-surface-app: #F8FAFC;
+  --color-surface-card: #FFFFFF;
+  --color-surface-input: #F1F5F9;
+  --color-surface-active: #E2E8F0;
+
+  --color-overlay: rgba(15, 23, 42, 0.6);
+
+  --color-border-subtle: #E2E8F0;
+  --color-border-input: #CBD5E1;
+  --color-border-active: #0F172A;
+
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94A3B8;
+
+  --color-semantic-success: #4F46E5;
+  --color-semantic-danger: #EF4444;
+  --color-semantic-warning: #F59E0B;
+  --color-semantic-brand: #0F172A;
+  --color-semantic-success-bg: #f0f0fdff;
+  --color-semantic-danger-bg: #FEF2F2;
+  --color-semantic-success-border: #c1bbf7ff;
+  --color-semantic-danger-border: #FECACA;
+
+  --color-viz-cash: #10B981;
+  --color-viz-digital-bank: #14B8A6;
+  --color-viz-usd: #0D9488;
+
+  --color-viz-sbn-ritel: #38BDF8;
+  --color-viz-obligasi-fr: #3B82F6;
+  --color-viz-bonds: #1D4ED8;
+
+  --color-viz-rdpu: #C084FC;
+  --color-viz-rd-campuran: #A855F7;
+  --color-viz-rd-saham: #8B5CF6;
+  --color-viz-rdpu-usd: #5c0596;
+
+  --color-viz-local-stocks: #EF4444;
+  --color-viz-sp500: #F97316;
+  --color-viz-nasdaq: #F43F5E;
+  --color-viz-us-stocks: #BE123C;
+
+  --color-viz-gold: #EAB308;
+  --color-viz-kripto: #4338CA;
+}
