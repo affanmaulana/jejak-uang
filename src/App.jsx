@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
+import TrialInvest from "./components/TrialInvest";
 import "./components/designtoken.css";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -381,12 +382,13 @@ export default function WealthTracker() {
   const [activeAssetIds, setActiveAssetIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState({ isOpen: false, title: "", type: null, targetId: null });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const closeModal = () => setModalAction({ isOpen: false, title: "", type: null, targetId: null });
 
   // ── BODY SCROLL LOCK ──
   useEffect(() => {
-    const isAnyModalOpen = isModalOpen || modalAction.isOpen;
+    const isAnyModalOpen = isModalOpen || modalAction.isOpen || isMobileMenuOpen;
     const scrollBarWidth = window.innerWidth - document.body.clientWidth;
 
     if (isAnyModalOpen) {
@@ -817,7 +819,7 @@ export default function WealthTracker() {
         .ok   { background: var(--color-semantic-success-bg); border:1.5px solid var(--color-semantic-success-border); border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
         .note { background: var(--color-surface-active); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:12px 14px; font-size:11.5px; color: var(--color-text-secondary); margin-top:10px; line-height:1.65; }
         .pgbar { background:var(--color-border-subtle); border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
-        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-top:20px; margin-bottom:120px; }
+        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-bottom:120px; }
         .contrib-row { border-top:1px solid var(--color-surface-input); margin-top:10px; padding-top:10px; }
         .cl { font-size:10px; font-weight:700; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
         .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
@@ -863,6 +865,32 @@ export default function WealthTracker() {
 @media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
 .fab { display:none; }
+  .tab-bar-sticky {
+    position:fixed;
+    z-index:999;
+    background: var(--color-surface-card);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid var(--color-border-subtle);
+    border-radius: 20px;
+    display:flex;
+    padding:8px;
+    gap:4px;
+    box-shadow: ${tokens.shadows.medium};
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tab-bar-sticky .tab { 
+    flex:1; 
+    text-align:center; 
+    font-size:14px;
+    font-weight: 800;
+    padding:12px 4px;
+    border-radius: 12px; 
+  }
+  .tab-bar-sticky .tab:not(.on):hover {
+    background: var(--color-surface-active);
+    color: var(--color-text-primary);
+  }
+
 @media (max-width:768px) {
   .header-title { font-size:24px !important; }
   .header-sub { font-size:12px !important; }
@@ -873,9 +901,9 @@ export default function WealthTracker() {
     align-items:center;
     justify-content:center;
     position:fixed;
-    bottom:80px;
+    bottom:88px;
     right:20px;
-    z-index:1000;
+    z-index:998;
     width:auto;
     height:auto;
     border-radius:12px;
@@ -891,29 +919,22 @@ export default function WealthTracker() {
   }
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
-    position:fixed;
-    bottom:8px; left:16px; right:16px;
-    z-index:999;
-    background: var(--color-surface-card);
-    backdrop-filter: blur(12px);
-    border: 1.5px solid var(--color-border-subtle);
-    border-radius: 20px;
-    display:flex;
-    padding:8px;
-    gap:4px;
-    box-shadow: ${tokens.shadows.medium};
+    bottom:12px; left:16px; right:16px;
   }
-  .tab-bar-sticky .tab { 
-    flex:1; 
-    text-align:center; 
-    font-size:14px;
-    font-weight: 800;
-    padding:12px 4px;
-    border-radius: 12px; 
-  }
-  .mobile-bottom-spacer { height:4px; }
+  .mobile-bottom-spacer { height:12px; }
 }
-@media (min-width:769px) { .tab-bar-sticky { display:none !important; } .mobile-bottom-spacer { display:none; } }
+@media (min-width:769px) { 
+  .mobile-only { display: none !important; }
+  .tab-bar-sticky {
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 980px;
+  }
+  .tab-bar-sticky .tab { max-width: 120px; }
+  .mobile-bottom-spacer { height: 12px; } 
+}
       `}</style>
 
       <div style={{ maxWidth: 980, margin: "0 auto" }}>
@@ -944,375 +965,354 @@ export default function WealthTracker() {
           </p>
         </div>
 
-        {/* ── GLOBAL DASHBOARD CONTROLLER ── */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-            marginBottom: 16,
-            flexWrap: "wrap",
-          }}
-        >
-          {/* LEFT: Real Return status + After-Tax toggle */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* Real Return status pill */}
+        {activeTab !== "trial_invest" && (
+          <>
+            {/* ── GLOBAL DASHBOARD CONTROLLER ── */}
             <div
               style={{
-                display: "inline-flex",
+                display: "flex",
                 alignItems: "center",
-                gap: 6,
-                padding: "5px 12px",
-                borderRadius: 999,
-                background: stats.realReturn >= 0 ? "var(--color-semantic-success-bg)" : "var(--color-semantic-danger-bg)",
-                border: `1.5px solid ${stats.realReturn >= 0 ? "var(--color-semantic-success-border)" : "var(--color-semantic-danger-border)"}`,
-                width: "fit-content",
+                justifyContent: "space-between",
+                gap: 12,
+                marginBottom: 16,
+                flexWrap: "wrap",
               }}
             >
-              <span
-                style={{
-                  fontSize: "var(--text-body-size)",
-                  fontWeight: "var(--text-subtitle-weight)",
-                  color: stats.realReturn >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
-                }}
-              >
-                {stats.realReturn >= 0 ? "+" : ""}{stats.realReturn}% vs inflasi {inflationRate}%/thn
-              </span>
-            </div>
-            {/* After-Tax iOS toggle */}
-            <label className="ios-toggle-wrap">
-              <div
-                className="ios-track"
-                style={{ background: showAfterTax ? "var(--color-semantic-brand)" : "var(--color-border-input)" }}
-                onClick={() => setShowAfterTax((v) => !v)}
-              >
-                <div
-                  className="ios-thumb"
-                  style={{ transform: showAfterTax ? "translateX(16px)" : "translateX(0)" }}
-                />
-              </div>
-              <span style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-caption-weight)", color: "var(--color-text-secondary)", cursor: "pointer" }}
-                onClick={() => setShowAfterTax((v) => !v)}
-              >
-                After-tax
-              </span>
-            </label>
-          </div>
-          {/* RIGHT: Total Aset */}
-          <div style={{ textAlign: "right" }}>
-            <div style={{ ...tokens.typography.eyebrow, color: "var(--color-text-tertiary)", marginBottom: 4 }}>
-              Total Aset
-            </div>
-            <div
-              style={{
-                fontSize: "var(--text-h2-size)",
-                fontWeight: "var(--text-h1-weight)",
-                fontFamily: tokens.typography.fontFamily,
-                color: "var(--color-text-primary)",
-              }}
-            >
-              {formatCompact(totalAssets)}
-            </div>
-            <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-secondary)", marginTop: 2 }}>
-              {formatIDR(totalAssets)}
-            </div>
-          </div>
-        </div>
-
-        {/* ── SUMMARY STATS — horizontal scroll strip ── */}
-        <div className="stat-strip">
-          {[
-            {
-              label: showAfterTax ? "Return After-Tax" : "Return Bruto",
-              value: `${showAfterTax ? stats.weightedNet : stats.weightedGross}%`,
-              sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
-              color: "var(--color-semantic-success)",
-              tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
-            },
-            {
-              label: "Equity Exposure",
-              value: `${stats.equityPct}%`,
-              sub: riskInfo.label,
-              color: riskInfo.color,
-              tip: "Persentase portofolio di aset berisiko tinggi (saham). Makin tinggi, makin volatil nilainya.",
-            },
-            {
-              label: "Kontribusi/Bln",
-              value: formatCompact(totalMonthlyContrib),
-              sub: "semua aset digabung",
-              color: "var(--color-viz-rdpu)",
-              tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
-            },
-            {
-              label: "Market Crash",
-              value: formatCompact(worstCase - totalAssets),
-              sub: `Aset jadi ${formatCompact(worstCase)} (${totalAssets > 0 ? ((worstCase / totalAssets - 1) * 100).toFixed(1) : 0}%)`,
-              color: "var(--color-semantic-danger)",
-              tip: "Simulasi saat aset mengalami worst drawdown sekaligus. Ini potensi nilai kerugian (dalam minus) dan nilai akhir portofoliomu.",
-            },
-          ].map((s, i) => (
-            <div key={i} className="stat">
-              <div
-                style={{
-                  ...tokens.typography.eyebrow,
-                  fontSize: "var(--text-eyebrow-size)",
-                  color: "var(--color-text-tertiary)",
-                  marginBottom: 5,
-                }}
-              >
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                  {s.label}
-                  {s.tip && (
-                    <span
-                      title={s.tip}
-                      style={{ cursor: "help", display: "inline-flex" }}
-                      onClick={(e) => {
-                        if (window.innerWidth <= 768) {
-                          e.stopPropagation();
-                          setModalAction({
-                            isOpen: true,
-                            title: `${s.label}:\n${s.tip}`,
-                            type: "info"
-                          });
-                        }
-                      }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-                      </svg>
-                    </span>
-                  )}
-                </span>
-              </div>
-              <div
-                style={{
-                  fontSize: "var(--text-h3-size)",
-                  fontWeight: "var(--text-h1-weight)",
-                  fontFamily: tokens.typography.fontFamily,
-                  color: s.color,
-                }}
-              >
-                {s.value}
-              </div>
-              <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 3 }}>
-                {s.sub}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── PROFIL ALOKASI KAMU (naked, selalu tampil) ── */}
-        <div style={{ marginBottom: 12 }}>
-          <div
-            style={{
-              ...tokens.typography.eyebrow,
-              fontSize: "var(--text-eyebrow-size)",
-              color: "var(--color-text-tertiary)",
-              marginBottom: 12,
-            }}
-          >
-            Simpan Profil Alokasi
-          </div>
-          <div className="profile-row">
-            {userTemplates.map((t) => (
-              <div
-                key={t.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "8px 12px",
-                  gap: 12,
-                  cursor: "pointer",
-                  border:
-                    activeTemplateId === t.id
-                      ? `1.5px solid var(--color-border-active)`
-                      : `1.5px solid var(--color-border-subtle)`,
-                  backgroundColor:
-                    activeTemplateId === t.id ? "var(--color-surface-card)" : "var(--color-surface-card)",
-                  borderRadius: 10,
-                  transition: "all 0.2s",
-                }}
-                onClick={() => loadUserTemplate(t)}
-                onMouseOver={(e) => {
-                  if (activeTemplateId !== t.id)
-                    e.currentTarget.style.borderColor = "var(--color-border-active)";
-                }}
-                onMouseOut={(e) => {
-                  if (activeTemplateId !== t.id)
-                    e.currentTarget.style.borderColor = "var(--color-border-subtle)";
-                }}
-              >
+              {/* LEFT: Real Return status + After-Tax toggle */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {/* Real Return status pill */}
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    width: 80,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "5px 12px",
+                    borderRadius: 999,
+                    background: stats.realReturn >= 0 ? "var(--color-semantic-success-bg)" : "var(--color-semantic-danger-bg)",
+                    border: `1.5px solid ${stats.realReturn >= 0 ? "var(--color-semantic-success-border)" : "var(--color-semantic-danger-border)"}`,
+                    width: "fit-content",
                   }}
                 >
                   <span
                     style={{
                       fontSize: "var(--text-body-size)",
                       fontWeight: "var(--text-subtitle-weight)",
-                      color: "var(--color-text-primary)",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
+                      color: stats.realReturn >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
                     }}
-                    title={t.name}
                   >
-                    {t.name}
+                    {stats.realReturn >= 0 ? "+" : ""}{stats.realReturn}% vs inflasi {inflationRate}%/thn
                   </span>
-                  <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>
-                    {new Date(t.updatedAt).toLocaleDateString("id-ID")}
+                </div>
+                {/* After-Tax iOS toggle */}
+                <label className="ios-toggle-wrap">
+                  <div
+                    className="ios-track"
+                    style={{ background: showAfterTax ? "var(--color-semantic-brand)" : "var(--color-border-input)" }}
+                    onClick={() => setShowAfterTax((v) => !v)}
+                  >
+                    <div
+                      className="ios-thumb"
+                      style={{ transform: showAfterTax ? "translateX(16px)" : "translateX(0)" }}
+                    />
+                  </div>
+                  <span style={{ fontSize: "var(--text-caption-size)", fontWeight: "var(--text-caption-weight)", color: "var(--color-text-secondary)", cursor: "pointer" }}
+                    onClick={() => setShowAfterTax((v) => !v)}
+                  >
+                    After-tax
                   </span>
+                </label>
+              </div>
+              {/* RIGHT: Total Aset */}
+              <div style={{ textAlign: "right" }}>
+                <div style={{ ...tokens.typography.eyebrow, color: "var(--color-text-tertiary)", marginBottom: 4 }}>
+                  Total Aset
                 </div>
                 <div
                   style={{
-                    display: "flex",
-                    gap: 4,
-                    borderLeft: `1.5px solid var(--color-surface-input)`,
-                    paddingLeft: 10,
-                  }}
-                >
-                  <button
-                    onClick={(e) => updateExistingTemplate(t.id, e)}
-                    style={{
-                      background: "var(--color-surface-input)",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "4px 6px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                    title="Timpa template ini"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16, color: "var(--color-text-secondary)" }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={(e) => deleteTemplate(t.id, e)}
-                    style={{
-                      background: "var(--color-semantic-danger-bg)",
-                      color: "var(--color-semantic-danger)",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "4px 6px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                    title="Hapus"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
-            {userTemplates.length < 3 ? (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  background: "var(--color-surface-app)",
-                  padding: 6,
-                  borderRadius: 10,
-                  border: `1.5px dashed var(--color-border-input)`,
-                  flexShrink: 0,
-                }}
-              >
-                <input
-                  type="text"
-                  style={{
-                    width: 140,
-                    padding: "8px 12px",
-                    background: "transparent",
-                    border: "none",
-                    outline: "none",
-                    fontSize: "var(--text-caption-size)",
-                    fontWeight: "var(--text-caption-weight)",
+                    fontSize: "var(--text-h2-size)",
+                    fontWeight: "var(--text-h1-weight)",
+                    fontFamily: tokens.typography.fontFamily,
                     color: "var(--color-text-primary)",
                   }}
-                  placeholder="Nama Profil..."
-                  value={templateNameInput}
-                  onChange={(e) => setTemplateNameInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveNewTemplate();
-                  }}
-                />
-                <button
-                  className="tab on"
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    height: "100%",
-                  }}
-                  onClick={saveNewTemplate}
                 >
-                  Save
-                </button>
+                  {formatCompact(totalAssets)}
+                </div>
+                <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-secondary)", marginTop: 2 }}>
+                  {formatIDR(totalAssets)}
+                </div>
               </div>
-            ) : (
+            </div>
+
+            {/* ── SUMMARY STATS — horizontal scroll strip ── */}
+            <div className="stat-strip">
+              {[
+                {
+                  label: showAfterTax ? "Return After-Tax" : "Return Bruto",
+                  value: `${showAfterTax ? stats.weightedNet : stats.weightedGross}%`,
+                  sub: `Gross ${stats.weightedGross}% / Net ${stats.weightedNet}%`,
+                  color: "var(--color-semantic-success)",
+                  tip: "Return portofolio setelah dipotong pajak (PPh final). Lebih realistis dari return bruto.",
+                },
+                {
+                  label: "Equity Exposure",
+                  value: `${stats.equityPct}%`,
+                  sub: riskInfo.label,
+                  color: riskInfo.color,
+                  tip: "Persentase portofolio di aset berisiko tinggi (saham). Makin tinggi, makin volatil nilainya.",
+                },
+                {
+                  label: "Kontribusi/Bln",
+                  value: formatCompact(totalMonthlyContrib),
+                  sub: "semua aset digabung",
+                  color: "var(--color-viz-rdpu)",
+                  tip: "Total uang baru yang kamu setorkan ke semua instrumen setiap bulan.",
+                },
+                {
+                  label: "Market Crash",
+                  value: formatCompact(worstCase - totalAssets),
+                  sub: `Aset jadi ${formatCompact(worstCase)} (${totalAssets > 0 ? ((worstCase / totalAssets - 1) * 100).toFixed(1) : 0}%)`,
+                  color: "var(--color-semantic-danger)",
+                  tip: "Simulasi saat aset mengalami worst drawdown sekaligus. Ini potensi nilai kerugian (dalam minus) dan nilai akhir portofoliomu.",
+                },
+              ].map((s, i) => (
+                <div key={i} className="stat">
+                  <div
+                    style={{
+                      ...tokens.typography.eyebrow,
+                      fontSize: "var(--text-eyebrow-size)",
+                      color: "var(--color-text-tertiary)",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      {s.label}
+                      {s.tip && (
+                        <span
+                          title={s.tip}
+                          style={{ cursor: "help", display: "inline-flex" }}
+                          onClick={(e) => {
+                            if (window.innerWidth <= 768) {
+                              e.stopPropagation();
+                              setModalAction({
+                                isOpen: true,
+                                title: `${s.label}:\n${s.tip}`,
+                                type: "info"
+                              });
+                            }
+                          }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 14, height: 14 }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                          </svg>
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "var(--text-h3-size)",
+                      fontWeight: "var(--text-h1-weight)",
+                      fontFamily: tokens.typography.fontFamily,
+                      color: s.color,
+                    }}
+                  >
+                    {s.value}
+                  </div>
+                  <div style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)", marginTop: 3 }}>
+                    {s.sub}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* ── PROFIL ALOKASI KAMU (naked, selalu tampil) ── */}
+            <div style={{ marginBottom: 12 }}>
               <div
-                title="Hapus salah satu profil untuk membuat yang baru"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "8px 14px",
-                  borderRadius: 10,
-                  border: `1.5px solid var(--color-border-subtle)`,
-                  background: "var(--color-surface-app)",
+                  ...tokens.typography.eyebrow,
+                  fontSize: "var(--text-eyebrow-size)",
                   color: "var(--color-text-tertiary)",
-                  fontSize: "var(--text-caption-size)",
-                  fontWeight: "var(--text-caption-weight)",
-                  flexShrink: 0,
-                  userSelect: "none",
-                  cursor: "default",
-                  letterSpacing: ".02em",
+                  marginBottom: 12,
                 }}
               >
-                <span style={{ fontSize: "var(--text-body-size)" }}>🔒</span>
-                <span>3 / 3</span>
+                Simpan Profil Alokasi
               </div>
-            )}
-          </div>
-        </div>
+              <div className="profile-row">
+                {userTemplates.map((t) => (
+                  <div
+                    key={t.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "8px 12px",
+                      gap: 12,
+                      cursor: "pointer",
+                      border:
+                        activeTemplateId === t.id
+                          ? `1.5px solid var(--color-border-active)`
+                          : `1.5px solid var(--color-border-subtle)`,
+                      backgroundColor:
+                        activeTemplateId === t.id ? "var(--color-surface-card)" : "var(--color-surface-card)",
+                      borderRadius: 10,
+                      transition: "all 0.2s",
+                    }}
+                    onClick={() => loadUserTemplate(t)}
+                    onMouseOver={(e) => {
+                      if (activeTemplateId !== t.id)
+                        e.currentTarget.style.borderColor = "var(--color-border-active)";
+                    }}
+                    onMouseOut={(e) => {
+                      if (activeTemplateId !== t.id)
+                        e.currentTarget.style.borderColor = "var(--color-border-subtle)";
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: 80,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "var(--text-body-size)",
+                          fontWeight: "var(--text-subtitle-weight)",
+                          color: "var(--color-text-primary)",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                        title={t.name}
+                      >
+                        {t.name}
+                      </span>
+                      <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>
+                        {new Date(t.updatedAt).toLocaleDateString("id-ID")}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 4,
+                        borderLeft: `1.5px solid var(--color-surface-input)`,
+                        paddingLeft: 10,
+                      }}
+                    >
+                      <button
+                        onClick={(e) => updateExistingTemplate(t.id, e)}
+                        style={{
+                          background: "var(--color-surface-input)",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "4px 6px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        title="Timpa template ini"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16, color: "var(--color-text-secondary)" }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={(e) => deleteTemplate(t.id, e)}
+                        style={{
+                          background: "var(--color-semantic-danger-bg)",
+                          color: "var(--color-semantic-danger)",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "4px 6px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        title="Hapus"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {userTemplates.length < 3 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      background: "var(--color-surface-app)",
+                      padding: 6,
+                      borderRadius: 10,
+                      border: `1.5px dashed var(--color-border-input)`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <input
+                      type="text"
+                      style={{
+                        width: 140,
+                        padding: "8px 12px",
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        fontSize: "var(--text-caption-size)",
+                        fontWeight: "var(--text-caption-weight)",
+                        color: "var(--color-text-primary)",
+                      }}
+                      placeholder="Nama Profil..."
+                      value={templateNameInput}
+                      onChange={(e) => setTemplateNameInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveNewTemplate();
+                      }}
+                    />
+                    <button
+                      className="tab on"
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: 8,
+                        height: "100%",
+                      }}
+                      onClick={saveNewTemplate}
+                    >
+                      Save
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    title="Hapus salah satu profil untuk membuat yang baru"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "8px 14px",
+                      borderRadius: 10,
+                      border: `1.5px solid var(--color-border-subtle)`,
+                      background: "var(--color-surface-app)",
+                      color: "var(--color-text-tertiary)",
+                      fontSize: "var(--text-caption-size)",
+                      fontWeight: "var(--text-caption-weight)",
+                      flexShrink: 0,
+                      userSelect: "none",
+                      cursor: "default",
+                      letterSpacing: ".02em",
+                    }}
+                  >
+                    <span style={{ fontSize: "var(--text-body-size)" }}>🔒</span>
+                    <span>3 / 3</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* ── TABS ── */}
-        <div
-          className="desktop-only"
-          style={{
-            display: "flex",
-            gap: 4,
-            marginBottom: 12,
-            background: "var(--color-surface-input)",
-            border: `1.5px solid var(--color-border-subtle)`,
-            borderRadius: 10,
-            padding: 4,
-            width: "fit-content",
-          }}
-        >
-          {[
-            ["input", "Input Aset"],
-            ["projection", "Proyeksi"],
-          ].map(([id, lbl]) => (
-            <button
-              key={id}
-              className={`tab ${activeTab === id ? "on" : ""}`}
-              onClick={() => setActiveTab(id)}
-            >
-              {lbl}
-            </button>
-          ))}
-        </div>
+        {/* Removed static desktop tabs in favor of floating dock */}
 
         {/* ══════════════════════════════════════════════
             TAB: INPUT ASET
@@ -1381,34 +1381,135 @@ export default function WealthTracker() {
           />
         )}
 
+        {/* ══════════════════════════════════════════════
+            TAB: TRIAL INVEST
+        ══════════════════════════════════════════════ */}
+        {activeTab === "trial_invest" && (
+          <TrialInvest />
+        )}
+
         <div className="mobile-bottom-spacer" />
 
         {/* ── DISCLAIMER ── */}
-        <div className="disc">
-          <strong>⚠️ Disclaimer:</strong> Seluruh perhitungan bersifat simulasi
-          edukatif berdasarkan data historis dan tidak menjamin hasil investasi di
-          masa depan. Angka return yang digunakan merupakan estimasi rata-rata
-          yang sudah disesuaikan dengan pajak (untuk After-tax) dan inflasi.
-          Selalu lakukan riset mandiri atau konsultasikan dengan penasihat
-          keuangan profesional sebelum mengambil keputusan investasi.
+        {activeTab !== "trial_invest" && (
+          <div className="disc">
+            <strong>⚠️ Disclaimer:</strong> Seluruh perhitungan bersifat simulasi
+            edukatif berdasarkan data historis dan tidak menjamin hasil investasi di
+            masa depan. Angka return yang digunakan merupakan estimasi rata-rata
+            yang sudah disesuaikan dengan pajak (untuk After-tax) dan inflasi.
+            Selalu lakukan riset mandiri atau konsultasikan dengan penasihat
+            keuangan profesional sebelum mengambil keputusan investasi.
+          </div>
+        )}
+
+        {/* ── FLOATING BOTTOM DOCK ── */}
+        <div className="tab-bar-sticky" style={{ justifyContent: "space-between" }}>
+          <div style={{ display: "flex", gap: 4, flex: 1 }}>
+            {[
+              ["input", "Input"],
+              ["projection", "Proyeksi"],
+            ].map(([id, lbl]) => (
+              <button
+                key={id}
+                className={`tab ${activeTab === id ? "on" : ""}`}
+                onClick={() => { setActiveTab(id); setIsMobileMenuOpen(false); }}
+                style={{ color: activeTab === id ? "var(--color-surface-card)" : "var(--color-text-tertiary)", width: "100%" }}
+              >
+                {lbl}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flex: "none", justifyContent: "flex-end" }}>
+            <div className="desktop-only" style={{ width: "1.5px", height: "24px", background: "var(--color-border-subtle)", borderRadius: "1px" }} />
+            <button
+              className={`tab desktop-only ${activeTab === "trial_invest" ? "on" : ""}`}
+              onClick={() => setActiveTab("trial_invest")}
+              style={{ color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)", width: "120px" }}
+            >
+              Trial Invest
+            </button>
+            <button
+              className={`tab mobile-only ${isMobileMenuOpen ? "on" : ""}`}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              style={{
+                color: isMobileMenuOpen ? "var(--color-surface-card)" : "var(--color-text-tertiary)",
+                width: "auto",
+                height: 48,
+                padding: "0 14px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 24, height: 24 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* ── MOBILE STICKY TAB BAR ── */}
-        <div className="tab-bar-sticky" style={{ background: "var(--color-surface-card)", borderTop: `1.5px solid var(--color-border-subtle)` }}>
-          {[
-            ["input", "Input"],
-            ["projection", "Proyeksi"],
-          ].map(([id, lbl]) => (
+        {/* ── MOBILE POPUP MENU OVERLAY ── */}
+        {isMobileMenuOpen && (
+          <div
+            className="mobile-only"
+            style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'var(--color-overlay)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+              zIndex: 998,
+              transition: 'all 0.3s'
+            }}
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+
+        {/* ── MOBILE POPUP MENU ── */}
+        {isMobileMenuOpen && (
+          <div
+            className="mobile-only"
+            style={{
+              position: 'fixed',
+              bottom: '72px',
+              left: '16px',
+              right: '16px',
+              backgroundColor: 'var(--color-surface-card)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1.5px solid var(--color-border-subtle)',
+              borderRadius: '20px',
+              padding: '8px',
+              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+              zIndex: 999,
+              display: 'flex',
+              flexDirection: 'column',
+              marginBottom: '16px',
+            }}
+          >
             <button
-              key={id}
-              className={`tab ${activeTab === id ? "on" : ""}`}
-              onClick={() => setActiveTab(id)}
-              style={{ color: activeTab === id ? "var(--color-surface-card)" : "var(--color-text-tertiary)" }}
+              className="tab"
+              onClick={() => { setActiveTab("trial_invest"); setIsMobileMenuOpen(false); }}
+              style={{
+                background: activeTab === "trial_invest" ? "var(--color-brand)" : "transparent",
+                color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)",
+                width: "100%",
+                textAlign: "left",
+                padding: "16px 20px",
+                fontSize: "16px",
+                fontWeight: 600,
+                borderRadius: "12px",
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                transition: "all 0.2s"
+              }}
             >
-              {lbl}
+              Trial Invest
             </button>
-          ))}
-        </div>
+          </div>
+        )}
 
         <Analytics />
 

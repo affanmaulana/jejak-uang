@@ -1281,7 +1281,7 @@ export default function InputTab({
         }}
       />
 
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 8 }}>
         {/* PARENT HEADER: RATA KANAN-KIRI (Flex Space-Between) */}
         <div
           style={{
@@ -1539,14 +1539,16 @@ export default function InputTab({
       </div>
 
       {/* ── MOBILE FAB ── */}
-      <button
-        className="fab"
-        onClick={() => setIsModalOpen(true)}
-        disabled={activeAssetIds.length >= ASSET_CLASSES.length}
-        title="Tambah Instrumen"
-      >
-        + Instrumen Baru
-      </button>
+      {activeAssetIds.length > 0 && (
+        <button
+          className="fab"
+          onClick={() => setIsModalOpen(true)}
+          disabled={activeAssetIds.length >= ASSET_CLASSES.length}
+          title="Tambah Instrumen"
+        >
+          + Instrumen Baru
+        </button>
+      )}
       {/* ── STYLED CONFIRMATION POPUP (Mirrored exactly from App.jsx) ── */}
       {showDiscardConfirm && (
         <div
