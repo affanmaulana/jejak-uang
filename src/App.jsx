@@ -33,7 +33,7 @@ const tokens = {
     h1: { fontSize: "var(--text-h1-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-h1-line-height)", letterSpacing: "var(--text-h1-letter-spacing)" },
     h2: { fontSize: "var(--text-h2-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-h2-line-height)", letterSpacing: "0" },
     eyebrow: { fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-caption-line-height)", letterSpacing: "var(--text-eyebrow-letter-spacing)", textTransform: "uppercase" },
-    bodyRegular: { fontSize: "var(--text-subtitle-size)", fontWeight: "400", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
+    bodyRegular: { fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-body-weight)", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
     bodyBold: { fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
     interactive: { fontSize: "var(--text-body-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-h1-line-height)", letterSpacing: "0" },
   },
@@ -803,26 +803,26 @@ export default function WealthTracker() {
             background:var(--color-surface-card); 
             box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
         }
-        .ifield-lg { padding: 14px 16px 14px 44px; font-size: 18px; font-weight: 800; }
-        .ifield    { padding: 12px 16px 12px 42px; font-size: 16px; font-weight: 700; height: 48px; }
-        .ifield-sm { padding: 9px 12px; font-size: 13px; font-weight: 600; border-radius: 8px; }
-        .stepbtn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:6px; cursor:pointer; font-size:15px; transition:all .15s; }
+        .ifield-lg { padding: 14px 16px 14px 44px; font-size: var(--text-h3-size); font-weight: var(--text-h3-weight); }
+        .ifield    { padding: 12px 16px 12px 42px; font-size: var(--text-subtitle-size); font-weight: var(--text-subtitle-weight); height: 48px; }
+        .ifield-sm { padding: 9px 12px; font-size: var(--text-body-size); font-weight: var(--text-caption-weight); border-radius: 8px; }
+        .stepbtn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:6px; cursor:pointer; font-size:var(--text-body-size); transition:all .15s; }
         .stepbtn:hover { background:var(--color-border-subtle); color:var(--color-text-primary); border-color:var(--color-border-input); }
-        .stepbtn-sm { width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:5px; cursor:pointer; font-size:13px; transition:all .15s; }
+        .stepbtn-sm { width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); color:var(--color-text-secondary); border-radius:5px; cursor:pointer; font-size:var(--text-caption-size); transition:all .15s; }
         .stepbtn-sm:hover { background:var(--color-border-subtle); color:var(--color-text-primary); }
-        .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); font-family:var(--font-family); }
+        .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:var(--text-body-size); font-weight:var(--text-caption-weight); border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); font-family:var(--font-family); }
         .tab:hover { color:var(--color-text-secondary); }
         .tab.on { background:var(--color-brand); color: var(--color-surface-card); box-shadow:0 4px 12px rgba(15,23,42,.15); }
         .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
         .tmplbtn:hover { border-color:var(--color-border-active); color: var(--color-brand); background: var(--color-surface-active); }
-        .warn { background: var(--color-semantic-danger-bg); border:1.5px solid var(--color-semantic-danger-border); border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-danger); display:flex; align-items:center; gap:10px; }
-        .ok   { background: var(--color-semantic-success-bg); border:1.5px solid var(--color-semantic-success-border); border-radius:10px; padding:12px 16px; font-size:13px; color:var(--color-success); display:flex; align-items:center; gap:10px; }
-        .note { background: var(--color-surface-active); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:12px 14px; font-size:11.5px; color: var(--color-text-secondary); margin-top:10px; line-height:1.65; }
+        .warn { background: var(--color-semantic-danger-bg); border:1.5px solid var(--color-semantic-danger-border); border-radius:10px; padding:12px 16px; font-size:var(--text-body-size); color:var(--color-danger); display:flex; align-items:center; gap:10px; }
+        .ok   { background: var(--color-semantic-success-bg); border:1.5px solid var(--color-semantic-success-border); border-radius:10px; padding:12px 16px; font-size:var(--text-body-size); color:var(--color-success); display:flex; align-items:center; gap:10px; }
+        .note { background: var(--color-surface-active); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:12px 14px; font-size:var(--text-caption-size); color: var(--color-text-secondary); margin-top:10px; line-height:var(--text-caption-line-height); }
         .pgbar { background:var(--color-border-subtle); border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
-        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:11px; color:var(--color-text-tertiary); line-height:1.7; margin-bottom:120px; }
+        .disc  { background:var(--color-surface-app); border:1.5px solid var(--color-border-subtle); border-radius:12px; padding:16px; font-size:var(--text-caption-size); color:var(--color-text-tertiary); line-height:1.7; margin-bottom:120px; }
         .contrib-row { border-top:1px solid var(--color-surface-input); margin-top:10px; padding-top:10px; }
-        .cl { font-size:10px; font-weight:700; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
-        .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+        .cl { font-size:var(--text-eyebrow-size); font-weight:var(--text-eyebrow-weight); color:var(--color-text-tertiary); text-transform:var(--text-eyebrow-transform); letter-spacing:var(--text-eyebrow-letter-spacing); margin-bottom:5px; }
+        .tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:var(--text-eyebrow-size); font-weight:var(--text-eyebrow-weight); letter-spacing:var(--text-eyebrow-letter-spacing); text-transform:var(--text-eyebrow-transform); }
         .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
 /* Android Chrome Ultimate Kill-Switch */
         .recharts-responsive-container,
@@ -881,8 +881,8 @@ export default function WealthTracker() {
   .tab-bar-sticky .tab { 
     flex:1; 
     text-align:center; 
-    font-size:14px;
-    font-weight: 800;
+    font-size:var(--text-body-bold-size);
+    font-weight: var(--text-body-bold-weight);
     padding:12px 4px;
     border-radius: 12px; 
   }
@@ -892,16 +892,16 @@ export default function WealthTracker() {
   }
 
 @media (max-width:768px) {
-  .header-title { font-size:24px !important; }
-  .header-sub { font-size:12px !important; }
+  .header-title { font-size:var(--text-h2-size) !important; }
+  .header-sub { font-size:var(--text-caption-size) !important; }
   .desktop-only { display: none !important; }
   .fab {
     display:flex;
-    padding:10px 24px 12px;
+    padding:14px 24px 16px;
     align-items:center;
     justify-content:center;
     position:fixed;
-    bottom:88px;
+    bottom:80px;
     right:20px;
     z-index:998;
     width:auto;
@@ -910,9 +910,9 @@ export default function WealthTracker() {
     background: var(--color-brand);
     border: none;
     cursor:pointer;
-    font-size:14px;
+    font-size:var(--text-body-bold-size);
     font-family: var(--font-family);
-    font-weight: 800;
+    font-weight: var(--text-body-bold-weight);
     color: var(--color-surface-card);
     transition:transform .15s;
     box-shadow: ${tokens.shadows.medium};
@@ -920,6 +920,8 @@ export default function WealthTracker() {
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
     bottom:12px; left:16px; right:16px;
+    padding:2px;
+    border-radius: 14px;
   }
   .mobile-bottom-spacer { height:12px; }
 }
@@ -1472,20 +1474,21 @@ export default function WealthTracker() {
             className="mobile-only"
             style={{
               position: 'fixed',
-              bottom: '72px',
+              bottom: '80px',
               left: '16px',
               right: '16px',
               backgroundColor: 'var(--color-surface-card)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               border: '1.5px solid var(--color-border-subtle)',
-              borderRadius: '20px',
-              padding: '8px',
-              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+              borderRadius: '14px',
+              padding: '2px',
+              boxShadow: tokens.shadows.medium,
               zIndex: 999,
               display: 'flex',
               flexDirection: 'column',
-              marginBottom: '16px',
+              gap: '4px',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
           >
             <button
@@ -1495,15 +1498,16 @@ export default function WealthTracker() {
                 background: activeTab === "trial_invest" ? "var(--color-brand)" : "transparent",
                 color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)",
                 width: "100%",
-                textAlign: "left",
-                padding: "16px 20px",
-                fontSize: "16px",
-                fontWeight: 600,
+                textAlign: "center",
+                padding: "16px 4px",
+                fontSize: "var(--text-body-bold-size)",
+                fontWeight: "var(--text-body-bold-weight)",
                 borderRadius: "12px",
                 border: "none",
                 display: "flex",
                 alignItems: "center",
-                transition: "all 0.2s"
+                transition: "all 0.2s",
+                justifyContent: "center",
               }}
             >
               Trial Invest
@@ -1615,6 +1619,6 @@ export default function WealthTracker() {
         )}
 
       </div>
-    </div>
+    </div >
   );
 }
