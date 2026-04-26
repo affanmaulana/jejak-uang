@@ -920,8 +920,8 @@ export default function WealthTracker() {
   .fab:active { transform:scale(0.93); }
   .tab-bar-sticky {
     bottom:12px; left:16px; right:16px;
-    padding:2px;
-    border-radius: 14px;
+    padding:4px;
+    border-radius: 16px;
   }
   .mobile-bottom-spacer { height:12px; }
 }
@@ -1481,8 +1481,8 @@ export default function WealthTracker() {
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               border: '1.5px solid var(--color-border-subtle)',
-              borderRadius: '14px',
-              padding: '2px',
+              borderRadius: '16px',
+              padding: '4px',
               boxShadow: tokens.shadows.medium,
               zIndex: 999,
               display: 'flex',
