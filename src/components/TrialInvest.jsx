@@ -1,4 +1,5 @@
 import React from 'react';
+import "../styles/tokens.css";
 
 export default function TrialInvest() {
   return (
@@ -13,7 +14,7 @@ export default function TrialInvest() {
       background: 'var(--color-surface-card)',
       borderRadius: '32px',
       border: '1.5px solid var(--color-border-subtle)',
-      boxShadow: '0 20px 40px rgba(15, 23, 42, 0.06)',
+      boxShadow: "var(--shadow-md)",
       marginTop: '24px',
       position: 'relative',
       overflow: 'hidden'
@@ -93,10 +94,10 @@ export default function TrialInvest() {
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 32px',
-          boxShadow: '0 12px 32px rgba(67, 56, 202, 0.25)',
-          border: '2px solid rgba(255, 255, 255, 0.1)'
+          boxShadow: "var(--shadow-strong)",
+          border: `2px solid ${"var(--color-white)"}1a`
         }}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" style={{ width: '48px', height: '48px' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="var(--color-white)" style={{ width: '48px', height: '48px' }}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
           </svg>
         </div>

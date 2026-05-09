@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import "./designtoken.css";
+import "../styles/tokens.css";
 import {
   ComposedChart,
   Area,

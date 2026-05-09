@@ -44,6 +44,17 @@
   --color-viz-gold: #EAB308;
   --color-viz-kripto: #4338CA;
 
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+
+  /* SHADOW TOKENS */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);
+  --shadow-strong: 0 12px 32px rgba(15, 23, 42, 0.18);
+  --shadow-modal: 0 24px 60px rgba(15, 23, 42, 0.3);
+  --shadow-glow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+
   /* TYPOGRAPHY TOKENS */
   --text-display-size: 48px;
   --text-display-weight: 900;

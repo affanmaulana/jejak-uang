@@ -1,324 +1,22 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import {
-  ComposedChart,
-  Area,
-  Line,
-  ReferenceLine,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
 import TrialInvest from "./components/TrialInvest";
-import "./components/designtoken.css";
 
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+// New modularized imports
+import { DEFAULT_USD_RATE, PROJECTION_YEARS, ASSET_CLASSES } from "./constants/assets";
+import { tokens } from "./theme/tokens";
+import { 
+  formatIDR, 
+  formatCompact, 
+  parseExpression, 
+  formatWhileTyping, 
+  afterTaxReturn 
+} from "./utils/formatters";
 
-const DEFAULT_USD_RATE = 17100;
-
-// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
-const tokens = {
-  shadows: {
-    soft: "0 4px 12px rgba(15, 23, 42, 0.08)",
-    medium: "0 8px 24px rgba(15, 23, 42, 0.12)",
-    strong: "0 12px 32px rgba(15, 23, 42, 0.18)",
-  },
-  typography: {
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-    display: { fontSize: "var(--text-display-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-display-line-height)", letterSpacing: "var(--text-display-letter-spacing)" },
-    h1: { fontSize: "var(--text-h1-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-h1-line-height)", letterSpacing: "var(--text-h1-letter-spacing)" },
-    h2: { fontSize: "var(--text-h2-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-h2-line-height)", letterSpacing: "0" },
-    eyebrow: { fontSize: "var(--text-caption-size)", fontWeight: "var(--text-subtitle-weight)", lineHeight: "var(--text-caption-line-height)", letterSpacing: "var(--text-eyebrow-letter-spacing)", textTransform: "uppercase" },
-    bodyRegular: { fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-body-weight)", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
-    bodyBold: { fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-subtitle-line-height)", letterSpacing: "0" },
-    interactive: { fontSize: "var(--text-body-size)", fontWeight: "var(--text-caption-weight)", lineHeight: "var(--text-h1-line-height)", letterSpacing: "0" },
-  },
-};
-
-const ASSET_CLASSES = [
-  {
-    id: "cash",
-    name: "Cash / Bank",
-    return: 1.0,
-    color: "var(--color-viz-cash)",
-    isEquity: false,
-    isUSD: false,
-    taxRate: 0.2,
-    liquidity: "T+0",
-    risk: "Sangat Rendah",
-    defaultDrawdown: 0,
-    description:
-      "Uang fisik atau tabungan bank biasa. Likuid penuh, bunga rendah.",
-  },
-  {
-    id: "bankDigital",
-    name: "Bank Digital",
-    return: 4.0,
-    color: "var(--color-viz-digital-bank)",
-    isEquity: false,
-    isUSD: false,
-    taxRate: 0.2,
-    liquidity: "T+0",
-    risk: "Sangat Rendah",
-    defaultDrawdown: 0,
-    description:
-      "Tabungan bank digital (Blu, Jago, dst). Bunga lebih tinggi, LPS terjamin.",
-  },
-  {
-    id: "sbn_ritel",
-    name: "SBN Ritel (ORI/SR/ST/SBR)",
-    description: "Surat Berharga Negara khusus ritel. Dijamin negara 100%.",
-    risk: "Sangat Rendah",
-    liquidity: "Rendah",
-    return: 6.0,
-    isEquity: false,
-    taxRate: 0.10,
-    color: "var(--color-viz-sbn-ritel)",
-    defaultDrawdown: 3,
-  },
-  {
-    id: "rdpu",
-    name: "Reksadana Pasar Uang",
-    return: 5.1,
-    color: "var(--color-viz-rdpu)",
-    isEquity: false,
-    isUSD: false,
-    taxRate: 0.1,
-    liquidity: "T+1",
-    risk: "Rendah",
-    defaultDrawdown: 0.5,
-    description: "Reksa dana pasar uang. Stabil, cocok untuk dana darurat.",
-  },
-  {
-    id: "usd",
-    name: "Valas USD",
-    return: 3.5,
-    color: "var(--color-viz-usd)",
-    isEquity: false,
-    isUSD: true,
-    taxRate: 0,
-    liquidity: "T+0",
-    risk: "Sedang",
-    defaultDrawdown: 10,
-    description:
-      "Simpanan USD. Return dari apresiasi kurs IDR/USD historis ~3–4%/tahun.",
-  },
-  {
-    id: "rdpu_usd",
-    name: "Reksadana Pasar Uang (USD)",
-    description: "Reksa dana pasar uang berdenominasi USD. Stabil dengan return mengikuti rate The Fed.",
-    risk: "Rendah",
-    liquidity: "Tinggi",
-    return: 4.8,
-    isEquity: false,
-    taxRate: 0,
-    color: "var(--color-viz-rdpu-usd)",
-    isUSD: false,
-    defaultDrawdown: 1,
-    canSwitchCurrency: true,
-  },
-  {
-    id: "obligasi_fr",
-    name: "Obligasi FR",
-    description: "Obligasi negara yang dapat diperdagangkan di pasar sekunder. Risiko rendah.",
-    risk: "Rendah-Menengah",
-    liquidity: "Menengah",
-    return: 6.5,
-    isEquity: false,
-    taxRate: 0.10,
-    defaultDrawdown: 8,
-    color: "var(--color-viz-obligasi-fr)",
-  },
-  {
-    id: "rdo",
-    name: "Reksadana Obligasi",
-    return: 6.5,
-    color: "var(--color-viz-bonds)",
-    isEquity: false,
-    isUSD: false,
-    taxRate: 0.1,
-    liquidity: "T+2",
-    risk: "Rendah–Sedang",
-    defaultDrawdown: 10,
-    description: "Reksa dana obligasi. Return lebih tinggi, sedikit fluktuasi.",
-  },
-  {
-    id: "gold",
-    name: "Emas / Gold",
-    return: 9.0,
-    color: "var(--color-viz-gold)",
-    isEquity: false,
-    isUSD: false,
-    taxRate: 0,
-    isGold: true,
-    liquidity: "T+1",
-    risk: "Sedang",
-    defaultDrawdown: 20,
-    description:
-      "Emas fisik/digital (Antam, Pegadaian, dll). Return ~9%/thn IDR. Sudah dipotong biaya efektif ~1.5%/thn (spread + PPh buyback + admin).",
-  },
-  {
-    id: "rd_campuran",
-    name: "Reksadana Campuran",
-    description: "Kombinasi saham dan obligasi. Return moderat dengan risiko terukur.",
-    risk: "Menengah-Tinggi",
-    liquidity: "Tinggi",
-    return: 8.5,
-    isEquity: true,
-    taxRate: 0,
-    defaultDrawdown: 25,
-    color: "var(--color-viz-rd-campuran)",
-  },
-  {
-    id: "sp500",
-    name: "S&P 500 ETF",
-    return: 10.5,
-    color: "var(--color-viz-sp500)",
-    isEquity: true,
-    isUSD: false,
-    canSwitchCurrency: true,
-    taxRate: 0.1,
-    liquidity: "T+2",
-    risk: "Tinggi",
-    defaultDrawdown: 50,
-    description:
-      "Indeks saham AS. Return historis ~10% USD/tahun + estimasi apresiasi kurs IDR.",
-  },
-  {
-    id: "rdSaham",
-    name: "Reksadana Saham",
-    return: 11.0,
-    color: "var(--color-viz-rd-saham)",
-    isEquity: true,
-    isUSD: false,
-    taxRate: 0,
-    liquidity: "T+3",
-    risk: "Tinggi",
-    defaultDrawdown: 45,
-    description:
-      "Kumpulan saham pilihan yang dikelola oleh Manajer Investasi profesional. Diversifikasi tinggi, potensi return jangka panjang.",
-  },
-  {
-    id: "saham",
-    name: "Saham IDX",
-    return: 12.0,
-    color: "var(--color-viz-local-stocks)",
-    isEquity: true,
-    isUSD: false,
-    taxRate: 0.001,
-    liquidity: "T+2",
-    risk: "Tinggi",
-    defaultDrawdown: 60,
-    description:
-      "Saham IDX via LTS. Potensi return tinggi dengan volatilitas signifikan.",
-  },
-  {
-    id: "nasdaq",
-    name: "NASDAQ 100 ETF",
-    description: "Indeks 100 perusahaan teknologi terbesar AS. Volatilitas tinggi.",
-    risk: "Sangat Tinggi",
-    liquidity: "Tinggi",
-    return: 15.0,
-    isEquity: true,
-    taxRate: 0.10,
-    color: "var(--color-viz-nasdaq)",
-    isUSD: false,
-    defaultDrawdown: 65,
-    canSwitchCurrency: true,
-  },
-  {
-    id: "us_stocks",
-    name: "Saham US Individu",
-    description: "Saham perusahaan Amerika Serikat secara spesifik (Apple, Microsoft, Tesla).",
-    risk: "Sangat Tinggi",
-    liquidity: "Tinggi",
-    return: 12.0,
-    isEquity: true,
-    taxRate: 0.10,
-    color: "var(--color-viz-us-stocks)",
-    isUSD: false,
-    defaultDrawdown: 75,
-    canSwitchCurrency: true,
-  },
-  {
-    id: "kripto",
-    name: "Aset Kripto (BTC, ETH)",
-    description: "Aset digital desentralisasi. Volatilitas sangat ekstrem, potensi return eksponensial.",
-    risk: "Sangat Tinggi",
-    liquidity: "Sangat Tinggi",
-    return: 25.0,
-    isEquity: true,
-    taxRate: 0.0021, // Pajak kripto Indo: 0.1% PPh + 0.11% PPN
-    color: "var(--color-viz-kripto)",
-    isUSD: false,
-    defaultDrawdown: 90,
-    canSwitchCurrency: true,
-  }
-
-];
-
-const PROJECTION_YEARS = 10;
-
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-
-const formatIDR = (v) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(v);
-
-const formatCompact = (v) => {
-  const abs = Math.abs(v);
-  const sign = v < 0 ? "-" : "";
-  if (abs >= 1e12) return `${sign}Rp ${(abs / 1e12).toFixed(2)}T`;
-  if (abs >= 1e9) return `${sign}Rp ${(abs / 1e9).toFixed(1)}M`;
-  if (abs >= 1e6) return `${sign}Rp ${(abs / 1e6).toFixed(1)}Jt`;
-  return `${sign}Rp ${Math.round(abs).toLocaleString("id-ID")}`;
-};
-
-const parseExpression = (str) => {
-  // Strip semua karakter selain angka, titik, koma, spasi, +, -
-  const cleaned = str.replace(/[^\d+\-.,\s]/g, "").trim();
-  if (!cleaned) return null;
-  // Tokenize: pisahkan jadi angka dan operator, awali dengan + implisit
-  const tokenMatches = cleaned.match(/[+\-]?[\d.,\s]+/g);
-  if (!tokenMatches) return null;
-  const result = tokenMatches.reduce((sum, token) => {
-    const num = Number(token.replace(/[.,\s]/g, ""));
-    return isNaN(num) ? sum : sum + num;
-  }, 0);
-  return result >= 0 ? result : null;
-};
-
-const formatWhileTyping = (str) => {
-  if (!str) return "";
-  // Split by + atau -, tapi pertahankan operatornya sebagai separator
-  const parts = str.split(/([+\-])/);
-  return parts.map((part) => {
-    // Kalau part adalah operator, kembalikan apa adanya
-    if (part === "+" || part === "-") return part;
-    // Kalau angka: strip non-digit dulu, lalu format
-    const digits = part.replace(/\D/g, "");
-    if (!digits) return part; // jaga spasi/string kosong
-    return new Intl.NumberFormat("id-ID").format(Number(digits));
-  }).join("");
-};
-
-const afterTaxReturn = (cls, overrideReturn) => {
-  const r = overrideReturn !== undefined ? overrideReturn : cls.return;
-  if (cls.id === "saham") return r * 0.97;
-  // Emas: kurangi biaya efektif tahunan 1.5% langsung dari return
-  // (mencakup: spread fisik/digital ~1.25%/thn + PPh buyback ~0.30%/thn − buffer)
-  if (cls.isGold) return r - 1.5;
-  if (cls.taxRate === 0) return r;
-  return r * (1 - cls.taxRate);
-};
+// Styles
+import "./styles/tokens.css";
 
 // ─── DATA MIGRATION PIPELINE ──────────────────────────────────────────────────
 const CURRENT_SCHEMA_VERSION = 1;
@@ -383,6 +81,35 @@ export default function WealthTracker() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState({ isOpen: false, title: "", type: null, targetId: null });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuClosing, setIsMobileMenuClosing] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
+  const showToast = (message, type = "success") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type, isClosing: false }]);
+    
+    // Start closing animation after 2.5s
+    setTimeout(() => {
+      setToasts((prev) => prev.map(t => t.id === id ? { ...t, isClosing: true } : t));
+    }, 2500);
+
+    // Remove from DOM after 3s
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  };
+
+  const handleToggleMobileMenu = () => {
+    if (isMobileMenuOpen) {
+      setIsMobileMenuClosing(true);
+      setTimeout(() => {
+        setIsMobileMenuOpen(false);
+        setIsMobileMenuClosing(false);
+      }, 250);
+    } else {
+      setIsMobileMenuOpen(true);
+    }
+  };
 
   const closeModal = () => setModalAction({ isOpen: false, title: "", type: null, targetId: null });
 
@@ -412,7 +139,11 @@ export default function WealthTracker() {
 
 
   const addAsset = (id) => {
-    setActiveAssetIds((prev) => prev.includes(id) ? prev : [...prev, id]);
+    const cls = ASSET_CLASSES.find((c) => c.id === id);
+    if (!activeAssetIds.includes(id)) {
+      setActiveAssetIds((prev) => [...prev, id]);
+      showToast(`${cls.name} berhasil ditambahkan!`);
+    }
     // Auto-close if all assets are now active
     if (ASSET_CLASSES.filter((c) => !activeAssetIds.includes(c.id)).length <= 1) {
       setIsModalOpen(false);
@@ -781,8 +512,8 @@ export default function WealthTracker() {
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:var(--color-border-input); border-radius:4px; }
         input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:0 1px 4px rgba(0,0,0,.18); }
-        input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:0 1px 4px rgba(0,0,0,.18); }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:var(--shadow-sm); }
+        input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:var(--shadow-sm); }
         .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; }
         .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
@@ -801,7 +532,7 @@ export default function WealthTracker() {
         .ifield:focus, .ifield-sm:focus, .ifield-lg:focus { 
             border-color:var(--color-border-active); 
             background:var(--color-surface-card); 
-            box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+            box-shadow: var(--shadow-glow);
         }
         .ifield-lg { padding: 14px 16px 14px 44px; font-size: var(--text-h3-size); font-weight: var(--text-h3-weight); }
         .ifield    { padding: 12px 16px 12px 42px; font-size: var(--text-subtitle-size); font-weight: var(--text-subtitle-weight); height: 48px; }
@@ -812,7 +543,7 @@ export default function WealthTracker() {
         .stepbtn-sm:hover { background:var(--color-border-subtle); color:var(--color-text-primary); }
         .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:var(--text-body-size); font-weight:var(--text-caption-weight); border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); font-family:var(--font-family); }
         .tab:hover { color:var(--color-text-secondary); }
-        .tab.on { background:var(--color-brand); color: var(--color-surface-card); box-shadow:0 4px 12px rgba(15,23,42,.15); }
+        .tab.on { background:var(--color-brand); color: var(--color-surface-card); box-shadow:var(--shadow-md); }
         .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
         .tmplbtn:hover { border-color:var(--color-border-active); color: var(--color-brand); background: var(--color-surface-active); }
         .warn { background: var(--color-semantic-danger-bg); border:1.5px solid var(--color-semantic-danger-border); border-radius:10px; padding:12px 16px; font-size:var(--text-body-size); color:var(--color-danger); display:flex; align-items:center; gap:10px; }
@@ -861,7 +592,7 @@ export default function WealthTracker() {
         /* ── iOS-style toggle ── */
         .ios-toggle-wrap { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
         .ios-track { position:relative; width:38px; height:22px; border-radius:11px; transition:background .25s; flex-shrink:0; }
-        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:var(--color-surface-card); box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .25s; }
+        .ios-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:var(--color-surface-card); box-shadow:var(--shadow-sm); transition:transform .25s; }
 @media (max-width:640px) { .asset-grid { grid-template-columns:1fr; } }
 @media (min-width:641px) and (max-width:1023px) { .asset-grid { grid-template-columns:repeat(2,1fr); } }
 .fab { display:none; }
@@ -924,6 +655,92 @@ export default function WealthTracker() {
     border-radius: 16px;
   }
   .mobile-bottom-spacer { height:12px; }
+  .mobile-menu-popup {
+    animation: mobileMenuSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .mobile-menu-popup.closing {
+    animation: mobileMenuSlideDown 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+@keyframes mobileMenuSlideUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes mobileMenuSlideDown {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(12px) scale(0.96); }
+}
+@keyframes mobileMenuFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes mobileMenuFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.mobile-menu-overlay {
+  animation: mobileMenuFade 0.3s ease forwards;
+}
+.mobile-menu-overlay.closing {
+  animation: mobileMenuFadeOut 0.25s ease forwards;
+}
+
+/* Toast Container & Animation */
+.toast-container {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  width: auto;
+  pointer-events: none;
+}
+
+@keyframes toastIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes toastOut {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-20px); opacity: 0; }
+}
+
+.toast {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--color-white);
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-strong);
+  font-size: var(--text-body-size);
+  font-weight: var(--text-subtitle-weight);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toastIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.toast.closing {
+  animation: toastOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    width: calc(100% - 32px);
+    bottom: 90px;
+  }
+  .toast {
+    width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    text-align: left;
+  }
 }
 @media (min-width:769px) { 
   .mobile-only { display: none !important; }
@@ -1432,7 +1249,7 @@ export default function WealthTracker() {
             </button>
             <button
               className={`tab mobile-only ${isMobileMenuOpen ? "on" : ""}`}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={handleToggleMobileMenu}
               style={{
                 color: isMobileMenuOpen ? "var(--color-surface-card)" : "var(--color-text-tertiary)",
                 width: "auto",
@@ -1452,9 +1269,9 @@ export default function WealthTracker() {
         </div>
 
         {/* ── MOBILE POPUP MENU OVERLAY ── */}
-        {isMobileMenuOpen && (
+        {(isMobileMenuOpen || isMobileMenuClosing) && (
           <div
-            className="mobile-only"
+            className={`mobile-only mobile-menu-overlay ${isMobileMenuClosing ? "closing" : ""}`}
             style={{
               position: 'fixed',
               top: 0, left: 0, right: 0, bottom: 0,
@@ -1462,16 +1279,15 @@ export default function WealthTracker() {
               backdropFilter: 'blur(4px)',
               WebkitBackdropFilter: 'blur(4px)',
               zIndex: 998,
-              transition: 'all 0.3s'
             }}
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={handleToggleMobileMenu}
           />
         )}
 
         {/* ── MOBILE POPUP MENU ── */}
-        {isMobileMenuOpen && (
+        {(isMobileMenuOpen || isMobileMenuClosing) && (
           <div
-            className="mobile-only"
+            className={`mobile-only mobile-menu-popup ${isMobileMenuClosing ? "closing" : ""}`}
             style={{
               position: 'fixed',
               bottom: '80px',
@@ -1515,6 +1331,18 @@ export default function WealthTracker() {
           </div>
         )}
 
+        {/* ── TOAST NOTIFICATIONS (Stacked) ── */}
+        <div className="toast-container">
+          {toasts.map((t) => (
+            <div key={t.id} className={`toast ${t.isClosing ? "closing" : ""}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 20, height: 20, flexShrink: 0 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+              {t.message}
+            </div>
+          ))}
+        </div>
+
         <Analytics />
 
         {/* ── CONFIRM DIALOG MODAL ── */}
@@ -1557,7 +1385,7 @@ export default function WealthTracker() {
                     style={{
                       width: "100%",
                       padding: "14px 0", borderRadius: "10px", border: "none",
-                      background: "var(--color-semantic-brand)", color: "#FFFFFF", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                      background: "var(--color-semantic-brand)", color: "var(--color-white)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                       cursor: "pointer", fontFamily: tokens.typography.fontFamily
                     }}
                   >
@@ -1605,7 +1433,7 @@ export default function WealthTracker() {
                         flex: 1,
                         padding: "12px 0", borderRadius: "8px", border: "none",
                         background: modalAction.type === "delete" ? "var(--color-semantic-danger)" : "var(--color-semantic-brand)",
-                        color: "#FFFFFF", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                        color: "var(--color-white)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                         cursor: "pointer", fontFamily: tokens.typography.fontFamily
                       }}
                     >
