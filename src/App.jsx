@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
-import TrialInvest from "./components/TrialInvest";
+import KalkulatorPensiun from "./components/KalkulatorPensiun";
 
 // New modularized imports
 import { DEFAULT_USD_RATE, PROJECTION_YEARS, ASSET_CLASSES } from "./constants/assets";
@@ -1204,7 +1204,11 @@ export default function WealthTracker() {
             TAB: TRIAL INVEST
         ══════════════════════════════════════════════ */}
         {activeTab === "trial_invest" && (
-          <TrialInvest />
+          <KalkulatorPensiun
+            userTemplates={userTemplates}
+            ASSET_CLASSES={ASSET_CLASSES}
+            tokens={tokens}
+          />
         )}
 
         <div className="mobile-bottom-spacer" />
@@ -1243,9 +1247,15 @@ export default function WealthTracker() {
             <button
               className={`tab desktop-only ${activeTab === "trial_invest" ? "on" : ""}`}
               onClick={() => setActiveTab("trial_invest")}
-              style={{ color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)", width: "120px" }}
+              style={{ 
+                color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)", 
+                width: "auto", 
+                maxWidth: "none", 
+                whiteSpace: "nowrap", 
+                padding: "12px 20px" 
+              }}
             >
-              Trial Invest
+              Kalkulator Pensiun
             </button>
             <button
               className={`tab mobile-only ${isMobileMenuOpen ? "on" : ""}`}
@@ -1326,7 +1336,7 @@ export default function WealthTracker() {
                 justifyContent: "center",
               }}
             >
-              Trial Invest
+              Kalkulator Pensiun
             </button>
           </div>
         )}
@@ -1367,7 +1377,8 @@ export default function WealthTracker() {
               style={{
                 backgroundColor: "var(--color-surface-card)",
                 borderRadius: "16px",
-                boxShadow: "0 24px 50px rgba(0,0,0,0.2)",
+                border: "1.5px solid var(--color-border-subtle)",
+                boxShadow: "none",
                 width: "100%",
                 maxWidth: "360px",
                 padding: "16px",
