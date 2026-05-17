@@ -448,7 +448,7 @@ export default function AssetEditorModal({
                         type="number"
                         step="0.1"
                         className="ifield-sm"
-                        style={{ textAlign: "center", padding: "0 32px" }}
+                        style={{ textAlign: "center", padding: "10px 32px", height: 44, boxSizing: "border-box" }}
                         value={draftReturn}
                         onChange={(e) => setDraftReturn(Number(e.target.value))}
                       />
@@ -483,7 +483,7 @@ export default function AssetEditorModal({
                       <input
                         type="number"
                         className="ifield-sm"
-                        style={{ textAlign: "center", padding: "0 32px" }}
+                        style={{ textAlign: "center", padding: "10px 32px", height: 44, boxSizing: "border-box" }}
                         value={draftDrawdown}
                         onChange={(e) => setDraftDrawdown(Number(e.target.value))}
                       />

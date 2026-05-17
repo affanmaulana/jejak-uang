@@ -55,9 +55,9 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Manual inputs
-  const [currentAge, setCurrentAge] = useState(25);
-  const [retirementAge, setRetirementAge] = useState(55);
+  // Manual inputs (String states to allow fluent editing, empty strings, and backspace)
+  const [currentAgeInput, setCurrentAgeInput] = useState("25");
+  const [retirementAgeInput, setRetirementAgeInput] = useState("55");
   const [rawInitial, setRawInitial] = useState("");
   const [initialAmount, setInitialAmount] = useState(0);
   const [rawMonthly, setRawMonthly] = useState("");
@@ -65,14 +65,23 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
   const [annualReturn, setAnnualReturn] = useState(8);
   const [inflationRate, setInflationRate] = useState(5);
 
-  const years = Math.max(retirementAge - currentAge, 1);
+  const currentAge = currentAgeInput === "" ? 0 : parseInt(currentAgeInput, 10);
+  const retirementAge = retirementAgeInput === "" ? 0 : parseInt(retirementAgeInput, 10);
+
+  const isAgeRangeInvalid = currentAge >= retirementAge;
+  const isInputEmpty = currentAgeInput === "" || retirementAgeInput === "";
+  const isAgeTooHigh = currentAge > 100 || retirementAge > 100;
+  const isAgeTooLow = currentAge <= 0 || retirementAge <= 0;
+  const isInvalid = isAgeRangeInvalid || isInputEmpty || isAgeTooHigh || isAgeTooLow;
+
+  const years = isInvalid ? 0 : Math.max(retirementAge - currentAge, 0);
 
   // Derived from template
   const templateData = useMemo(() => {
     if (mode !== "template" || !selectedTemplateId) return null;
     const t = (userTemplates || []).find(x => x.id === selectedTemplateId);
     if (!t) return null;
-    const DEFAULT_USD_RATE = 17100;
+    const DEFAULT_USD_RATE = 17600;
     let totalAsset = 0;
     let totalContrib = 0;
     let weightedReturn = 0;
@@ -104,6 +113,14 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
 
   // FV Calculation
   const chartData = useMemo(() => {
+    if (isInvalid) {
+      return [{
+        label: "Sekarang",
+        portfolio: 0,
+        totalContributed: 0,
+        real: 0,
+      }];
+    }
     const r = effectiveReturn / 100;
     const data = [];
     for (let y = 0; y <= years; y++) {
@@ -122,7 +139,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
       });
     }
     return data;
-  }, [effectiveInitial, effectiveMonthly, effectiveReturn, inflationRate, years, currentAge]);
+  }, [effectiveInitial, effectiveMonthly, effectiveReturn, inflationRate, years, currentAge, isInvalid]);
 
   const finalValue = chartData[chartData.length - 1]?.portfolio || 0;
   const finalContributed = chartData[chartData.length - 1]?.totalContributed || 0;
@@ -210,33 +227,55 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
               <div>
                 <label style={labelStyle}>Usia Sekarang</label>
                 <input
-                  type="number" min={10} max={80}
-                  value={currentAge}
-                  onChange={e => setCurrentAge(Math.min(80, Math.max(10, Number(e.target.value))))}
+                  type="number"
+                  value={currentAgeInput}
+                  onChange={e => setCurrentAgeInput(e.target.value)}
+                  placeholder="25"
                   style={{ ...inputStyle, textAlign: "left" }}
                 />
               </div>
               <div>
                 <label style={labelStyle}>Usia Pensiun</label>
                 <input
-                  type="number" min={currentAge + 1} max={99}
-                  value={retirementAge}
-                  onChange={e => setRetirementAge(Math.min(99, Math.max(currentAge + 1, Number(e.target.value))))}
+                  type="number"
+                  value={retirementAgeInput}
+                  onChange={e => setRetirementAgeInput(e.target.value)}
+                  placeholder="55"
                   style={{ ...inputStyle, textAlign: "left" }}
                 />
               </div>
             </div>
-            <div style={{
-              padding: "10px 14px",
-              background: "var(--color-semantic-success-bg)",
-              border: "1.5px solid var(--color-semantic-success-border)",
-              borderRadius: 10,
-              textAlign: "center"
-            }}>
-              <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-success)" }}>
-                {years} tahun masa pertumbuhan
-              </span>
-            </div>
+            {isInvalid ? (
+              <div style={{
+                padding: "10px 14px",
+                background: "var(--color-semantic-danger-bg)",
+                border: "1.5px solid var(--color-semantic-danger-border)",
+                borderRadius: 10,
+                textAlign: "center"
+              }}>
+                <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-danger)" }}>
+                  {isAgeRangeInvalid 
+                    ? "⚠️ Usia pensiun harus lebih besar dari usia sekarang!" 
+                    : isAgeTooHigh 
+                    ? "⚠️ Usia maksimal simulasi adalah 100 tahun!"
+                    : isAgeTooLow && !isInputEmpty
+                    ? "⚠️ Usia harus lebih besar dari 0!"
+                    : "⚠️ Usia sekarang dan pensiun harus diisi!"}
+                </span>
+              </div>
+            ) : (
+              <div style={{
+                padding: "10px 14px",
+                background: "var(--color-semantic-success-bg)",
+                border: "1.5px solid var(--color-semantic-success-border)",
+                borderRadius: 10,
+                textAlign: "center"
+              }}>
+                <span style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-semantic-success)" }}>
+                  {years} tahun masa pertumbuhan
+                </span>
+              </div>
+            )}
           </div>
 
           <hr style={{ border: 0, borderTop: "1.5px dashed var(--color-border-subtle)", margin: "4px 0" }} />
