@@ -478,17 +478,17 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
                 Daya beli riil setelah disesuaikan inflasi: <strong style={{ color: "var(--color-semantic-success)" }}>{formatCompact(finalReal)}</strong>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: 10, border: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 700, marginBottom: 2 }}>Total Disetor</div>
+              <div className="pensiun-hero-grid">
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 700 }}>Total Disetor</div>
                   <div style={{ fontSize: "var(--text-body-bold-size)", fontWeight: "var(--text-h1-weight)", color: "rgba(255,255,255,0.9)" }}>{formatCompact(finalContributed)}</div>
                 </div>
-                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: 10, border: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 700, marginBottom: 2 }}>Pertumbuhan</div>
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 700 }}>Pertumbuhan</div>
                   <div style={{ fontSize: "var(--text-body-bold-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-viz-cash)" }}>{formatCompact(Math.max(0, totalGrowth))}</div>
                 </div>
-                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: 10, border: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 700, marginBottom: 2 }}>Multiplier</div>
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 700 }}>Multiplier</div>
                   <div style={{ fontSize: "var(--text-body-bold-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-viz-rd-campuran)" }}>{growthMultiple}×</div>
                 </div>
               </div>
@@ -605,6 +605,16 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
         }
         .custom-option:active {
           background-color: var(--color-semantic-success-bg) !important;
+        }
+        .pensiun-hero-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 8px;
+        }
+        @media (max-width: 868px) {
+          .pensiun-hero-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
     </div>
