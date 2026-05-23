@@ -1,8 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import "../styles/tokens.css";
 import AssetEditorModal from './AssetEditorModal';
 import AssetCatalogModal from './AssetCatalogModal';
+
+const listContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.05,
+    }
+  }
+};
+
+const listItemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 350, damping: 25 }
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.95, 
+    transition: { duration: 0.2 } 
+  }
+};
 
 export default function InputTab({
   // Global & Asset Data
@@ -210,28 +235,38 @@ export default function InputTab({
           </div>
         ) : (
           /* ── COMPACT LIST OF ASSETS ── */
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-            {ASSET_CLASSES.filter((cls) => activeAssetIds.includes(cls.id)).map((cls) => {
-              const raw = assets[cls.id] || 0;
-              const currencyPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
-              const idr = currencyPref === 'USD' ? raw * customUSDRate : raw;
-              const pct = totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
+          <motion.div
+            style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}
+            variants={listContainerVariants}
+            initial="hidden"
+            animate="visible"
+            layout
+          >
+            <AnimatePresence initial={false}>
+              {ASSET_CLASSES.filter((cls) => activeAssetIds.includes(cls.id)).map((cls) => {
+                const raw = assets[cls.id] || 0;
+                const currencyPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+                const idr = currencyPref === 'USD' ? raw * customUSDRate : raw;
+                const pct = totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
 
-              return (
-                <motion.div
-                  key={cls.id}
-                  onClick={() => setEditingAssetId(cls.id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "16px 16px",
-                    background: "var(--color-surface-card)",
-                    borderRadius: 16,
-                    cursor: "pointer",
-                    boxShadow: tokens.shadows.small || "var(--shadow-sm)",
-                    border: `1px solid var(--color-border-subtle)`,
-                  }}
+                return (
+                  <motion.div
+                    key={cls.id}
+                    layout
+                    variants={listItemVariants}
+                    exit="exit"
+                    onClick={() => setEditingAssetId(cls.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "16px 16px",
+                      background: "var(--color-surface-card)",
+                      borderRadius: 16,
+                      cursor: "pointer",
+                      boxShadow: tokens.shadows.small || "var(--shadow-sm)",
+                      border: `1px solid var(--color-border-subtle)`,
+                    }}
                   whileHover={{
                     y: -2,
                     borderColor: "var(--color-border-input)",
@@ -319,7 +354,8 @@ export default function InputTab({
                 </motion.div>
               );
             })}
-          </div>
+            </AnimatePresence>
+          </motion.div>
         )}
 
         {/* ── FLOATING MODAL EDITOR ── */}
