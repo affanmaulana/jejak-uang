@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import "../styles/tokens.css";
 import AssetEditorModal from './AssetEditorModal';
 import AssetCatalogModal from './AssetCatalogModal';
@@ -114,10 +115,12 @@ export default function InputTab({
               ? `${activeAssetIds.length} instrumen aktif`
               : "Belum ada instrumen dipilih"}
           </div>
-          <button
+          <motion.button
             onClick={() => setIsModalOpen(true)}
             disabled={activeAssetIds.length >= ASSET_CLASSES.length}
             className="desktop-only"
+            whileHover={activeAssetIds.length >= ASSET_CLASSES.length ? {} : { scale: 1.02, y: -1 }}
+            whileTap={activeAssetIds.length >= ASSET_CLASSES.length ? {} : { scale: 0.98 }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -131,13 +134,13 @@ export default function InputTab({
               background: activeAssetIds.length >= ASSET_CLASSES.length ? "var(--color-surface-input)" : "var(--color-semantic-brand)",
               color: activeAssetIds.length >= ASSET_CLASSES.length ? "var(--color-text-tertiary)" : "var(--color-surface-card)",
               boxShadow: activeAssetIds.length >= ASSET_CLASSES.length ? "none" : "var(--shadow-medium)",
-              transition: "all .2s",
+              transition: "background-color .2s, color .2s",
               fontFamily: tokens.typography.fontFamily,
             }}
           >
             <span style={{ fontSize: "var(--text-h3-size)", lineHeight: "1" }}>＋</span>
             Instrumen Baru
-          </button>
+          </motion.button>
         </div>
 
         {/* ── EMPTY STATE ── */}
@@ -181,8 +184,10 @@ export default function InputTab({
             >
               Mulai lacak portofoliomu. Pilih instrumen investasi yang kamu miliki dan simulasikan pertumbuhannya.
             </div>
-            <button
+            <motion.button
               onClick={() => setIsModalOpen(true)}
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -197,14 +202,11 @@ export default function InputTab({
                 color: "var(--color-surface-card)",
                 boxShadow: "var(--shadow-lg)",
                 fontFamily: tokens.typography.fontFamily,
-                transition: "transform .15s",
               }}
-              onMouseOver={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseOut={(e) => (e.currentTarget.style.transform = "translateY(0)")}
             >
               <span style={{ fontSize: "var(--text-h3-size)", lineHeight: "1" }}>＋</span>
               Tambah Instrumen Pertamamu
-            </button>
+            </motion.button>
           </div>
         ) : (
           /* ── COMPACT LIST OF ASSETS ── */
@@ -216,7 +218,7 @@ export default function InputTab({
               const pct = totalAssets > 0 ? ((idr / totalAssets) * 100).toFixed(1) : 0;
 
               return (
-                <div
+                <motion.div
                   key={cls.id}
                   onClick={() => setEditingAssetId(cls.id)}
                   style={{
@@ -228,17 +230,15 @@ export default function InputTab({
                     borderRadius: 16,
                     cursor: "pointer",
                     boxShadow: tokens.shadows.small || "var(--shadow-sm)",
-                    border: `1px solid ${"var(--color-border-subtle)"}`,
-                    transition: "transform 0.15s, border-color 0.15s",
+                    border: `1px solid var(--color-border-subtle)`,
                   }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = "var(--color-border-input)";
-                    e.currentTarget.style.transform = "translateY(-1px)";
+                  whileHover={{
+                    y: -2,
+                    borderColor: "var(--color-border-input)",
+                    boxShadow: "var(--shadow-glow, 0 8px 24px rgba(0,0,0,0.06))",
                   }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = "var(--color-border-subtle)";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
+                  whileTap={{ scale: 0.995 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                     <div
@@ -316,7 +316,7 @@ export default function InputTab({
                       </svg>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
 import KalkulatorPensiun from "./components/KalkulatorPensiun";
@@ -961,7 +961,7 @@ export default function WealthTracker() {
               </div>
               <div className="profile-row">
                 {userTemplates.map((t) => (
-                  <div
+                  <motion.div
                     key={t.id}
                     style={{
                       display: "flex",
@@ -973,20 +973,16 @@ export default function WealthTracker() {
                         activeTemplateId === t.id
                           ? `1.5px solid var(--color-border-active)`
                           : `1.5px solid var(--color-border-subtle)`,
-                      backgroundColor:
-                        activeTemplateId === t.id ? "var(--color-surface-card)" : "var(--color-surface-card)",
+                      backgroundColor: "var(--color-surface-card)",
                       borderRadius: 10,
-                      transition: "all 0.2s",
                     }}
+                    whileHover={{
+                      y: -1,
+                      borderColor: "var(--color-border-active)",
+                      boxShadow: "var(--shadow-glow, 0 4px 12px rgba(0,0,0,0.05))"
+                    }}
+                    whileTap={{ scale: 0.985 }}
                     onClick={() => loadUserTemplate(t)}
-                    onMouseOver={(e) => {
-                      if (activeTemplateId !== t.id)
-                        e.currentTarget.style.borderColor = "var(--color-border-active)";
-                    }}
-                    onMouseOut={(e) => {
-                      if (activeTemplateId !== t.id)
-                        e.currentTarget.style.borderColor = "var(--color-border-subtle)";
-                    }}
                   >
                     <div
                       style={{
@@ -1020,8 +1016,10 @@ export default function WealthTracker() {
                         paddingLeft: 10,
                       }}
                     >
-                      <button
+                      <motion.button
                         onClick={(e) => updateExistingTemplate(t.id, e)}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
                         style={{
                           background: "var(--color-surface-input)",
                           border: "none",
@@ -1037,9 +1035,11 @@ export default function WealthTracker() {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16, color: "var(--color-text-secondary)" }}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                         </svg>
-                      </button>
-                      <button
+                      </motion.button>
+                      <motion.button
                         onClick={(e) => deleteTemplate(t.id, e)}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
                         style={{
                           background: "var(--color-semantic-danger-bg)",
                           color: "var(--color-semantic-danger)",
@@ -1056,9 +1056,9 @@ export default function WealthTracker() {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                         </svg>
-                      </button>
+                      </motion.button>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
                 {userTemplates.length < 3 ? (
                   <div
@@ -1246,33 +1246,40 @@ export default function WealthTracker() {
               ["input", "Input"],
               ["projection", "Proyeksi"],
             ].map(([id, lbl]) => (
-              <button
+              <motion.button
                 key={id}
                 className={`tab ${activeTab === id ? "on" : ""}`}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => { setActiveTab(id); setIsMobileMenuOpen(false); }}
-                style={{ color: activeTab === id ? "var(--color-surface-card)" : "var(--color-text-tertiary)", width: "100%" }}
+                style={{ color: activeTab === id ? "var(--color-surface-card)" : "var(--color-text-tertiary)", width: "100%", border: "none" }}
               >
                 {lbl}
-              </button>
+              </motion.button>
             ))}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flex: "none", justifyContent: "flex-end" }}>
             <div className="desktop-only" style={{ width: "1.5px", height: "24px", background: "var(--color-border-subtle)", borderRadius: "1px" }} />
-            <button
+            <motion.button
               className={`tab desktop-only ${activeTab === "trial_invest" ? "on" : ""}`}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setActiveTab("trial_invest")}
               style={{ 
                 color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)", 
                 width: "auto", 
                 maxWidth: "none", 
                 whiteSpace: "nowrap", 
-                padding: "12px 20px" 
+                padding: "12px 20px",
+                border: "none"
               }}
             >
               Kalkulator Pensiun
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               className={`tab mobile-only ${isMobileMenuOpen ? "on" : ""}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleToggleMobileMenu}
               style={{
                 color: isMobileMenuOpen ? "var(--color-surface-card)" : "var(--color-text-tertiary)",
@@ -1282,13 +1289,14 @@ export default function WealthTracker() {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                flexShrink: 0
+                flexShrink: 0,
+                border: "none"
               }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 24, height: 24 }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
-            </button>
+            </motion.button>
           </div>
         </div>
 
