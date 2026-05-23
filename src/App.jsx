@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
 import KalkulatorPensiun from "./components/KalkulatorPensiun";
+import Container from "./components/Container";
 
 // New modularized imports
 import { DEFAULT_USD_RATE, PROJECTION_YEARS, ASSET_CLASSES } from "./constants/assets";
@@ -756,7 +757,7 @@ export default function WealthTracker() {
 }
       `}</style>
 
-      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+      <Container style={{ padding: 0 }}>
         {/* ── HEADER ── */}
         <div style={{ marginBottom: 20 }}>
           <h1
@@ -1457,7 +1458,7 @@ export default function WealthTracker() {
           </div>
         )}
 
-      </div>
+      </Container>
     </div >
   );
 }
