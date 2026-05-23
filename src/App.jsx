@@ -587,10 +587,10 @@ export default function WealthTracker() {
           box-shadow: none !important;
         }
           /* ── Stat scroll strip ── */
-        .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: 0 -16px 12px -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .stat-strip { display:flex; flex-direction:row; gap:8px; overflow-x:auto; margin: -4px -16px 8px -16px; padding: 4px 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .stat-strip::-webkit-scrollbar { display:none; }
         /* ── Profile row (naked) ── */
-        .profile-row { display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; margin: 0 -16px; padding: 0 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
+        .profile-row { display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; margin: -4px -16px 0 -16px; padding: 4px 16px 8px 16px; scrollbar-width: none; -ms-overflow-style: none; }
         .profile-row::-webkit-scrollbar { display:none; }
         /* ── iOS-style toggle ── */
         .ios-toggle-wrap { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
@@ -977,7 +977,6 @@ export default function WealthTracker() {
                       borderRadius: 10,
                     }}
                     whileHover={{
-                      y: -1,
                       borderColor: "var(--color-border-active)",
                       boxShadow: "var(--shadow-glow, 0 4px 12px rgba(0,0,0,0.05))"
                     }}
@@ -1249,8 +1248,7 @@ export default function WealthTracker() {
               <motion.button
                 key={id}
                 className={`tab ${activeTab === id ? "on" : ""}`}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => { setActiveTab(id); setIsMobileMenuOpen(false); }}
                 style={{ color: activeTab === id ? "var(--color-surface-card)" : "var(--color-text-tertiary)", width: "100%", border: "none" }}
               >
@@ -1262,8 +1260,7 @@ export default function WealthTracker() {
             <div className="desktop-only" style={{ width: "1.5px", height: "24px", background: "var(--color-border-subtle)", borderRadius: "1px" }} />
             <motion.button
               className={`tab desktop-only ${activeTab === "trial_invest" ? "on" : ""}`}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setActiveTab("trial_invest")}
               style={{ 
                 color: activeTab === "trial_invest" ? "var(--color-surface-card)" : "var(--color-text-tertiary)", 
@@ -1278,8 +1275,7 @@ export default function WealthTracker() {
             </motion.button>
             <motion.button
               className={`tab mobile-only ${isMobileMenuOpen ? "on" : ""}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleToggleMobileMenu}
               style={{
                 color: isMobileMenuOpen ? "var(--color-surface-card)" : "var(--color-text-tertiary)",
