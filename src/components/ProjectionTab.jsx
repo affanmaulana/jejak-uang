@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import "../styles/tokens.css";
 import {
   ComposedChart,
@@ -867,15 +868,19 @@ export default function ProjectionTab({
           )}
 
           {/* Breakdown */}
-          <div
+          <motion.div
             style={{
-              borderTop: `1px solid ${"var(--color-border-subtle)"}`,
+              borderTop: `1px solid var(--color-border-subtle)`,
               paddingTop: 16,
               marginTop: 16,
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))",
               gap: 10,
             }}
+            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 12 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.4 }}
           >
             {[
               {
@@ -929,7 +934,7 @@ export default function ProjectionTab({
                 </div>
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
 
@@ -938,13 +943,17 @@ export default function ProjectionTab({
         const last = chartData[chartData.length - 1];
         const isWinning = last.real >= last.inflation;
         return (
-          <div
+          <motion.div
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
               gap: 16,
               marginTop: 16,
             }}
+            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 15 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.5 }}
           >
             <div className="card" style={{ padding: 18, background: "var(--color-surface-card)" }}>
               <div style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-h1-weight)", color: "var(--color-text-primary)", marginBottom: 8 }}>
@@ -980,7 +989,7 @@ export default function ProjectionTab({
                   : "Nilai Riil di bawah Garis Inflasi = pertumbuhan asetmu tidak cukup menutupi kenaikan harga barang."}
               </div>
             </div>
-          </div>
+          </motion.div>
         );
       })()}
     </div>
