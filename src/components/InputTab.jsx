@@ -359,40 +359,48 @@ export default function InputTab({
         )}
 
         {/* ── FLOATING MODAL EDITOR ── */}
-        <AssetEditorModal
-          editingAssetId={editingAssetId}
-          setEditingAssetId={setEditingAssetId}
-          ASSET_CLASSES={ASSET_CLASSES}
-          assets={assets}
-          setAssets={setAssets}
-          monthlyContribs={monthlyContribs}
-          setMonthlyContribs={setMonthlyContribs}
-          customReturnOverrides={customReturnOverrides}
-          setCustomReturnOverrides={setCustomReturnOverrides}
-          customDrawdowns={customDrawdowns}
-          setCustomDrawdowns={setCustomDrawdowns}
-          customUSDRate={customUSDRate}
-          assetCurrencyPrefs={assetCurrencyPrefs}
-          setAssetCurrencyPrefs={setAssetCurrencyPrefs}
-          tokens={tokens}
-          formatIDR={formatIDR}
-          formatCompact={formatCompact}
-          parseExpression={parseExpression}
-          formatWhileTyping={formatWhileTyping}
-          afterTaxReturn={afterTaxReturn}
-          setShowDeleteConfirm={setShowDeleteConfirm}
-        />
+        <AnimatePresence>
+          {editingAssetId !== null && (
+            <AssetEditorModal
+              editingAssetId={editingAssetId}
+              setEditingAssetId={setEditingAssetId}
+              ASSET_CLASSES={ASSET_CLASSES}
+              assets={assets}
+              setAssets={setAssets}
+              monthlyContribs={monthlyContribs}
+              setMonthlyContribs={setMonthlyContribs}
+              customReturnOverrides={customReturnOverrides}
+              setCustomReturnOverrides={setCustomReturnOverrides}
+              customDrawdowns={customDrawdowns}
+              setCustomDrawdowns={setCustomDrawdowns}
+              customUSDRate={customUSDRate}
+              assetCurrencyPrefs={assetCurrencyPrefs}
+              setAssetCurrencyPrefs={setAssetCurrencyPrefs}
+              tokens={tokens}
+              formatIDR={formatIDR}
+              formatCompact={formatCompact}
+              parseExpression={parseExpression}
+              formatWhileTyping={formatWhileTyping}
+              afterTaxReturn={afterTaxReturn}
+              setShowDeleteConfirm={setShowDeleteConfirm}
+            />
+          )}
+        </AnimatePresence>
 
         {/* ── MODAL OVERLAY: KATALOG INSTRUMEN ── */}
-        <AssetCatalogModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          ASSET_CLASSES={ASSET_CLASSES}
-          activeAssetIds={activeAssetIds}
-          addAsset={addAsset}
-          catalogFilter={catalogFilter}
-          setCatalogFilter={setCatalogFilter}
-        />
+        <AnimatePresence>
+          {isModalOpen && (
+            <AssetCatalogModal
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+              ASSET_CLASSES={ASSET_CLASSES}
+              activeAssetIds={activeAssetIds}
+              addAsset={addAsset}
+              catalogFilter={catalogFilter}
+              setCatalogFilter={setCatalogFilter}
+            />
+          )}
+        </AnimatePresence>
 
       </div>
 

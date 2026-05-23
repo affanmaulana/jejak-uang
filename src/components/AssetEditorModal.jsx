@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import "../styles/tokens.css";
 
 export default function AssetEditorModal({
@@ -44,8 +45,6 @@ export default function AssetEditorModal({
     }
   }, [editingAssetId, ASSET_CLASSES, assets, monthlyContribs, customReturnOverrides, customDrawdowns]);
 
-  if (!editingAssetId) return null;
-
   const cls = ASSET_CLASSES.find((c) => c.id === editingAssetId);
   if (!cls) return null;
 
@@ -81,8 +80,12 @@ export default function AssetEditorModal({
   };
 
   return (
-    <div
+    <motion.div
       onClick={handleCloseModal}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       style={{
         position: "fixed",
         inset: 0,
@@ -93,7 +96,6 @@ export default function AssetEditorModal({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        transition: "all 0.3s ease"
       }}
     >
       <style>
@@ -146,9 +148,13 @@ export default function AssetEditorModal({
           }
         `}
       </style>
-      <div
+      <motion.div
         className="floating-modal-container"
         onClick={(e) => e.stopPropagation()}
+        initial={{ scale: 0.95, opacity: 0, y: 15 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 15 }}
+        transition={{ type: "spring", stiffness: 350, damping: 25 }}
         style={{
           background: "var(--color-surface-card)",
           borderRadius: 20,
@@ -593,7 +599,7 @@ export default function AssetEditorModal({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

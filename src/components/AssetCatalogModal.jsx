@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import "../styles/tokens.css";
 
 export default function AssetCatalogModal({
@@ -10,11 +11,13 @@ export default function AssetCatalogModal({
   catalogFilter,
   setCatalogFilter
 }) {
-  if (!isModalOpen) return null;
-
   return (
-    <div
+    <motion.div
       onClick={() => setIsModalOpen(false)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       style={{
         position: "fixed",
         inset: 0,
@@ -26,11 +29,14 @@ export default function AssetCatalogModal({
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
-        transition: "all 0.3s ease"
       }}
     >
-      <div
+      <motion.div
         onClick={(e) => e.stopPropagation()}
+        initial={{ scale: 0.95, opacity: 0, y: 15 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 15 }}
+        transition={{ type: "spring", stiffness: 350, damping: 25 }}
         style={{
           background: "var(--color-surface-card)",
           borderRadius: 20,
@@ -287,7 +293,7 @@ export default function AssetCatalogModal({
             })()}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
