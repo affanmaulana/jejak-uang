@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { AnimatePresence } from "framer-motion";
 import InputTab from "./components/InputTab";
 import ProjectionTab from "./components/ProjectionTab";
 import KalkulatorPensiun from "./components/KalkulatorPensiun";
 import Container from "./components/Container";
+import PageTransition from "./components/PageTransition";
 
 // New modularized imports
 import { DEFAULT_USD_RATE, PROJECTION_YEARS, ASSET_CLASSES } from "./constants/assets";
@@ -1137,80 +1139,91 @@ export default function WealthTracker() {
         {/* ══════════════════════════════════════════════
             TAB: INPUT ASET
         ══════════════════════════════════════════════ */}
-        {activeTab === "input" && (
-          <InputTab
-            tokens={tokens}
-            ASSET_CLASSES={ASSET_CLASSES}
-            customUSDRate={customUSDRate}
-            setCustomUSDRate={setCustomUSDRate}
-            assetCurrencyPrefs={assetCurrencyPrefs}
-            setAssetCurrencyPrefs={setAssetCurrencyPrefs}
-            activeAssetIds={activeAssetIds}
-            assets={assets}
-            setAssets={setAssets}
-            monthlyContribs={monthlyContribs}
-            setMonthlyContribs={setMonthlyContribs}
-            totalAssets={totalAssets}
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-            monthlyExpense={monthlyExpense}
-            setMonthlyExpense={setMonthlyExpense}
-            targetMonths={targetMonths}
-            setTargetMonths={setTargetMonths}
-            includeEmergencyInTotal={includeEmergencyInTotal}
-            setIncludeEmergencyInTotal={setIncludeEmergencyInTotal}
-            userTemplates={userTemplates}
-            activeTemplateId={activeTemplateId}
-            saveNewTemplate={saveNewTemplate}
-            formatIDR={formatIDR}
-            formatCompact={formatCompact}
-            parseExpression={parseExpression}
-            formatWhileTyping={formatWhileTyping}
-            afterTaxReturn={afterTaxReturn}
-            customReturnOverrides={customReturnOverrides}
-            setCustomReturnOverrides={setCustomReturnOverrides}
-            customDrawdowns={customDrawdowns}
-            setCustomDrawdowns={setCustomDrawdowns}
-            addAsset={addAsset}
-            removeAsset={removeAsset}
-            handleStep={handleStep}
-            handleContribStep={handleContribStep}
-            handleExpenseStep={handleExpenseStep}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {/* ══════════════════════════════════════════════
+              TAB: INPUT ASET
+          ══════════════════════════════════════════════ */}
+          {activeTab === "input" && (
+            <PageTransition key="input">
+              <InputTab
+                tokens={tokens}
+                ASSET_CLASSES={ASSET_CLASSES}
+                customUSDRate={customUSDRate}
+                setCustomUSDRate={setCustomUSDRate}
+                assetCurrencyPrefs={assetCurrencyPrefs}
+                setAssetCurrencyPrefs={setAssetCurrencyPrefs}
+                activeAssetIds={activeAssetIds}
+                assets={assets}
+                setAssets={setAssets}
+                monthlyContribs={monthlyContribs}
+                setMonthlyContribs={setMonthlyContribs}
+                totalAssets={totalAssets}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                monthlyExpense={monthlyExpense}
+                setMonthlyExpense={setMonthlyExpense}
+                targetMonths={targetMonths}
+                setTargetMonths={setTargetMonths}
+                includeEmergencyInTotal={includeEmergencyInTotal}
+                setIncludeEmergencyInTotal={setIncludeEmergencyInTotal}
+                userTemplates={userTemplates}
+                activeTemplateId={activeTemplateId}
+                saveNewTemplate={saveNewTemplate}
+                formatIDR={formatIDR}
+                formatCompact={formatCompact}
+                parseExpression={parseExpression}
+                formatWhileTyping={formatWhileTyping}
+                afterTaxReturn={afterTaxReturn}
+                customReturnOverrides={customReturnOverrides}
+                setCustomReturnOverrides={setCustomReturnOverrides}
+                customDrawdowns={customDrawdowns}
+                setCustomDrawdowns={setCustomDrawdowns}
+                addAsset={addAsset}
+                removeAsset={removeAsset}
+                handleStep={handleStep}
+                handleContribStep={handleContribStep}
+                handleExpenseStep={handleExpenseStep}
+              />
+            </PageTransition>
+          )}
 
-        {/* ══════════════════════════════════════════════
-            TAB: PROYEKSI & ALOKASI
-        ══════════════════════════════════════════════ */}
-        {activeTab === "projection" && (
-          <ProjectionTab
-            tokens={tokens}
-            inflationRate={inflationRate}
-            setInflationRate={setInflationRate}
-            totalMonthlyContrib={totalMonthlyContrib}
-            fireTarget={fireTarget}
-            setFireTarget={setFireTarget}
-            chartData={chartData}
-            formatIDR={formatIDR}
-            formatCompact={formatCompact}
-            totalAssets={totalAssets}
-            worstCase={worstCase}
-            allocData={allocData}
-            monthlyContribs={monthlyContribs}
-            afterTaxReturn={afterTaxReturn}
-          />
-        )}
+          {/* ══════════════════════════════════════════════
+              TAB: PROYEKSI & ALOKASI
+          ══════════════════════════════════════════════ */}
+          {activeTab === "projection" && (
+            <PageTransition key="projection">
+              <ProjectionTab
+                tokens={tokens}
+                inflationRate={inflationRate}
+                setInflationRate={setInflationRate}
+                totalMonthlyContrib={totalMonthlyContrib}
+                fireTarget={fireTarget}
+                setFireTarget={setFireTarget}
+                chartData={chartData}
+                formatIDR={formatIDR}
+                formatCompact={formatCompact}
+                totalAssets={totalAssets}
+                worstCase={worstCase}
+                allocData={allocData}
+                monthlyContribs={monthlyContribs}
+                afterTaxReturn={afterTaxReturn}
+              />
+            </PageTransition>
+          )}
 
-        {/* ══════════════════════════════════════════════
-            TAB: TRIAL INVEST
-        ══════════════════════════════════════════════ */}
-        {activeTab === "trial_invest" && (
-          <KalkulatorPensiun
-            userTemplates={userTemplates}
-            ASSET_CLASSES={ASSET_CLASSES}
-            tokens={tokens}
-          />
-        )}
+          {/* ══════════════════════════════════════════════
+              TAB: TRIAL INVEST
+          ══════════════════════════════════════════════ */}
+          {activeTab === "trial_invest" && (
+            <PageTransition key="trial_invest">
+              <KalkulatorPensiun
+                userTemplates={userTemplates}
+                ASSET_CLASSES={ASSET_CLASSES}
+                tokens={tokens}
+              />
+            </PageTransition>
+          )}
+        </AnimatePresence>
 
         <div className="mobile-bottom-spacer" />
 
