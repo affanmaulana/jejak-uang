@@ -517,10 +517,10 @@ export default function WealthTracker() {
         input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:var(--shadow-sm); }
         input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:var(--shadow-sm); }
-        .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; }
+        .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; box-shadow: var(--shadow-sm); }
         .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
-        .stat  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:14px 16px; flex-shrink:0; min-width:148px; }
+        .stat  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:10px; padding:14px 16px; flex-shrink:0; min-width:148px; box-shadow: var(--shadow-sm); }
         .ifield, .ifield-sm, .ifield-lg { 
             width:100%; 
             background:var(--color-surface-input); 
@@ -547,7 +547,7 @@ export default function WealthTracker() {
         .tab { padding:8px 18px; border-radius:8px; cursor:pointer; font-size:var(--text-body-size); font-weight:var(--text-caption-weight); border:none; transition:all .2s; background:transparent; color:var(--color-text-tertiary); font-family:var(--font-family); }
         .tab:hover { color:var(--color-text-secondary); }
         .tab.on { background:var(--color-brand); color: var(--color-surface-card); box-shadow:var(--shadow-md); }
-        .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; }
+        .tmplbtn { padding:11px 14px; border-radius:10px; border:1.5px solid var(--color-border-subtle); background:var(--color-surface-card); color:var(--color-text-secondary); cursor:pointer; transition:all .2s; text-align:left; width:100%; box-shadow: var(--shadow-sm); }
         .tmplbtn:hover { border-color:var(--color-border-active); color: var(--color-brand); background: var(--color-surface-active); }
         .warn { background: var(--color-semantic-danger-bg); border:1.5px solid var(--color-semantic-danger-border); border-radius:10px; padding:12px 16px; font-size:var(--text-body-size); color:var(--color-danger); display:flex; align-items:center; gap:10px; }
         .ok   { background: var(--color-semantic-success-bg); border:1.5px solid var(--color-semantic-success-border); border-radius:10px; padding:12px 16px; font-size:var(--text-body-size); color:var(--color-success); display:flex; align-items:center; gap:10px; }

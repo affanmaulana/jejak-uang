@@ -189,7 +189,8 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
           padding: 20,
           display: "flex",
           flexDirection: "column",
-          gap: 16
+          gap: 16,
+          boxShadow: "var(--shadow-sm)"
         }}>
           {/* TAB CHOOSER (INPUT MANUAL / TEMPLATE) MOVED TO LEFT COLUMN AT TOP */}
           <div style={{ display: "flex", gap: 4, padding: 4, background: "var(--color-surface-input)", borderRadius: 12, border: "1.5px solid var(--color-border-subtle)" }}>
@@ -500,7 +501,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            boxShadow: "none"
+            boxShadow: "var(--shadow-sm)"
           }}>
             {/* BG Gradients */}
             <div style={{ position: "absolute", top: "-20%", right: "-10%", width: 220, height: 220, background: "radial-gradient(circle, var(--color-viz-rd-campuran) 0%, transparent 70%)", opacity: 0.2, filter: "blur(40px)" }} />
@@ -546,7 +547,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
             padding: "20px 16px",
             display: "flex",
             flexDirection: "column",
-            boxShadow: "none"
+            boxShadow: "var(--shadow-sm)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, paddingRight: 4, flexWrap: "wrap", gap: 8 }}>
               <div>
