@@ -514,9 +514,13 @@ export default function WealthTracker() {
         }
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:var(--color-border-input); border-radius:4px; }
-        input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:var(--shadow-sm); }
-        input[type=range]::-moz-range-thumb { width:15px; height:15px; border-radius:50%; cursor:pointer; border:2.5px solid var(--color-surface-card); background:var(--color-surface-card); box-shadow:var(--shadow-sm); }
+        input[type=range] { -webkit-appearance:none; height:4px; border-radius:4px; outline:none; cursor:pointer; background:var(--color-border-subtle); }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; cursor:pointer; border:2px solid var(--color-surface-card); background:var(--color-brand); box-shadow:var(--shadow-md); transition:transform .1s ease, background-color .1s ease; }
+        input[type=range]::-moz-range-thumb { width:18px; height:18px; border-radius:50%; cursor:pointer; border:2px solid var(--color-surface-card); background:var(--color-brand); box-shadow:var(--shadow-md); transition:transform .1s ease, background-color .1s ease; }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); background: var(--color-text-secondary); }
+        input[type=range]::-moz-range-thumb:hover { transform: scale(1.15); background: var(--color-text-secondary); }
+        input[type=range]::-webkit-slider-thumb:active { transform: scale(0.92); }
+        input[type=range]::-moz-range-thumb:active { transform: scale(0.92); }
         .card  { background:var(--color-surface-card); border:1.5px solid var(--color-border-subtle); border-radius:16px; overflow: hidden; box-shadow: var(--shadow-sm); }
         .card2 { background:var(--color-surface-input); border:1.5px solid var(--color-border-subtle); border-radius:12px; }
         .glow-bar { position: absolute; top: 0; left: 0; right: 0; height: 6px; }
