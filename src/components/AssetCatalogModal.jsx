@@ -191,9 +191,10 @@ export default function AssetCatalogModal({
               }
 
               return filteredAssets.map((cls) => (
-                <div
+                <motion.div
                   key={cls.id}
                   onClick={() => addAsset(cls.id)}
+                  whileTap={{ scale: 0.97 }}
                   style={{
                     background: "var(--color-surface-card)",
                     border: `1.5px solid var(--color-border-subtle)`,
@@ -288,7 +289,7 @@ export default function AssetCatalogModal({
                       );
                     })()}
                   </div>
-                </div>
+                </motion.div>
               ));
             })()}
           </div>
