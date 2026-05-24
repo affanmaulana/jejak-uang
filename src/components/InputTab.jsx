@@ -87,21 +87,31 @@ export default function InputTab({
     const scrollBarWidth = window.innerWidth - document.body.clientWidth;
 
     if (isAnyModalOpen) {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
+      // Save current scroll position and apply fixed positioning to lock the background
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
       document.body.style.paddingRight = `${scrollBarWidth}px`;
-      document.body.style.overscrollBehavior = "none";
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
-      document.documentElement.style.overflow = "unset";
+      // Retrieve original scroll position and clear fixed position styles
+      const scrollY = parseInt(document.body.style.top || "0", 10) * -1;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
       document.body.style.paddingRight = "0px";
-      document.body.style.overscrollBehavior = "unset";
+      document.body.style.overflow = "";
+      if (scrollY > 0) {
+        window.scrollTo(0, scrollY);
+      }
     }
     return () => {
-      document.body.style.overflow = "unset";
-      document.documentElement.style.overflow = "unset";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
       document.body.style.paddingRight = "0px";
-      document.body.style.overscrollBehavior = "unset";
+      document.body.style.overflow = "";
     };
   }, [isModalOpen, editingAssetId, showDiscardConfirm, showDeleteConfirm]);
 
