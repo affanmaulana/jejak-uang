@@ -1378,106 +1378,115 @@ export default function WealthTracker() {
         <Analytics />
 
         {/* ── CONFIRM DIALOG MODAL ── */}
-        {modalAction.isOpen && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              pointerEvents: "auto",
-              zIndex: 9999,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "var(--color-overlay)",
-              backdropFilter: "blur(4px)",
-              padding: "16px",
-              transition: "all 0.3s ease"
-            }}
-            onClick={closeModal}
-          >
-            <div
+        <AnimatePresence>
+          {modalAction.isOpen && (
+            <motion.div
+              onClick={closeModal}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               style={{
-                backgroundColor: "var(--color-surface-card)",
-                borderRadius: "16px",
-                border: "1.5px solid var(--color-border-subtle)",
-                boxShadow: "none",
-                width: "100%",
-                maxWidth: "360px",
+                position: "fixed",
+                inset: 0,
+                pointerEvents: "auto",
+                zIndex: 9999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "var(--color-overlay)",
+                backdropFilter: "blur(4px)",
                 padding: "16px",
-                textAlign: "center"
               }}
-              onClick={(e) => e.stopPropagation()}
             >
-              <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
-                {modalAction.title}
-              </p>
-              <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-                {modalAction.type === "info" ? (
-                  <button
-                    onClick={closeModal}
-                    style={{
-                      width: "100%",
-                      padding: "14px 0", borderRadius: "10px", border: "none",
-                      background: "var(--color-semantic-brand)", color: "var(--color-white)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
-                      cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                    }}
-                  >
-                    Tutup
-                  </button>
-                ) : (
-                  <>
+              <motion.div
+                onClick={(e) => e.stopPropagation()}
+                initial={{ scale: 0.95, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                style={{
+                  backgroundColor: "var(--color-surface-card)",
+                  borderRadius: "16px",
+                  border: "1.5px solid var(--color-border-subtle)",
+                  boxShadow: "var(--shadow-xl)",
+                  width: "100%",
+                  maxWidth: "360px",
+                  padding: "20px",
+                  textAlign: "center"
+                }}
+              >
+                <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+                  {modalAction.title}
+                </p>
+                <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+                  {modalAction.type === "info" ? (
                     <button
                       onClick={closeModal}
                       style={{
-                        flex: 1,
-                        padding: "12px 0", borderRadius: "8px", border: `1.5px solid var(--color-border-subtle)`,
-                        background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                        width: "100%",
+                        padding: "14px 0", borderRadius: "10px", border: "none",
+                        background: "var(--color-semantic-brand)", color: "var(--color-white)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
                         cursor: "pointer", fontFamily: tokens.typography.fontFamily
                       }}
                     >
-                      Batal
+                      Tutup
                     </button>
-                    <button
-                      onClick={() => {
-                        if (modalAction.type === "delete") {
-                          setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
-                          if (activeTemplateId === modalAction.targetId) setActiveTemplateId(null);
-                        } else if (modalAction.type === "update") {
-                          setUserTemplates((prev) =>
-                            prev.map((t) => {
-                              if (t.id === modalAction.targetId) {
-                                return {
-                                  ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
-                                  customReturns: { ...customReturnOverrides },
-                                  customDrawdowns: { ...customDrawdowns },
-                                  customUSDRate: customUSDRate,
-                                  assetCurrencyPrefs: { ...assetCurrencyPrefs },
-                                  activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
-                                  targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
-                                };
-                              }
-                              return t;
-                            })
-                          );
-                        }
-                        closeModal();
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: "12px 0", borderRadius: "8px", border: "none",
-                        background: modalAction.type === "delete" ? "var(--color-semantic-danger)" : "var(--color-semantic-brand)",
-                        color: "var(--color-white)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
-                        cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                      }}
-                    >
-                      {modalAction.type === "delete" ? "Hapus" : "Ya, Update"}
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+                  ) : (
+                    <>
+                      <button
+                        onClick={closeModal}
+                        style={{
+                          flex: 1,
+                          padding: "12px 0", borderRadius: "8px", border: `1.5px solid var(--color-border-subtle)`,
+                          background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                          cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                        }}
+                      >
+                        Batal
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (modalAction.type === "delete") {
+                            setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
+                            if (activeTemplateId === modalAction.targetId) setActiveTemplateId(null);
+                          } else if (modalAction.type === "update") {
+                            setUserTemplates((prev) =>
+                              prev.map((t) => {
+                                if (t.id === modalAction.targetId) {
+                                  return {
+                                    ...t, assets: { ...assets }, contribs: { ...monthlyContribs },
+                                    customReturns: { ...customReturnOverrides },
+                                    customDrawdowns: { ...customDrawdowns },
+                                    customUSDRate: customUSDRate,
+                                    assetCurrencyPrefs: { ...assetCurrencyPrefs },
+                                    activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
+                                    targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
+                                  };
+                                }
+                                return t;
+                              })
+                            );
+                          }
+                          closeModal();
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: "12px 0", borderRadius: "8px", border: "none",
+                          background: modalAction.type === "delete" ? "var(--color-semantic-danger)" : "var(--color-semantic-brand)",
+                          color: "var(--color-white)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                          cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                        }}
+                      >
+                        {modalAction.type === "delete" ? "Hapus" : "Ya, Update"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </Container>
     </div >

@@ -684,122 +684,145 @@ export default function InputTab({
         </button>
       )}
       {/* ── STYLED CONFIRMATION POPUP (Mirrored exactly from App.jsx) ── */}
-      {showDiscardConfirm && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            pointerEvents: "auto",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "var(--color-overlay)",
-            backdropFilter: "blur(4px)",
-            padding: "16px",
-            WebkitTapHighlightColor: "transparent",
-            transition: "all 0.3s ease"
-          }}
-        >
-          <div
+      <AnimatePresence>
+        {showDiscardConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             style={{
-              backgroundColor: "var(--color-surface-card)",
-              borderRadius: "16px",
-              boxShadow: "var(--shadow-xl)",
-              width: "100%",
-              maxWidth: "360px",
+              position: "fixed",
+              inset: 0,
+              pointerEvents: "auto",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "var(--color-overlay)",
+              backdropFilter: "blur(4px)",
               padding: "16px",
-              textAlign: "center"
+              WebkitTapHighlightColor: "transparent",
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setShowDiscardConfirm(false)}
           >
-            <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
-              Angka yang kamu ubah belum disimpan. Yakin ingin membuang perubahan ini?
-            </p>
-            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-              <button
-                onClick={() => setShowDiscardConfirm(false)}
-                style={{
-                  flex: 1,
-                  padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
-                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
-                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                }}
-              >
-                Lanjut Edit
-              </button>
-              <button
-                onClick={() => {
-                  setEditingAssetId(null);
-                  setShowDiscardConfirm(false);
-                }}
-                style={{
-                  flex: 1,
-                  padding: "12px 0", borderRadius: "8px", border: "none",
-                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
-                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                }}
-              >
-                Ya, Buang
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              transition={{ type: "spring", stiffness: 380, damping: 26 }}
+              style={{
+                backgroundColor: "var(--color-surface-card)",
+                borderRadius: "16px",
+                boxShadow: "var(--shadow-xl)",
+                width: "100%",
+                maxWidth: "360px",
+                padding: "20px",
+                textAlign: "center"
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+                Angka yang kamu ubah belum disimpan. Yakin ingin membuang perubahan ini?
+              </p>
+              <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+                <button
+                  onClick={() => setShowDiscardConfirm(false)}
+                  style={{
+                    flex: 1,
+                    padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
+                    background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                  }}
+                >
+                  Lanjut Edit
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingAssetId(null);
+                    setShowDiscardConfirm(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: "12px 0", borderRadius: "8px", border: "none",
+                    background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                  }}
+                >
+                  Ya, Buang
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── STYLED DELETE CONFIRMATION POPUP ── */}
-      {showDeleteConfirm && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            pointerEvents: "auto",
-            zIndex: 10000, // Lebih tinggi dari modal editor
-            display: "flex", alignItems: "center", justifyContent: "center",
-            backgroundColor: "var(--color-overlay)", backdropFilter: "blur(4px)", padding: "16px",
-            WebkitTapHighlightColor: "transparent",
-            transition: "all 0.3s ease"
-          }}
-        >
-          <div
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             style={{
-              backgroundColor: "var(--color-surface-card)", borderRadius: "16px",
-              boxShadow: "var(--shadow-xl)", width: "100%", maxWidth: "360px",
-              padding: "20px", textAlign: "center"
+              position: "fixed",
+              inset: 0,
+              pointerEvents: "auto",
+              zIndex: 10000, // Lebih tinggi dari modal editor
+              backgroundColor: "var(--color-overlay)", backdropFilter: "blur(4px)", padding: "16px",
+              WebkitTapHighlightColor: "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setShowDeleteConfirm(false)}
           >
-            <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
-              Hapus <strong>{ASSET_CLASSES.find(c => c.id === editingAssetId)?.name}</strong> dari portofolio? Semua data nilai dan kontribusi akan hilang permanen.
-            </p>
-            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                style={{
-                  flex: 1, padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
-                  background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
-                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                }}
-              >
-                Batal
-              </button>
-              <button
-                onClick={() => {
-                  removeAsset(editingAssetId);
-                  setEditingAssetId(null);
-                  setShowDeleteConfirm(false);
-                }}
-                style={{
-                  flex: 1, padding: "12px 0", borderRadius: "8px", border: "none",
-                  background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
-                  cursor: "pointer", fontFamily: tokens.typography.fontFamily
-                }}
-              >
-                Ya, Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              transition={{ type: "spring", stiffness: 380, damping: 26 }}
+              style={{
+                backgroundColor: "var(--color-surface-card)", borderRadius: "16px",
+                boxShadow: "var(--shadow-xl)", width: "100%", maxWidth: "360px",
+                padding: "20px", textAlign: "center"
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p style={{ fontSize: "var(--text-body-size)", fontWeight: "var(--text-body-weight)", color: "var(--color-text-primary)", lineHeight: "var(--text-body-line-height)", marginBottom: "22px", fontFamily: tokens.typography.fontFamily }}>
+                Hapus <strong>{ASSET_CLASSES.find(c => c.id === editingAssetId)?.name}</strong> dari portofolio? Semua data nilai dan kontribusi akan hilang permanen.
+              </p>
+              <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  style={{
+                    flex: 1, padding: "12px 0", borderRadius: "8px", border: `1.5px solid ${"var(--color-border-subtle)"}`,
+                    background: "var(--color-surface-input)", color: "var(--color-text-secondary)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                  }}
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={() => {
+                    removeAsset(editingAssetId);
+                    setEditingAssetId(null);
+                    setShowDeleteConfirm(false);
+                  }}
+                  style={{
+                    flex: 1, padding: "12px 0", borderRadius: "8px", border: "none",
+                    background: "var(--color-semantic-danger)", color: "var(--color-surface-card)", fontWeight: "var(--text-subtitle-weight)", fontSize: "var(--text-body-size)",
+                    cursor: "pointer", fontFamily: tokens.typography.fontFamily
+                  }}
+                >
+                  Ya, Hapus
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import "../styles/tokens.css";
 import {
   AreaChart,
@@ -195,9 +196,10 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
           {/* TAB CHOOSER (INPUT MANUAL / TEMPLATE) MOVED TO LEFT COLUMN AT TOP */}
           <div style={{ display: "flex", gap: 4, padding: 4, background: "var(--color-surface-input)", borderRadius: 12, border: "1.5px solid var(--color-border-subtle)" }}>
             {[["manual", "Manual"], ["template", "Tersimpan"]].map(([m, lbl]) => (
-              <button
+              <motion.button
                 key={m}
                 onClick={() => setMode(m)}
+                whileTap={{ scale: 0.97 }}
                 style={{
                   flex: 1,
                   padding: "8px 0",
@@ -214,7 +216,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
                 }}
               >
                 {lbl}
-              </button>
+              </motion.button>
             ))}
           </div>
 
@@ -293,8 +295,9 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
                 ) : (
                   <div style={{ position: "relative", width: "100%" }}>
                     {/* Trigger Button */}
-                    <div
+                    <motion.div
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      whileTap={{ scale: 0.995 }}
                       style={{
                         ...inputStyle,
                         display: "flex",
@@ -327,75 +330,83 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
                       >
                         <polyline points="6 9 12 15 18 9"></polyline>
                       </svg>
-                    </div>
+                    </motion.div>
 
                     {/* Pop-up Options List */}
-                    {isDropdownOpen && (
-                      <>
-                        {/* Overlay to close on click outside */}
-                        <div
-                          onClick={() => setIsDropdownOpen(false)}
-                          style={{
-                            position: "fixed",
-                            inset: 0,
-                            zIndex: 998,
-                            cursor: "default"
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "calc(100% + 6px)",
-                            left: 0,
-                            right: 0,
-                            background: "var(--color-surface-card)",
-                            border: "1.5px solid var(--color-border-subtle)",
-                            borderRadius: 12,
-                            padding: 6,
-                            zIndex: 999,
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 2,
-                            maxHeight: 200,
-                            overflowY: "auto"
-                          }}
-                        >
-                          {userTemplates.map(t => {
-                            const isSelected = selectedTemplateId === t.id;
-                            return (
-                              <div
-                                key={t.id}
-                                onClick={() => {
-                                  setSelectedTemplateId(t.id);
-                                  setIsDropdownOpen(false);
-                                }}
-                                className="custom-option"
-                                style={{
-                                  padding: "10px 12px",
-                                  borderRadius: 8,
-                                  cursor: "pointer",
-                                  fontSize: "var(--text-body-size)",
-                                  fontWeight: isSelected ? "var(--text-body-bold-weight)" : "normal",
-                                  color: isSelected ? "var(--color-semantic-success)" : "var(--color-text-primary)",
-                                  background: isSelected ? "var(--color-semantic-success-bg)" : "transparent",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  transition: "all 0.15s ease-in-out"
-                                }}
-                              >
-                                <span>{t.name}</span>
-                                {isSelected && (
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="var(--color-semantic-success)" style={{ width: 16, height: 16 }}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                  </svg>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </>
-                    )}
+                    <AnimatePresence>
+                      {isDropdownOpen && (
+                        <>
+                          {/* Overlay to close on click outside */}
+                          <div
+                            onClick={() => setIsDropdownOpen(false)}
+                            style={{
+                              position: "fixed",
+                              inset: 0,
+                              zIndex: 998,
+                              cursor: "default"
+                            }}
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.15 }}
+                            style={{
+                              position: "absolute",
+                              top: "calc(100% + 6px)",
+                              left: 0,
+                              right: 0,
+                              background: "var(--color-surface-card)",
+                              border: "1.5px solid var(--color-border-subtle)",
+                              borderRadius: 12,
+                              padding: 6,
+                              zIndex: 999,
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 2,
+                              maxHeight: 200,
+                              overflowY: "auto",
+                              boxShadow: "var(--shadow-xl)"
+                            }}
+                          >
+                            {userTemplates.map(t => {
+                              const isSelected = selectedTemplateId === t.id;
+                              return (
+                                <motion.div
+                                  key={t.id}
+                                  onClick={() => {
+                                    setSelectedTemplateId(t.id);
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className="custom-option"
+                                  style={{
+                                    padding: "10px 12px",
+                                    borderRadius: 8,
+                                    cursor: "pointer",
+                                    fontSize: "var(--text-body-size)",
+                                    fontWeight: isSelected ? "var(--text-body-bold-weight)" : "normal",
+                                    color: isSelected ? "var(--color-semantic-success)" : "var(--color-text-primary)",
+                                    background: isSelected ? "var(--color-semantic-success-bg)" : "transparent",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    transition: "all 0.15s ease-in-out"
+                                  }}
+                                >
+                                  <span>{t.name}</span>
+                                  {isSelected && (
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="var(--color-semantic-success)" style={{ width: 16, height: 16 }}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                  )}
+                                </motion.div>
+                              );
+                            })}
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )}
               </div>
