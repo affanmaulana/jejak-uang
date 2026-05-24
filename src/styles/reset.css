@@ -16,6 +16,22 @@
   outline-offset: 2px;
 }
 
+/* Standard touch/press feedback for buttons, links, and clickable items */
+button,
+a,
+[role="button"],
+.tab {
+  transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.15s ease;
+}
+
+button:active,
+a:active,
+[role="button"]:active,
+.tab:active {
+  opacity: 0.75;
+  transform: scale(0.97);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-delay: 0s !important;
@@ -25,5 +41,13 @@
     transition-duration: 0s !important;
     scroll-behavior: auto !important;
     transform: none !important;
+  }
+  
+  button:active,
+  a:active,
+  [role="button"]:active,
+  .tab:active {
+    transform: none !important;
+    opacity: 0.85 !important;
   }
 }
