@@ -81,37 +81,20 @@ export default function InputTab({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [catalogFilter, setCatalogFilter] = useState('all');
 
-  // ── BODY SCROLL LOCK ──
+    // 🔒 BODY SCROLL LOCK 🔒
   useEffect(() => {
     const isAnyModalOpen = isModalOpen || editingAssetId !== null || showDiscardConfirm || showDeleteConfirm;
-    const scrollBarWidth = window.innerWidth - document.body.clientWidth;
 
     if (isAnyModalOpen) {
-      // Save current scroll position and apply fixed positioning to lock the background
-      const scrollY = window.scrollY;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = "100%";
-      document.body.style.paddingRight = `${scrollBarWidth}px`;
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     } else {
-      // Retrieve original scroll position and clear fixed position styles
-      const scrollY = parseInt(document.body.style.top || "0", 10) * -1;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      document.body.style.paddingRight = "0px";
       document.body.style.overflow = "";
-      if (scrollY > 0) {
-        window.scrollTo(0, scrollY);
-      }
+      document.documentElement.style.overflow = "";
     }
     return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      document.body.style.paddingRight = "0px";
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isModalOpen, editingAssetId, showDiscardConfirm, showDeleteConfirm]);
 
