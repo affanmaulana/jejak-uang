@@ -1,8 +1,19 @@
-/* Minimal CSS Reset to establish browser consistency without breaking current styling */
+﻿/* Minimal CSS Reset to establish browser consistency without breaking current styling */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure focus outlines don't show on mouse click or mobile tap, but retain them for keyboard focus-visible accessibility */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-semantic-brand, #0F172A);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -16,4 +27,3 @@
     transform: none !important;
   }
 }
-
