@@ -79,9 +79,21 @@ export default function WealthTracker() {
   const [showAfterTax, setShowAfterTax] = useState(true);
   const [activeTab, setActiveTab] = useState("input");
 
-  // Reset scroll to top when changing tabs
+  // Reset scroll to top when changing tabs (deferred to ensure DOM has updated)
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const handleScrollReset = () => {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    };
+    
+    // Defer execution until the browser has finished rendering/updating
+    const frameId = requestAnimationFrame(() => {
+      handleScrollReset();
+      setTimeout(handleScrollReset, 0);
+    });
+
+    return () => cancelAnimationFrame(frameId);
   }, [activeTab]);
 
   // ── State Option 2: Top Modal ──
