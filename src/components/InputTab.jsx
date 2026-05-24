@@ -212,7 +212,7 @@ export default function InputTab({
             <motion.button
               onClick={() => setIsModalOpen(true)}
               whileHover={{ scale: 1.03, y: -2 }}
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: 0.985 }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -272,7 +272,7 @@ export default function InputTab({
                     borderColor: "var(--color-border-input)",
                     boxShadow: "var(--shadow-glow, 0 8px 24px rgba(0,0,0,0.06))",
                   }}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.985 }}
                   transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>

@@ -984,7 +984,7 @@ export default function WealthTracker() {
                       borderColor: "var(--color-border-active)",
                       boxShadow: "var(--shadow-glow, 0 4px 12px rgba(0,0,0,0.05))"
                     }}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.985 }}
                     onClick={() => loadUserTemplate(t)}
                   >
                     <div

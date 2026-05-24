@@ -194,7 +194,7 @@ export default function AssetCatalogModal({
                 <motion.div
                   key={cls.id}
                   onClick={() => addAsset(cls.id)}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.985 }}
                   style={{
                     background: "var(--color-surface-card)",
                     border: `1.5px solid var(--color-border-subtle)`,

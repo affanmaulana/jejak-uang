@@ -199,7 +199,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
               <motion.button
                 key={m}
                 onClick={() => setMode(m)}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.99 }}
                 style={{
                   flex: 1,
                   padding: "8px 0",
@@ -297,7 +297,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
                     {/* Trigger Button */}
                     <motion.div
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      whileTap={{ scale: 0.97 }}
+                      whileTap={{ scale: 0.99 }}
                       style={{
                         ...inputStyle,
                         display: "flex",
