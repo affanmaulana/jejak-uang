@@ -1001,8 +1001,7 @@ export default function WealthTracker() {
       <Container style={{ padding: 0 }}>
         {/* ── HEADER ── */}
         {/* Header */}
-        {!(isMobile && (activeTab === "snapshot" || activeTab === "projection")) && (
-          <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 20 }}>
           <h1
             className="header-title"
             style={{
@@ -1027,7 +1026,6 @@ export default function WealthTracker() {
             Return riil · Pajak · Kontribusi per aset · Stress test
           </p>
         </div>
-        )}
 
         {activeTab !== "trial_invest" && !(isMobile && (activeTab === "snapshot" || activeTab === "projection")) && (
           <>
