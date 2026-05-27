@@ -1,4 +1,4 @@
-export const DEFAULT_USD_RATE = 17600;
+export const DEFAULT_USD_RATE = 17800;
 export const PROJECTION_YEARS = 10;
 
 export const ASSET_CLASSES = [

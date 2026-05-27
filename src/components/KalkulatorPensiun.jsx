@@ -83,7 +83,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
     if (mode !== "template" || !selectedTemplateId) return null;
     const t = (userTemplates || []).find(x => x.id === selectedTemplateId);
     if (!t) return null;
-    const DEFAULT_USD_RATE = 17600;
+    const DEFAULT_USD_RATE = 17800;
 
     // Check if snapshot is preferred and available
     const hasSnapshots = t.monthlySnapshots && t.monthlySnapshots.length > 0;

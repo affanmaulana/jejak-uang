@@ -198,9 +198,11 @@ export default function MonthlySnapshotTab({
     return list;
   }, [sortedSnapshots, assets, initialPortfolioValue, customReturnOverrides, customUSDRate, assetCurrencyPrefs, ASSET_CLASSES]);
 
-  // 3. Accumulative Net Inflow
-  const totalNetInflow = useMemo(() => {
-    return snapshotsWithMetrics.reduce((sum, snap) => sum + snap.netInflow, 0);
+  // 3. Rata-rata Kenaikan Bulanan (Rupiah)
+  const averageMonthlyIncrease = useMemo(() => {
+    if (snapshotsWithMetrics.length === 0) return 0;
+    const totalIncrease = snapshotsWithMetrics.reduce((sum, snap) => sum + (snap.totalPortfolio - snap.prevTotalPortfolio), 0);
+    return totalIncrease / snapshotsWithMetrics.length;
   }, [snapshotsWithMetrics]);
 
   // 4. Portfolio Growth Percentage
@@ -661,7 +663,7 @@ export default function MonthlySnapshotTab({
           </div>
         </motion.div>
 
-        {/* CARD 2: NET INFLOW */}
+        {/* CARD 2: AVERAGE MONTHLY INCREASE IN RUPIAH */}
         <motion.div
           whileHover={{ y: -4, borderColor: "var(--color-semantic-brand)", boxShadow: "0 12px 30px rgba(0,0,0,0.05)" }}
           style={{
@@ -679,7 +681,7 @@ export default function MonthlySnapshotTab({
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              Kontribusi Bersih (Inflow)
+              Rata-rata Kenaikan Bulanan
             </span>
             <div
               style={{
@@ -689,18 +691,18 @@ export default function MonthlySnapshotTab({
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}
             >
-              {/* Inflow Arrow SVG */}
+              {/* Up Trend Arrow SVG */}
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14 }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l-6.75-6.75M12 19.5l6.75-6.75" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" />
               </svg>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: "26px", fontWeight: "900", color: totalNetInflow >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", letterSpacing: "-0.5px" }}>
-              {totalNetInflow >= 0 ? "+" : ""}{formatCompact(totalNetInflow)}
+            <div style={{ fontSize: "26px", fontWeight: "900", color: averageMonthlyIncrease >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)", letterSpacing: "-0.5px" }}>
+              {averageMonthlyIncrease >= 0 ? "+" : ""}{formatCompact(averageMonthlyIncrease)}
             </div>
             <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 4 }}>
-              Total suntikan modal riil Anda
+              Rata-rata pertumbuhan saldo per bulan
             </div>
           </div>
         </motion.div>
@@ -1378,7 +1380,7 @@ export default function MonthlySnapshotTab({
                   </AnimatePresence>
                 </div>
 
-                {/* Grid 16 Asset Inputs - ELEGANT CARDS SYNCED 100% WITH INPUT TAB (NO GRADIENTS, NO DASHED BORDERS, NO LEFT ACTION BTN) */}
+                {/* Grid 16 Asset Inputs - ELEGANT CARDS SYNCED 100% WITH INPUT TAB (NO GRADIENTS, SUBDUED PASSIVE +/- BUTTONS ON THE RIGHT) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <label
                     style={{
@@ -1499,27 +1501,34 @@ export default function MonthlySnapshotTab({
                               </div>
                             )}
 
-                            {/* Tombol Aksi Bulat Solid Premium di Far Right */}
-                            <motion.button
+                            {/* Tombol Aksi Bulat Premium di Far Right - Lebih Pasif & Subdued */}
+                            <button
                               type="button"
                               onClick={() => handleToggleAsset(cls.id)}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
                               style={{
                                 width: 32, height: 32,
                                 borderRadius: "10px",
-                                border: "none",
-                                background: isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)",
-                                color: "var(--color-white)",
+                                border: "1.5px solid var(--color-border-subtle)",
+                                background: "var(--color-surface-input)",
+                                color: isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)",
                                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                                 fontSize: isActive ? 12 : 14, fontWeight: "bold",
                                 boxShadow: "var(--shadow-sm)",
-                                transition: "all 0.15s"
+                                transition: "all 0.15s",
+                                outline: "none",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)";
+                                e.currentTarget.style.background = isActive ? "rgba(239, 68, 68, 0.08)" : "rgba(16, 185, 129, 0.08)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = "var(--color-border-subtle)";
+                                e.currentTarget.style.background = "var(--color-surface-input)";
                               }}
                               title={isActive ? "Hapus dari Portofolio" : "Tambah ke Portofolio"}
                             >
                               {isActive ? "✕" : "＋"}
-                            </motion.button>
+                            </button>
                           </div>
                         </div>
                       );
