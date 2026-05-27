@@ -1183,9 +1183,6 @@ export default function MonthlySnapshotTab({
             <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: 0 }}>
               Pergeseran Alokasi (Asset Drift)
             </h3>
-            <p style={{ fontSize: 11, color: "var(--color-text-tertiary)", margin: "4px 0 0 0" }}>
-              Membandingkan nominal dan bobot alokasi rencana awal dengan realisasi snapshot terbaru ({formatMonthLabelLong(latestSnapshot.yearMonth)}).
-            </p>
           </div>
           
           <div style={{ overflowX: "auto" }}>
@@ -1194,7 +1191,7 @@ export default function MonthlySnapshotTab({
                 <tr style={{ borderBottom: "1.5px solid var(--color-border-subtle)", background: "var(--color-surface-app)" }}>
                   <th style={{ padding: "14px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Alokasi Aset</th>
                   <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Rencana Awal</th>
-                  <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Snapshot Terbaru</th>
+                  <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Snapshot Terbaru ({formatMonthLabelLong(latestSnapshot.yearMonth)})</th>
                   <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Perubahan Alokasi</th>
                 </tr>
               </thead>
@@ -1204,7 +1201,7 @@ export default function MonthlySnapshotTab({
                   const diffWeight = item.actWeight - item.initWeight;
                   
                   const isPositive = diffValIDR > 0;
-                  const isNegative = diffValIDR < 0;
+                  const isNegative = diffValIDR <= 0;
                   
                   return (
                     <tr
@@ -1223,16 +1220,19 @@ export default function MonthlySnapshotTab({
                             style={{
                               width: 32,
                               height: 32,
-                              borderRadius: 8,
-                              background: "var(--color-surface-input)",
-                              border: "1px solid var(--color-border-subtle)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              fontSize: 16,
                             }}
                           >
-                            {item.icon || "💰"}
+                            <div
+                              style={{
+                                width: 12,
+                                height: 12,
+                                borderRadius: "50%",
+                                background: item.color || "var(--color-semantic-brand)",
+                              }}
+                            />
                           </div>
                           <div>
                             <span style={{ fontSize: 14, fontWeight: "bold", color: "var(--color-text-primary)" }}>
