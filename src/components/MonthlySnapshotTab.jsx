@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ResponsiveContainer,
   ComposedChart,
+  Area,
   Line,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -31,7 +31,6 @@ const popoverVariants = {
   exit: { opacity: 0, y: -10, scale: 0.95 },
 };
 
-// 12 Indonesian months list
 const MONTHS_INDO = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -48,7 +47,7 @@ export default function MonthlySnapshotTab({
   customUSDRate,
   assetCurrencyPrefs,
   activeAssetIds,
-  setActiveAssetIds, // REQUIRED FOR SNAPSHOT MUTATIONS
+  setActiveAssetIds,
   monthlySnapshots,
   addSnapshot,
   updateSnapshot,
@@ -78,6 +77,7 @@ export default function MonthlySnapshotTab({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSnapshot, setEditingSnapshot] = useState(null); // null for new, snapshot object for edit
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
+  const [snapshotToDelete, setSnapshotToDelete] = useState(null); // snapshot object for single delete confirmation
 
   // --- FORM STATES ---
   const [formMonth, setFormMonth] = useState(""); // YYYY-MM
@@ -262,7 +262,6 @@ export default function MonthlySnapshotTab({
       let monthInflow = 0;
 
       if (m === 0) {
-        // Month 0 is initial assets
         actualTotal = initialPortfolioValue;
         isSnapshotMonth = true;
       } else if (exactSnap) {
@@ -343,9 +342,18 @@ export default function MonthlySnapshotTab({
       nextMonthYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     }
     
+    // Check if next month is in the future relative to current real-world month
+    const now = new Date();
+    const currentYMInt = now.getFullYear() * 12 + now.getMonth();
+    const [ny, nm] = nextMonthYM.split("-").map(Number);
+    
+    if (ny * 12 + (nm - 1) > currentYMInt) {
+      // Fallback to current real-world month if next snapshot month is in the future
+      nextMonthYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+
     setFormMonth(nextMonthYM);
     
-    // Sync picker defaults
     const [y, m] = nextMonthYM.split("-").map(Number);
     setPickerYear(y);
 
@@ -402,12 +410,9 @@ export default function MonthlySnapshotTab({
   // --- IN-MODAL ASSET ADD/REMOVE TOGGLE ---
   const handleToggleAsset = (id) => {
     if (activeAssetIds.includes(id)) {
-      // Remove from active list
       setActiveAssetIds((prev) => prev.filter((aid) => aid !== id));
-      // Set balance to 0 in form
       setFormAssetValues((prev) => ({ ...prev, [id]: 0 }));
     } else {
-      // Add to active list
       setActiveAssetIds((prev) => [...prev, id]);
     }
   };
@@ -440,7 +445,6 @@ export default function MonthlySnapshotTab({
     setIsModalOpen(false);
   };
 
-  // Convert month YYYY-MM to Indonesian string
   const formatMonthLabelLong = (ym) => {
     if (!ym) return "";
     const [y, m] = ym.split("-").map(Number);
@@ -634,187 +638,252 @@ export default function MonthlySnapshotTab({
         </div>
       </div>
 
-      {/* RE-ARCHITECTED DASHBOARD METRIC CARDS */}
+      {/* REDESIGNED HIGH-END FINTECH DASHBOARD PANEL (Stripe-like Layout) */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gridTemplateColumns: isMobile ? "1fr" : "1.3fr 2.7fr",
           gap: 16,
+          background: "var(--color-surface-card)",
+          border: "1.5px solid var(--color-border-subtle)",
+          borderRadius: 20,
+          padding: "24px",
+          boxShadow: "var(--shadow-md, 0 10px 30px rgba(0,0,0,0.04))",
+          backdropFilter: "blur(20px)",
         }}
       >
-        {/* CARD 1: TOTAL PORTFOLIO ACTUAL */}
+        {/* HERO CARD: TOTAL PORTFOLIO ACTUAL */}
         <div
           style={{
-            background: "var(--color-surface-card)",
-            border: "1.5px solid var(--color-border-subtle)",
+            background: "linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(79, 70, 229, 0.06) 100%)",
+            border: "1.5px solid rgba(16, 185, 129, 0.15)",
             borderRadius: 16,
-            padding: "18px 20px",
-            boxShadow: tokens.shadows.small,
+            padding: "24px",
             display: "flex",
             flexDirection: "column",
-            gap: 4,
+            justifyContent: "center",
+            gap: 10,
+            boxShadow: "0 8px 32px rgba(16, 185, 129, 0.03)",
           }}
         >
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
-            Total Portofolio Aktual
+          <div>
+            <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Total Portofolio Aktual
+            </div>
+            <div
+              style={{
+                fontSize: isMobile ? "28px" : "36px",
+                fontWeight: "900",
+                color: "var(--color-text-primary)",
+                lineHeight: 1.1,
+                marginTop: 6,
+                letterSpacing: "-0.5px"
+              }}
+            >
+              {formatCompact(latestPortfolioValue)}
+            </div>
           </div>
-          <div
-            style={{
-              fontSize: "var(--text-h2-size)",
-              fontWeight: "var(--text-h1-weight)",
-              color: "var(--color-text-primary)",
-              lineHeight: 1.2,
-            }}
-          >
-            {formatCompact(latestPortfolioValue)}
-          </div>
-          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
-            {latestSnapshot
-              ? `Terakhir dicatat: ${formatMonthLabelLong(latestSnapshot.yearMonth)}`
-              : "Belum ada catatan snapshot"}
+          <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", width: "100%" }} />
+          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)", display: "flex", alignItems: "center", gap: 6 }}>
+            <span>📅</span>
+            <span>
+              {latestSnapshot
+                ? `Terakhir dicatat: ${formatMonthLabelLong(latestSnapshot.yearMonth)}`
+                : "Belum ada catatan snapshot"}
+            </span>
           </div>
         </div>
 
-        {/* CARD 2: TOTAL NET INFLOW */}
+        {/* 3 SUB-METRICS LIST ROW */}
         <div
           style={{
-            background: "var(--color-surface-card)",
-            border: "1.5px solid var(--color-border-subtle)",
-            borderRadius: 16,
-            padding: "18px 20px",
-            boxShadow: tokens.shadows.small,
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+            gap: 12,
           }}
         >
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
-            Kontribusi Bersih (Net Inflow)
-          </div>
+          {/* SUB-CARD 1: NET INFLOW */}
           <div
             style={{
-              fontSize: "var(--text-h2-size)",
-              fontWeight: "var(--text-h1-weight)",
-              color:
-                totalNetInflow >= 0
-                  ? "var(--color-semantic-success)"
-                  : "var(--color-semantic-danger)",
-              lineHeight: 1.2,
+              background: "var(--color-surface-input)",
+              border: "1.5px solid var(--color-border-subtle)",
+              borderRadius: 14,
+              padding: "18px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 8,
+              transition: "transform 0.2s",
             }}
           >
-            {totalNetInflow >= 0 ? "+" : ""}
-            {formatCompact(totalNetInflow)}
+            <div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: "600" }}>
+                Kontribusi Bersih (Net Inflow)
+              </div>
+              <div
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: totalNetInflow >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
+                  marginTop: 6,
+                }}
+              >
+                {totalNetInflow >= 0 ? "+" : ""}
+                {formatCompact(totalNetInflow)}
+              </div>
+            </div>
+            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+              Akumulasi suntikan modal riil Anda.
+            </div>
           </div>
-          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
-            Total dana segar yang Anda tambahkan.
-          </div>
-        </div>
 
-        {/* CARD 3: PORTFOLIO GROWTH PERCENTAGE */}
-        <div
-          style={{
-            background: "var(--color-surface-card)",
-            border: "1.5px solid var(--color-border-subtle)",
-            borderRadius: 16,
-            padding: "18px 20px",
-            boxShadow: tokens.shadows.small,
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-          }}
-        >
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
-            Persentase Kenaikan Portofolio
-          </div>
+          {/* SUB-CARD 2: GROWTH PERCENTAGE */}
           <div
             style={{
-              fontSize: "var(--text-h2-size)",
-              fontWeight: "var(--text-h1-weight)",
-              color:
-                growthPercentage >= 0
-                  ? "var(--color-semantic-success)"
-                  : "var(--color-semantic-danger)",
-              lineHeight: 1.2,
+              background: "var(--color-surface-input)",
+              border: "1.5px solid var(--color-border-subtle)",
+              borderRadius: 14,
+              padding: "18px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 8,
             }}
           >
-            {growthPercentage >= 0 ? "▲ +" : "▼ "}
-            {growthPercentage.toFixed(2)}%
+            <div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: "600" }}>
+                Kenaikan Portofolio
+              </div>
+              <div
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: growthPercentage >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
+                  marginTop: 6,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4
+                }}
+              >
+                {growthPercentage >= 0 ? "▲" : "▼"} {Math.abs(growthPercentage).toFixed(2)}%
+              </div>
+            </div>
+            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+              Perkembangan saldo aktual vs modal awal.
+            </div>
           </div>
-          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
-            Perkembangan saldo terhadap rencana awal.
-          </div>
-        </div>
 
-        {/* CARD 4: AVERAGE ACTUAL MONTHLY RETURN */}
-        <div
-          style={{
-            background: "var(--color-surface-card)",
-            border: "1.5px solid var(--color-border-subtle)",
-            borderRadius: 16,
-            padding: "18px 20px",
-            boxShadow: tokens.shadows.small,
-            display: "flex",
-            flexDirection: "column",
-            gap: 4,
-          }}
-        >
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
-            Rata-rata Return Bulanan Aktual
-          </div>
+          {/* SUB-CARD 3: AVERAGE MONTHLY RETURN */}
           <div
             style={{
-              fontSize: "var(--text-h2-size)",
-              fontWeight: "var(--text-h1-weight)",
-              color:
-                averageMonthlyReturn >= 0
-                  ? "var(--color-semantic-success)"
-                  : "var(--color-semantic-danger)",
-              lineHeight: 1.2,
+              background: "var(--color-surface-input)",
+              border: "1.5px solid var(--color-border-subtle)",
+              borderRadius: 14,
+              padding: "18px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              gap: 8,
             }}
           >
-            {averageMonthlyReturn >= 0 ? "+" : ""}
-            {averageMonthlyReturn.toFixed(2)}%
-          </div>
-          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
-            Pertumbuhan pasar bersih per bulan.
+            <div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontWeight: "600" }}>
+                Rata-rata Return Bulanan
+              </div>
+              <div
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: averageMonthlyReturn >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
+                  marginTop: 6,
+                }}
+              >
+                {averageMonthlyReturn >= 0 ? "+" : ""}
+                {averageMonthlyReturn.toFixed(2)}%
+              </div>
+            </div>
+            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+              Pertumbuhan portofolio bersih dari pasar.
+            </div>
           </div>
         </div>
       </div>
 
       {monthlySnapshots.length > 0 ? (
         <>
-          {/* GRAPHS SIDE-BY-SIDE */}
+          {/* GRAPHS */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gridTemplateColumns: "1fr",
               gap: 20,
             }}
           >
-            {/* GRAPH 1: PORTFOLIO COMPARISON */}
+            {/* REDESIGNED HIGH-END PORTFOLIO COMPARISON GRADIENT AREA CHART */}
             <div
               style={{
                 background: "var(--color-surface-card)",
                 border: "1.5px solid var(--color-border-subtle)",
-                borderRadius: 16,
-                padding: isMobile ? "14px" : "20px",
+                borderRadius: 20,
+                padding: isMobile ? "16px" : "24px",
                 boxShadow: tokens.shadows.small,
               }}
             >
               <h3
                 style={{
                   fontSize: "var(--text-subtitle-size)",
-                  fontWeight: "var(--text-subtitle-weight)",
+                  fontWeight: "bold",
                   color: "var(--color-text-primary)",
                   margin: "0 0 16px 0",
+                  letterSpacing: "-0.2px"
                 }}
               >
-                Komparasi Portofolio: Aktual vs Rencana
+                Kurva Perkembangan: Aktual vs Rencana
               </h3>
-              <div style={{ width: "100%", height: isMobile ? 200 : 260 }}>
+              
+              {/* Premium Legend Row */}
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginBottom: 20 }}>
+                {[
+                  { label: "Rencana (Plan)", color: "var(--color-semantic-brand)", dashed: true },
+                  { label: "Aktual (Realisasi)", color: "var(--color-semantic-success)", dashed: false },
+                  { label: "Proyeksi dari Aktual", color: "var(--color-semantic-success)", dashed: true },
+                  { label: "Inflow Bulanan", color: "rgba(16, 185, 129, 0.2)", isBar: true },
+                ].map((leg, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {leg.isBar ? (
+                      <div style={{ width: 12, height: 12, borderRadius: 3, background: leg.color }} />
+                    ) : (
+                      <div
+                        style={{
+                          width: 20,
+                          height: leg.dashed ? 0 : 3,
+                          borderRadius: 3,
+                          background: leg.dashed ? "transparent" : leg.color,
+                          borderTop: leg.dashed ? `2px dashed ${leg.color}` : "none",
+                        }}
+                      />
+                    )}
+                    <span style={{ fontSize: 11, fontWeight: "500", color: "var(--color-text-secondary)" }}>
+                      {leg.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ width: "100%", height: isMobile ? 220 : 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={chartData} margin={{ top: 10, right: 5, left: -22, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
+                    <defs>
+                      <linearGradient id="colorPlan" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-semantic-brand)" stopOpacity={0.08} />
+                        <stop offset="95%" stopColor="var(--color-semantic-brand)" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-semantic-success)" stopOpacity={0.08} />
+                        <stop offset="95%" stopColor="var(--color-semantic-success)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.04)" vertical={false} />
                     <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={10} tickLine={false} />
                     <YAxis
                       stroke="var(--color-text-tertiary)"
@@ -824,38 +893,51 @@ export default function MonthlySnapshotTab({
                     />
                     <Tooltip
                       contentStyle={{
-                        background: "var(--color-surface-card)",
+                        background: "rgba(15, 23, 42, 0.95)",
                         border: "1.5px solid var(--color-border-subtle)",
-                        borderRadius: "8px",
+                        borderRadius: "12px",
                         color: "var(--color-text-primary)",
                         fontSize: 12,
+                        backdropFilter: "blur(8px)",
+                        boxShadow: "var(--shadow-xl)"
                       }}
-                      formatter={(value) => [formatIDR(value), ""]}
+                      formatter={(value, name) => [formatIDR(value), name]}
                     />
-                    <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
-                    <Line
+                    {/* Soft Inflow Bars */}
+                    <Bar
+                      name="Inflow Bulanan"
+                      dataKey="Net Inflow"
+                      fill="var(--color-semantic-success)"
+                      opacity={0.15}
+                      radius={[3, 3, 0, 0]}
+                    />
+                    {/* Plan Area */}
+                    <Area
                       type="monotone"
-                      name="Rencana (Plan)"
+                      name="Rencana"
                       dataKey="Plan"
                       stroke="var(--color-semantic-brand)"
-                      strokeWidth={1.5}
-                      dot={false}
+                      strokeWidth={2}
+                      fill="url(#colorPlan)"
                     />
-                    <Line
+                    {/* Actual Area */}
+                    <Area
                       type="monotone"
                       name="Aktual"
                       dataKey="Aktual"
                       stroke="var(--color-semantic-success)"
-                      strokeWidth={2.5}
-                      dot={{ r: 2.5, fill: "var(--color-semantic-success)", strokeWidth: 1 }}
+                      strokeWidth={3}
+                      fill="url(#colorActual)"
+                      dot={{ r: 3.5, fill: "var(--color-semantic-success)", stroke: "var(--color-surface-card)", strokeWidth: 1.5 }}
                     />
+                    {/* Projected Actual Line */}
                     <Line
                       type="monotone"
-                      name="Proyeksi Aktual"
+                      name="Proyeksi dari Aktual"
                       dataKey="ProyeksiAktual"
                       stroke="var(--color-semantic-success)"
-                      strokeDasharray="3 3"
-                      strokeWidth={1.5}
+                      strokeDasharray="4 4"
+                      strokeWidth={2}
                       dot={false}
                     />
                   </ComposedChart>
@@ -863,75 +945,13 @@ export default function MonthlySnapshotTab({
               </div>
               <p
                 style={{
-                  fontSize: 9,
+                  fontSize: 10,
                   color: "var(--color-text-tertiary)",
                   textAlign: "center",
-                  margin: "8px 0 0 0",
+                  margin: "12px 0 0 0",
                 }}
               >
                 Catatan: Aset USD dikonversi menggunakan kurs saat ini ({formatIDR(customUSDRate)}).
-              </p>
-            </div>
-
-            {/* GRAPH 2: MONTHLY NET INFLOW */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1.5px solid var(--color-border-subtle)",
-                borderRadius: 16,
-                padding: isMobile ? "14px" : "20px",
-                boxShadow: tokens.shadows.small,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "var(--text-subtitle-size)",
-                  fontWeight: "var(--text-subtitle-weight)",
-                  color: "var(--color-text-primary)",
-                  margin: "0 0 16px 0",
-                }}
-              >
-                Kontribusi Bersih (Net Inflow) per Bulan
-              </h3>
-              <div style={{ width: "100%", height: isMobile ? 200 : 260 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={chartData} margin={{ top: 10, right: 5, left: -22, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
-                    <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={10} tickLine={false} />
-                    <YAxis
-                      stroke="var(--color-text-tertiary)"
-                      fontSize={10}
-                      tickLine={false}
-                      tickFormatter={(val) => formatCompact(val).replace("Rp ", "")}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--color-surface-card)",
-                        border: "1.5px solid var(--color-border-subtle)",
-                        borderRadius: "8px",
-                        color: "var(--color-text-primary)",
-                        fontSize: 12,
-                      }}
-                      formatter={(value) => [formatIDR(value), "Inflow"]}
-                    />
-                    <Bar
-                      name="Net Inflow"
-                      dataKey="Net Inflow"
-                      fill="var(--color-semantic-success)"
-                      radius={[3, 3, 0, 0]}
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-              <p
-                style={{
-                  fontSize: 9,
-                  color: "var(--color-text-tertiary)",
-                  textAlign: "center",
-                  margin: "8px 0 0 0",
-                }}
-              >
-                Kolom hijau berarti menambah modal, kolom merah/minus berarti penarikan modal.
               </p>
             </div>
           </div>
@@ -955,7 +975,7 @@ export default function MonthlySnapshotTab({
                 alignItems: "center",
               }}
             >
-              <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-primary)", margin: 0 }}>
+              <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: 0 }}>
                 Riwayat Snapshot Bulanan
               </h3>
             </div>
@@ -990,7 +1010,7 @@ export default function MonthlySnapshotTab({
                           </svg>
                         </button>
                         <button
-                          onClick={() => deleteSnapshot(snap.id)}
+                          onClick={() => setSnapshotToDelete(snap)}
                           style={{ border: "none", background: "transparent", color: "var(--color-semantic-danger)", cursor: "pointer" }}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
@@ -1103,7 +1123,7 @@ export default function MonthlySnapshotTab({
                               </svg>
                             </button>
                             <button
-                              onClick={() => deleteSnapshot(snap.id)}
+                              onClick={() => setSnapshotToDelete(snap)}
                               style={{
                                 border: "none",
                                 background: "transparent",
@@ -1309,7 +1329,7 @@ export default function MonthlySnapshotTab({
                     Pilih Bulan Pencatatan
                   </label>
                   <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                    {/* Custom Month Picker Trigger */}
+                    {/* Custom Month Picker Trigger (No calendar emoji!) */}
                     <div
                       onClick={() => !editingSnapshot && setPickerOpen(!pickerOpen)}
                       style={{
@@ -1319,7 +1339,7 @@ export default function MonthlySnapshotTab({
                         background: "var(--color-surface-input)",
                         color: "var(--color-text-primary)",
                         fontSize: "var(--text-body-size)",
-                        fontWeight: "500",
+                        fontWeight: "600",
                         flex: 1,
                         cursor: editingSnapshot ? "not-allowed" : "pointer",
                         display: "flex",
@@ -1328,7 +1348,6 @@ export default function MonthlySnapshotTab({
                         userSelect: "none"
                       }}
                     >
-                      <span>📅</span>
                       <span style={{ flex: 1 }}>{formatMonthLabelLong(formMonth) || "Pilih Bulan"}</span>
                       {!editingSnapshot && (
                         <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>▼</span>
@@ -1356,7 +1375,7 @@ export default function MonthlySnapshotTab({
                     )}
                   </div>
 
-                  {/* CUSTOM PICKER POPOVER ELEMENT */}
+                  {/* CUSTOM PICKER POPOVER ELEMENT WITH PAST & FUTURE BLOCKING */}
                   <AnimatePresence>
                     {pickerOpen && (
                       <motion.div
@@ -1397,7 +1416,12 @@ export default function MonthlySnapshotTab({
                           <span style={{ fontWeight: "bold", fontSize: 15, color: "var(--color-text-primary)" }}>{pickerYear}</span>
                           <button
                             type="button"
-                            onClick={() => setPickerYear(prev => prev + 1)}
+                            onClick={() => {
+                              const now = new Date();
+                              if (pickerYear < now.getFullYear() + 2) {
+                                setPickerYear(prev => prev + 1);
+                              }
+                            }}
                             style={{
                               width: 28, height: 28, borderRadius: "50%", border: "1.5px solid var(--color-border-subtle)",
                               background: "var(--color-surface-input)", color: "var(--color-text-primary)", cursor: "pointer",
@@ -1408,26 +1432,58 @@ export default function MonthlySnapshotTab({
                           </button>
                         </div>
                         
-                        {/* Month Grid */}
+                        {/* Month Grid with strict blocking for future & already recorded months */}
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
                           {MONTHS_INDO_SHORT.map((mShort, idx) => {
                             const currentFormMonth = String(idx + 1).padStart(2, "0");
-                            const isSelected = formMonth === `${pickerYear}-${currentFormMonth}`;
+                            const targetYM = `${pickerYear}-${currentFormMonth}`;
+                            const isSelected = formMonth === targetYM;
+                            
+                            // Check if this month is in the future
+                            const now = new Date();
+                            const currentYMInt = now.getFullYear() * 12 + now.getMonth();
+                            const pickerYMInt = pickerYear * 12 + idx;
+                            const isFuture = pickerYMInt > currentYMInt;
+
+                            // Check if this month has already been recorded in snapshots
+                            const isAlreadyRecorded = monthlySnapshots.some(s => s.yearMonth === targetYM);
+
+                            // Disabled state
+                            const isDisabled = isFuture || (isAlreadyRecorded && (!editingSnapshot || editingSnapshot.yearMonth !== targetYM));
+
                             return (
-                              <motion.div
+                              <motion.button
                                 key={idx}
+                                type="button"
+                                disabled={isDisabled}
                                 onClick={() => handleSelectMonthYear(idx)}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
+                                whileHover={!isDisabled ? { scale: 1.04 } : {}}
+                                whileTap={!isDisabled ? { scale: 0.96 } : {}}
                                 style={{
-                                  padding: "10px 0", borderRadius: 8, textAlign: "center", fontSize: 12, fontWeight: "500",
-                                  cursor: "pointer", transition: "all 0.15s",
-                                  background: isSelected ? "var(--color-semantic-brand)" : "var(--color-surface-input)",
-                                  color: isSelected ? "var(--color-white)" : "var(--color-text-primary)"
+                                  padding: "10px 0",
+                                  borderRadius: 8,
+                                  textAlign: "center",
+                                  fontSize: 12,
+                                  fontWeight: "600",
+                                  cursor: isDisabled ? "not-allowed" : "pointer",
+                                  transition: "all 0.15s",
+                                  border: "none",
+                                  background: isSelected 
+                                    ? "var(--color-semantic-brand)" 
+                                    : isDisabled 
+                                      ? "rgba(255,255,255,0.01)" 
+                                      : "var(--color-surface-input)",
+                                  color: isSelected 
+                                    ? "var(--color-white)" 
+                                    : isDisabled 
+                                      ? "var(--color-text-tertiary)" 
+                                      : "var(--color-text-primary)",
+                                  opacity: isDisabled ? 0.35 : 1,
                                 }}
+                                title={isFuture ? "Bulan depan belum bisa dicatat" : isAlreadyRecorded ? "Bulan ini sudah dicatat snapshotnya" : ""}
                               >
                                 {mShort}
-                              </motion.div>
+                              </motion.button>
                             );
                           })}
                         </div>
@@ -1436,7 +1492,7 @@ export default function MonthlySnapshotTab({
                   </AnimatePresence>
                 </div>
 
-                {/* Grid 16 Asset Inputs (Equipped with interactive Add/Remove Card Controls) */}
+                {/* Grid 16 Asset Inputs (Premium Cards without dimming, crisp active/inactive borders, and internal prefix currency symbols) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <label
                     style={{
@@ -1459,7 +1515,6 @@ export default function MonthlySnapshotTab({
                   >
                     {ASSET_CLASSES.map((cls) => {
                       const currencyPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? "USD" : "IDR");
-                      const placeholder = currencyPref === "USD" ? "$ 0" : "Rp 0";
                       
                       const isActive = activeAssetIds.includes(cls.id);
                       const val = formAssetValues[cls.id] || 0;
@@ -1472,14 +1527,15 @@ export default function MonthlySnapshotTab({
                             alignItems: "center",
                             justifyContent: "space-between",
                             gap: 12,
-                            padding: "10px 12px",
-                            background: isActive ? "transparent" : "rgba(30, 41, 59, 0.25)",
-                            borderRadius: "10px",
-                            border: `1.5px solid ${
-                              isActive ? "var(--color-border-subtle)" : "transparent"
-                            }`,
-                            opacity: isActive ? 1 : 0.45,
-                            transition: "all 0.25s ease-in-out",
+                            padding: "12px 14px",
+                            background: "var(--color-surface-card)",
+                            borderRadius: "12px",
+                            border: isActive 
+                              ? "1.5px solid var(--color-semantic-success)" 
+                              : "1.5px dashed var(--color-border-subtle)",
+                            opacity: 1, // NO DIMMING! Beautifully crisp.
+                            transition: "all 0.2s ease-in-out",
+                            boxShadow: isActive ? "0 4px 16px rgba(16, 185, 129, 0.04)" : "none",
                           }}
                         >
                           {/* Toggle active / inactive control button */}
@@ -1488,9 +1544,10 @@ export default function MonthlySnapshotTab({
                             onClick={() => handleToggleAsset(cls.id)}
                             style={{
                               width: 24, height: 24, borderRadius: "50%", border: "none",
-                              background: isActive ? "var(--color-semantic-danger-light, rgba(239, 68, 68, 0.1))" : "var(--color-semantic-success-light, rgba(16, 185, 129, 0.1))",
+                              background: isActive ? "var(--color-semantic-danger-light, rgba(239, 68, 68, 0.12))" : "var(--color-semantic-success-light, rgba(16, 185, 129, 0.12))",
                               color: isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)",
-                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: "bold"
+                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: "bold",
+                              boxShadow: "var(--shadow-sm)"
                             }}
                             title={isActive ? "Hapus dari Portofolio" : "Tambah ke Portofolio"}
                           >
@@ -1511,7 +1568,7 @@ export default function MonthlySnapshotTab({
                               <div
                                 style={{
                                   fontSize: "var(--text-body-bold-size)",
-                                  fontWeight: "var(--text-body-bold-weight)",
+                                  fontWeight: "bold",
                                   color: "var(--color-text-primary)",
                                   lineHeight: 1.2,
                                 }}
@@ -1519,30 +1576,44 @@ export default function MonthlySnapshotTab({
                                 {cls.name}
                               </div>
                               <span style={{ fontSize: 9, color: "var(--color-text-tertiary)" }}>
-                                {currencyPref} · {cls.risk}
+                                {cls.risk}
                               </span>
                             </div>
                           </div>
 
-                          {/* Value Input */}
+                          {/* Value Input Area with currency symbol embedded inside the input field */}
                           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-                            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                background: isActive ? "var(--color-surface-input)" : "rgba(255, 255, 255, 0.02)",
+                                border: isActive ? "1.5px solid var(--color-semantic-success)" : "1.5px solid var(--color-border-subtle)",
+                                borderRadius: "8px",
+                                padding: "0 10px",
+                                width: 140,
+                                transition: "border-color 0.2s"
+                              }}
+                            >
+                              <span style={{ fontSize: 12, fontWeight: "bold", color: isActive ? "var(--color-text-secondary)" : "var(--color-text-tertiary)", userSelect: "none" }}>
+                                {currencyPref === "USD" ? "$" : "Rp"}
+                              </span>
                               <input
                                 type="text"
-                                placeholder={placeholder}
+                                placeholder="0"
                                 disabled={!isActive}
                                 value={isActive && val > 0 ? (currencyPref === "USD" ? val.toLocaleString("en-US") : formatWhileTyping(val.toString())) : ""}
                                 onChange={(e) => handleAssetInputChange(cls.id, e.target.value)}
                                 style={{
-                                  padding: "6px 10px",
-                                  borderRadius: "6px",
-                                  border: "1.5px solid var(--color-border-subtle)",
-                                  background: isActive ? "var(--color-surface-input)" : "rgba(30, 41, 59, 0.05)",
+                                  border: "none",
+                                  background: "transparent",
+                                  padding: "8px 0 8px 6px",
+                                  textAlign: "right",
+                                  width: "100%",
                                   color: "var(--color-text-primary)",
                                   fontSize: 13,
-                                  textAlign: "right",
-                                  width: 130,
                                   fontFamily: tokens.typography.fontFamily,
+                                  outline: "none",
                                   cursor: isActive ? "text" : "not-allowed"
                                 }}
                               />
@@ -1633,6 +1704,105 @@ export default function MonthlySnapshotTab({
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CONFIRM DELETE SINGLE SNAPSHOT POP-UP MODAL */}
+      <AnimatePresence>
+        {snapshotToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "var(--color-overlay)",
+              backdropFilter: "blur(4px)",
+              zIndex: 9500,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 16,
+            }}
+            onClick={() => setSnapshotToDelete(null)}
+          >
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              style={{
+                background: "var(--color-surface-card)",
+                borderRadius: 16,
+                width: "100%",
+                maxWidth: 420,
+                padding: "24px",
+                border: "1.5px solid var(--color-border-subtle)",
+                boxShadow: "var(--shadow-xl)",
+                textAlign: "center",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  background: "var(--color-semantic-danger-light, rgba(239, 68, 68, 0.1))",
+                  color: "var(--color-semantic-danger)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                  marginBottom: 16,
+                }}
+              >
+                🗑️
+              </div>
+              <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: "0 0 8px 0" }}>
+                Hapus Catatan Bulanan?
+              </h3>
+              <p style={{ fontSize: "var(--text-body-size)", color: "var(--color-text-tertiary)", margin: "0 0 24px 0", lineHeight: 1.5 }}>
+                Apakah Anda yakin ingin menghapus catatan snapshot untuk bulan <strong>{formatMonthLabelLong(snapshotToDelete.yearMonth)}</strong> secara permanen?
+              </p>
+              <div style={{ display: "flex", gap: 12 }}>
+                <button
+                  onClick={() => setSnapshotToDelete(null)}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    borderRadius: "8px",
+                    border: "1.5px solid var(--color-border-subtle)",
+                    background: "var(--color-surface-input)",
+                    color: "var(--color-text-secondary)",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={() => {
+                    deleteSnapshot(snapshotToDelete.id);
+                    setSnapshotToDelete(null);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    borderRadius: "8px",
+                    border: "none",
+                    background: "var(--color-semantic-danger)",
+                    color: "var(--color-white)",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  Ya, Hapus
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
