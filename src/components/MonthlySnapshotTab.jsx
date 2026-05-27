@@ -597,30 +597,11 @@ export default function MonthlySnapshotTab({
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, width: isMobile ? "100%" : "auto" }}>
-          {monthlySnapshots.length > 0 && (
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setIsDeleteAllOpen(true)}
-              style={{
-                flex: isMobile ? 1 : "none",
-                padding: "10px 16px",
-                borderRadius: "10px",
-                border: "1.5px solid var(--color-semantic-danger)",
-                background: "transparent",
-                color: "var(--color-semantic-danger)",
-                fontWeight: "var(--text-body-bold-weight)",
-                fontSize: "var(--text-caption-size)",
-                cursor: "pointer",
-              }}
-            >
-              Hapus Semua
-            </motion.button>
-          )}
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleOpenAddModal}
             style={{
-              flex: isMobile ? 1.5 : "none",
+              flex: 1,
               padding: "10px 20px",
               borderRadius: "10px",
               border: "none",
@@ -981,6 +962,24 @@ export default function MonthlySnapshotTab({
             <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: 0 }}>
               Riwayat Snapshot Bulanan
             </h3>
+            {monthlySnapshots.length > 0 && (
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setIsDeleteAllOpen(true)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  border: "1.5px solid var(--color-semantic-danger)",
+                  background: "transparent",
+                  color: "var(--color-semantic-danger)",
+                  fontWeight: "var(--text-body-bold-weight)",
+                  fontSize: "11px",
+                  cursor: "pointer",
+                }}
+              >
+                Hapus Semua
+              </motion.button>
+            )}
           </div>
           
           {/* CONDITIONAL RENDER: PREMIUM MOBILE CARD-LIST OR DESKTOP TABLE */}

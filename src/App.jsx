@@ -1225,7 +1225,7 @@ export default function WealthTracker() {
                         style={{
                           fontSize: "var(--text-body-size)",
                           fontWeight: "var(--text-subtitle-weight)",
-                          color: "var(--color-text-primary)",
+                          color: activeTemplateId === t.id ? "var(--color-text-primary)" : "var(--color-text-tertiary)",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
