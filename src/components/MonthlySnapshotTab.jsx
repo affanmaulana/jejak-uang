@@ -218,6 +218,51 @@ export default function MonthlySnapshotTab({
     return (sumRates / snapshotsWithMetrics.length) * 100;
   }, [snapshotsWithMetrics]);
 
+  // --- ASSET DRIFT COMPARISON ---
+  const assetDriftData = useMemo(() => {
+    if (!latestSnapshot) return [];
+
+    const initialTotalIDR = Object.entries(assets).reduce((sum, [id, val]) => {
+      const cls = ASSET_CLASSES.find((c) => c.id === id);
+      if (!cls) return sum;
+      const pref = assetCurrencyPrefs[id] || (cls.isUSD ? "USD" : "IDR");
+      return sum + (pref === "USD" ? val * customUSDRate : val);
+    }, 0);
+
+    const actualTotalIDR = Object.entries(latestSnapshot.assetValues).reduce((sum, [id, val]) => {
+      const cls = ASSET_CLASSES.find((c) => c.id === id);
+      if (!cls) return sum;
+      const pref = assetCurrencyPrefs[id] || (cls.isUSD ? "USD" : "IDR");
+      return sum + (pref === "USD" ? val * customUSDRate : val);
+    }, 0);
+
+    return ASSET_CLASSES.map((cls) => {
+      const initVal = assets[cls.id] || 0;
+      const initPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? "USD" : "IDR");
+      const initValIDR = initPref === "USD" ? initVal * customUSDRate : initVal;
+      const initWeight = initialTotalIDR > 0 ? (initValIDR / initialTotalIDR) * 100 : 0;
+
+      const actVal = latestSnapshot.assetValues[cls.id] || 0;
+      const actPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? "USD" : "IDR");
+      const actValIDR = actPref === "USD" ? actVal * customUSDRate : actVal;
+      const actWeight = actualTotalIDR > 0 ? (actValIDR / actualTotalIDR) * 100 : 0;
+
+      const drift = actWeight - initWeight;
+
+      return {
+        ...cls,
+        initVal,
+        initValIDR,
+        initWeight,
+        actVal,
+        actValIDR,
+        actWeight,
+        drift,
+        pref: actPref,
+      };
+    }).filter(item => item.initValIDR > 0 || item.actValIDR > 0);
+  }, [assets, latestSnapshot, ASSET_CLASSES, customUSDRate, assetCurrencyPrefs]);
+
   // --- CHART DATA PREPARATION ---
   const chartData = useMemo(() => {
     if (sortedSnapshots.length === 0) return [];
@@ -1024,7 +1069,7 @@ export default function MonthlySnapshotTab({
                     <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Bulan</th>
                     <th style={{ padding: "12px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Total Saldo Aktual</th>
                     <th style={{ padding: "12px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Net Inflow</th>
-                    <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Catatan</th>
+                    <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold", maxWidth: "220px" }}>Catatan</th>
                     <th style={{ padding: "12px 20px", textAlign: "center", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold", width: 100 }}>Aksi</th>
                   </tr>
                 </thead>
@@ -1060,7 +1105,18 @@ export default function MonthlySnapshotTab({
                         {snap.netInflow >= 0 ? "+" : ""}
                         {formatIDR(snap.netInflow)}
                       </td>
-                      <td style={{ padding: "14px 20px", fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)" }}>
+                      <td
+                        style={{
+                          padding: "14px 20px",
+                          fontSize: "var(--text-caption-size)",
+                          color: "var(--color-text-secondary)",
+                          maxWidth: "220px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                        title={snap.notes || undefined}
+                      >
                         {snap.notes || <span style={{ color: "var(--color-text-tertiary)" }}>-</span>}
                       </td>
                       <td style={{ padding: "14px 20px", textAlign: "center" }}>
@@ -1105,6 +1161,210 @@ export default function MonthlySnapshotTab({
           )}
         </div>
       </div>
+
+      {/* ASSET DRIFT / COMPARISON SECTION */}
+      {latestSnapshot && assetDriftData.length > 0 && (
+        <div
+          style={{
+            background: "var(--color-surface-card)",
+            border: "1.5px solid var(--color-border-subtle)",
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: tokens.shadows.small,
+            marginTop: 8,
+          }}
+        >
+          <div
+            style={{
+              padding: "16px 20px",
+              borderBottom: "1.5px solid var(--color-border-subtle)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: 0 }}>
+                Pergeseran Alokasi (Asset Drift)
+              </h3>
+              <p style={{ fontSize: 11, color: "var(--color-text-tertiary)", margin: "4px 0 0 0" }}>
+                Membandingkan alokasi rencana awal (Tab Input) dengan realisasi snapshot terbaru ({formatMonthLabelLong(latestSnapshot.yearMonth)}).
+              </p>
+            </div>
+          </div>
+          
+          <div style={{ padding: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
+              {assetDriftData.map((item) => {
+                const isOverweight = item.drift > 0;
+                const isUnderweight = item.drift < 0;
+                
+                return (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: "var(--color-surface-input)",
+                      border: "1px solid var(--color-border-subtle)",
+                      borderRadius: 12,
+                      padding: 16,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {/* Top Row: Asset Class Name & Drift Pill */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 8,
+                            background: "var(--color-surface-card)",
+                            border: "1px solid var(--color-border-subtle)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 16,
+                          }}
+                        >
+                          {item.icon || "💰"}
+                        </div>
+                        <div>
+                          <span style={{ fontSize: 14, fontWeight: "bold", color: "var(--color-text-primary)" }}>
+                            {item.name}
+                          </span>
+                          <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                            {item.category}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Drift Status Pill */}
+                      <div
+                        style={{
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontSize: 11,
+                          fontWeight: "bold",
+                          background: isOverweight
+                            ? "rgba(16, 185, 129, 0.1)"
+                            : isUnderweight
+                            ? "rgba(239, 68, 68, 0.1)"
+                            : "rgba(100, 116, 139, 0.1)",
+                          color: isOverweight
+                            ? "var(--color-semantic-success)"
+                            : isUnderweight
+                            ? "var(--color-semantic-danger)"
+                            : "var(--color-text-secondary)",
+                          border: `1px solid ${
+                            isOverweight
+                              ? "rgba(16, 185, 129, 0.2)"
+                              : isUnderweight
+                              ? "rgba(239, 68, 68, 0.2)"
+                              : "rgba(100, 116, 139, 0.2)"
+                          }`,
+                        }}
+                      >
+                        {isOverweight ? `+${item.drift.toFixed(1)}%` : item.drift.toFixed(1)}% {isOverweight ? "Surplus" : isUnderweight ? "Defisit" : "Sesuai"}
+                      </div>
+                    </div>
+                    
+                    {/* Middle Row: Comparison Details */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, background: "var(--color-surface-card)", padding: 10, borderRadius: 8, border: "1px solid var(--color-border-subtle)" }}>
+                      {/* Target Plan */}
+                      <div>
+                        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>Rencana Awal</div>
+                        <div style={{ fontSize: 13, fontWeight: "bold", color: "var(--color-text-primary)", marginTop: 2 }}>
+                          {item.initWeight.toFixed(1)}%
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 1 }}>
+                          {formatIDR(item.initValIDR)}
+                          {item.pref === "USD" && item.initVal > 0 && (
+                            <span style={{ fontSize: 9, color: "var(--color-text-tertiary)", display: "block" }}>
+                              (${item.initVal.toLocaleString()})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Newest Snapshot Actual */}
+                      <div>
+                        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>Snapshot Terbaru</div>
+                        <div style={{ fontSize: 13, fontWeight: "bold", color: "var(--color-text-primary)", marginTop: 2 }}>
+                          {item.actWeight.toFixed(1)}%
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 1 }}>
+                          {formatIDR(item.actValIDR)}
+                          {item.pref === "USD" && item.actVal > 0 && (
+                            <span style={{ fontSize: 9, color: "var(--color-text-tertiary)", display: "block" }}>
+                              (${item.actVal.toLocaleString()})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Bottom Row: Visual Progress Bar Meter */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--color-text-tertiary)" }}>
+                        <span>Distribusi Alokasi:</span>
+                        <span>Rencana vs Aktual</span>
+                      </div>
+                      
+                      {/* Progress Bar Container */}
+                      <div style={{ position: "relative", height: 8, background: "var(--color-surface-card)", borderRadius: 4, overflow: "hidden", border: "1px solid var(--color-border-subtle)" }}>
+                        {/* Actual Weight Bar */}
+                        <div
+                          style={{
+                            height: "100%",
+                            width: `${Math.min(item.actWeight, 100)}%`,
+                            background: isOverweight
+                              ? "var(--color-semantic-success)"
+                              : "var(--color-semantic-brand)",
+                            borderRadius: 4,
+                            transition: "width 0.5s ease",
+                          }}
+                        />
+                        {/* Plan/Target Weight Overlay Line/Marker */}
+                        {item.initWeight > 0 && item.initWeight < 100 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              left: `${item.initWeight}%`,
+                              top: 0,
+                              bottom: 0,
+                              width: 2,
+                              background: "var(--color-text-primary)",
+                              opacity: 0.8,
+                              zIndex: 2,
+                            }}
+                            title={`Target Alokasi: ${item.initWeight.toFixed(1)}%`}
+                          />
+                        )}
+                      </div>
+                      
+                      {/* Visual Legend Description */}
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "var(--color-text-tertiary)" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <span style={{ width: 6, height: 6, background: "var(--color-semantic-brand)", borderRadius: "50%" }} />
+                          Aktual
+                        </span>
+                        {item.initWeight > 0 && (
+                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <span style={{ width: 2, height: 6, background: "var(--color-text-primary)" }} />
+                            Rencana (${item.initWeight.toFixed(0)}%)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FORM MODAL FOR RECORDING SNAPSHOT */}
       <AnimatePresence>
