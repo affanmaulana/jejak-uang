@@ -1416,6 +1416,7 @@ export default function WealthTracker() {
                 formatWhileTyping={formatWhileTyping}
                 activeTemplateId={activeTemplateId}
                 userTemplates={userTemplates}
+                monthlyContribs={monthlyContribs}
               />
             </PageTransition>
           )}

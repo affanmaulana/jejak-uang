@@ -37,6 +37,7 @@ export default function MonthlySnapshotTab({
   deleteSnapshot,
   deleteAllSnapshots,
   assets,
+  monthlyContribs,
   customReturnOverrides,
   showAfterTax,
   formatIDR,
