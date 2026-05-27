@@ -1178,190 +1178,125 @@ export default function MonthlySnapshotTab({
             style={{
               padding: "16px 20px",
               borderBottom: "1.5px solid var(--color-border-subtle)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
             }}
           >
-            <div>
-              <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: 0 }}>
-                Pergeseran Alokasi (Asset Drift)
-              </h3>
-              <p style={{ fontSize: 11, color: "var(--color-text-tertiary)", margin: "4px 0 0 0" }}>
-                Membandingkan alokasi rencana awal (Tab Input) dengan realisasi snapshot terbaru ({formatMonthLabelLong(latestSnapshot.yearMonth)}).
-              </p>
-            </div>
+            <h3 style={{ fontSize: "var(--text-subtitle-size)", fontWeight: "bold", color: "var(--color-text-primary)", margin: 0 }}>
+              Pergeseran Alokasi (Asset Drift)
+            </h3>
+            <p style={{ fontSize: 11, color: "var(--color-text-tertiary)", margin: "4px 0 0 0" }}>
+              Membandingkan nominal dan bobot alokasi rencana awal dengan realisasi snapshot terbaru ({formatMonthLabelLong(latestSnapshot.yearMonth)}).
+            </p>
           </div>
           
-          <div style={{ padding: 20 }}>
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
-              {assetDriftData.map((item) => {
-                const isOverweight = item.drift > 0;
-                const isUnderweight = item.drift < 0;
-                
-                return (
-                  <div
-                    key={item.id}
-                    style={{
-                      background: "var(--color-surface-input)",
-                      border: "1px solid var(--color-border-subtle)",
-                      borderRadius: 12,
-                      padding: 16,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 12,
-                    }}
-                  >
-                    {/* Top Row: Asset Class Name & Drift Pill */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div
-                          style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 8,
-                            background: "var(--color-surface-card)",
-                            border: "1px solid var(--color-border-subtle)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 16,
-                          }}
-                        >
-                          {item.icon || "💰"}
-                        </div>
-                        <div>
-                          <span style={{ fontSize: 14, fontWeight: "bold", color: "var(--color-text-primary)" }}>
-                            {item.name}
-                          </span>
-                          <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                            {item.category}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Drift Status Pill */}
-                      <div
-                        style={{
-                          padding: "4px 8px",
-                          borderRadius: 6,
-                          fontSize: 11,
-                          fontWeight: "bold",
-                          background: isOverweight
-                            ? "rgba(16, 185, 129, 0.1)"
-                            : isUnderweight
-                            ? "rgba(239, 68, 68, 0.1)"
-                            : "rgba(100, 116, 139, 0.1)",
-                          color: isOverweight
-                            ? "var(--color-semantic-success)"
-                            : isUnderweight
-                            ? "var(--color-semantic-danger)"
-                            : "var(--color-text-secondary)",
-                          border: `1px solid ${
-                            isOverweight
-                              ? "rgba(16, 185, 129, 0.2)"
-                              : isUnderweight
-                              ? "rgba(239, 68, 68, 0.2)"
-                              : "rgba(100, 116, 139, 0.2)"
-                          }`,
-                        }}
-                      >
-                        {isOverweight ? `+${item.drift.toFixed(1)}%` : item.drift.toFixed(1)}% {isOverweight ? "Surplus" : isUnderweight ? "Defisit" : "Sesuai"}
-                      </div>
-                    </div>
-                    
-                    {/* Middle Row: Comparison Details */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, background: "var(--color-surface-card)", padding: 10, borderRadius: 8, border: "1px solid var(--color-border-subtle)" }}>
-                      {/* Target Plan */}
-                      <div>
-                        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>Rencana Awal</div>
-                        <div style={{ fontSize: 13, fontWeight: "bold", color: "var(--color-text-primary)", marginTop: 2 }}>
-                          {item.initWeight.toFixed(1)}%
-                        </div>
-                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 1 }}>
-                          {formatIDR(item.initValIDR)}
-                          {item.pref === "USD" && item.initVal > 0 && (
-                            <span style={{ fontSize: 9, color: "var(--color-text-tertiary)", display: "block" }}>
-                              (${item.initVal.toLocaleString()})
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Newest Snapshot Actual */}
-                      <div>
-                        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>Snapshot Terbaru</div>
-                        <div style={{ fontSize: 13, fontWeight: "bold", color: "var(--color-text-primary)", marginTop: 2 }}>
-                          {item.actWeight.toFixed(1)}%
-                        </div>
-                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 1 }}>
-                          {formatIDR(item.actValIDR)}
-                          {item.pref === "USD" && item.actVal > 0 && (
-                            <span style={{ fontSize: 9, color: "var(--color-text-tertiary)", display: "block" }}>
-                              (${item.actVal.toLocaleString()})
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Bottom Row: Visual Progress Bar Meter */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--color-text-tertiary)" }}>
-                        <span>Distribusi Alokasi:</span>
-                        <span>Rencana vs Aktual</span>
-                      </div>
-                      
-                      {/* Progress Bar Container */}
-                      <div style={{ position: "relative", height: 8, background: "var(--color-surface-card)", borderRadius: 4, overflow: "hidden", border: "1px solid var(--color-border-subtle)" }}>
-                        {/* Actual Weight Bar */}
-                        <div
-                          style={{
-                            height: "100%",
-                            width: `${Math.min(item.actWeight, 100)}%`,
-                            background: isOverweight
-                              ? "var(--color-semantic-success)"
-                              : "var(--color-semantic-brand)",
-                            borderRadius: 4,
-                            transition: "width 0.5s ease",
-                          }}
-                        />
-                        {/* Plan/Target Weight Overlay Line/Marker */}
-                        {item.initWeight > 0 && item.initWeight < 100 && (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
+              <thead>
+                <tr style={{ borderBottom: "1.5px solid var(--color-border-subtle)", background: "var(--color-surface-app)" }}>
+                  <th style={{ padding: "14px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Alokasi Aset</th>
+                  <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Rencana Awal</th>
+                  <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Snapshot Terbaru</th>
+                  <th style={{ padding: "14px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Perubahan Alokasi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {assetDriftData.map((item) => {
+                  const diffValIDR = item.actValIDR - item.initValIDR;
+                  const diffWeight = item.actWeight - item.initWeight;
+                  
+                  const isPositive = diffValIDR > 0;
+                  const isNegative = diffValIDR < 0;
+                  
+                  return (
+                    <tr
+                      key={item.id}
+                      style={{
+                        borderBottom: "1px solid var(--color-border-subtle)",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-surface-input)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                    >
+                      {/* Asset name & Icon */}
+                      <td style={{ padding: "14px 20px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <div
                             style={{
-                              position: "absolute",
-                              left: `${item.initWeight}%`,
-                              top: 0,
-                              bottom: 0,
-                              width: 2,
-                              background: "var(--color-text-primary)",
-                              opacity: 0.8,
-                              zIndex: 2,
+                              width: 32,
+                              height: 32,
+                              borderRadius: 8,
+                              background: "var(--color-surface-input)",
+                              border: "1px solid var(--color-border-subtle)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 16,
                             }}
-                            title={`Target Alokasi: ${item.initWeight.toFixed(1)}%`}
-                          />
-                        )}
-                      </div>
+                          >
+                            {item.icon || "💰"}
+                          </div>
+                          <div>
+                            <span style={{ fontSize: 14, fontWeight: "bold", color: "var(--color-text-primary)" }}>
+                              {item.name}
+                            </span>
+                            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
+                              {item.category}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
                       
-                      {/* Visual Legend Description */}
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "var(--color-text-tertiary)" }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <span style={{ width: 6, height: 6, background: "var(--color-semantic-brand)", borderRadius: "50%" }} />
-                          Aktual
-                        </span>
-                        {item.initWeight > 0 && (
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ width: 2, height: 6, background: "var(--color-text-primary)" }} />
-                            Rencana (${item.initWeight.toFixed(0)}%)
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      {/* Rencana Awal */}
+                      <td style={{ padding: "14px 20px", textAlign: "right" }}>
+                        <div style={{ fontSize: 14, fontWeight: "500", color: "var(--color-text-primary)" }}>
+                          {formatIDR(item.initValIDR)}
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
+                          {item.initWeight.toFixed(1)}% alokasi
+                        </div>
+                      </td>
+                      
+                      {/* Snapshot Terbaru */}
+                      <td style={{ padding: "14px 20px", textAlign: "right" }}>
+                        <div style={{ fontSize: 14, fontWeight: "500", color: "var(--color-text-primary)" }}>
+                          {formatIDR(item.actValIDR)}
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
+                          {item.actWeight.toFixed(1)}% alokasi
+                        </div>
+                      </td>
+                      
+                      {/* Perubahan Alokasi */}
+                      <td
+                        style={{
+                          padding: "14px 20px",
+                          textAlign: "right",
+                          background: isPositive
+                            ? "rgba(16, 185, 129, 0.06)"
+                            : isNegative
+                            ? "rgba(239, 68, 68, 0.06)"
+                            : "transparent",
+                          color: isPositive
+                            ? "var(--color-semantic-success)"
+                            : isNegative
+                            ? "var(--color-semantic-danger)"
+                            : "var(--color-text-secondary)",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        <div style={{ fontSize: 14 }}>
+                          {diffValIDR > 0 ? "+" : ""}
+                          {formatIDR(diffValIDR)}
+                        </div>
+                        <div style={{ fontSize: 11, marginTop: 2 }}>
+                          {diffWeight > 0 ? "+" : ""}
+                          {diffWeight.toFixed(1)}% alokasi
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
