@@ -296,6 +296,17 @@ export default function WealthTracker() {
     setActiveTemplateId(t.id);
   };
 
+  // Helper to determine active asset IDs based on the newest snapshot
+  const getNewestSnapshotActiveIds = (snapshots, fallbackIds) => {
+    if (!snapshots || snapshots.length === 0) return fallbackIds;
+    const sorted = [...snapshots].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+    const latest = sorted[sorted.length - 1];
+    const activeIds = Object.entries(latest.assetValues)
+      .filter(([_, val]) => val > 0)
+      .map(([id, _]) => id);
+    return activeIds.length > 0 ? activeIds : fallbackIds;
+  };
+
   // --- CRUD MONTHLY SNAPSHOTS ---
   const addSnapshot = (snapshot) => {
     if (monthlySnapshots.some(s => s.yearMonth === snapshot.yearMonth)) {
@@ -306,6 +317,9 @@ export default function WealthTracker() {
     const updatedSnapshots = [...monthlySnapshots, snapshot].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
     setMonthlySnapshots(updatedSnapshots);
     
+    const newestActiveIds = getNewestSnapshotActiveIds(updatedSnapshots, activeAssetIds);
+    setActiveAssetIds(newestActiveIds);
+    
     if (activeTemplateId) {
       setUserTemplates((prev) =>
         prev.map((t) => {
@@ -313,6 +327,7 @@ export default function WealthTracker() {
             return {
               ...t,
               monthlySnapshots: updatedSnapshots,
+              activeIds: newestActiveIds,
               updatedAt: new Date().toISOString(),
             };
           }
@@ -337,6 +352,9 @@ export default function WealthTracker() {
     });
     setMonthlySnapshots(updatedSnapshots);
     
+    const newestActiveIds = getNewestSnapshotActiveIds(updatedSnapshots, activeAssetIds);
+    setActiveAssetIds(newestActiveIds);
+    
     if (activeTemplateId) {
       setUserTemplates((prev) =>
         prev.map((t) => {
@@ -344,6 +362,7 @@ export default function WealthTracker() {
             return {
               ...t,
               monthlySnapshots: updatedSnapshots,
+              activeIds: newestActiveIds,
               updatedAt: new Date().toISOString(),
             };
           }
@@ -358,6 +377,9 @@ export default function WealthTracker() {
     const updatedSnapshots = monthlySnapshots.filter((s) => s.id !== monthId);
     setMonthlySnapshots(updatedSnapshots);
     
+    const newestActiveIds = getNewestSnapshotActiveIds(updatedSnapshots, activeAssetIds);
+    setActiveAssetIds(newestActiveIds);
+    
     if (activeTemplateId) {
       setUserTemplates((prev) =>
         prev.map((t) => {
@@ -365,6 +387,7 @@ export default function WealthTracker() {
             return {
               ...t,
               monthlySnapshots: updatedSnapshots,
+              activeIds: newestActiveIds,
               updatedAt: new Date().toISOString(),
             };
           }
@@ -377,6 +400,7 @@ export default function WealthTracker() {
 
   const deleteAllSnapshots = () => {
     setMonthlySnapshots([]);
+    // Do not reset activeAssetIds as there's no snapshot left to derive from, keep current
     if (activeTemplateId) {
       setUserTemplates((prev) =>
         prev.map((t) => {
@@ -1402,6 +1426,7 @@ export default function WealthTracker() {
                 customUSDRate={customUSDRate}
                 assetCurrencyPrefs={assetCurrencyPrefs}
                 activeAssetIds={activeAssetIds}
+                setActiveAssetIds={setActiveAssetIds}
                 monthlySnapshots={monthlySnapshots}
                 addSnapshot={addSnapshot}
                 updateSnapshot={updateSnapshot}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ResponsiveContainer,
@@ -15,15 +15,32 @@ import {
   parseYearMonth,
   formatYearMonth,
   calculateMonthlyNetReturn,
-  afterTaxReturn, // imported from formatters as well
+  afterTaxReturn,
 } from "../utils/formatters";
 
-// Slide animation variants for modal
+// Slide animation variants for modal/dropdowns
 const modalVariants = {
   hidden: { scale: 0.95, opacity: 0, y: 20 },
   visible: { scale: 1, opacity: 1, y: 0 },
   exit: { scale: 0.95, opacity: 0, y: 20 },
 };
+
+const popoverVariants = {
+  hidden: { opacity: 0, y: -10, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -10, scale: 0.95 },
+};
+
+// 12 Indonesian months list
+const MONTHS_INDO = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+];
+
+const MONTHS_INDO_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Agt", "Sep", "Okt", "Nov", "Des"
+];
 
 export default function MonthlySnapshotTab({
   tokens,
@@ -31,6 +48,7 @@ export default function MonthlySnapshotTab({
   customUSDRate,
   assetCurrencyPrefs,
   activeAssetIds,
+  setActiveAssetIds, // REQUIRED FOR SNAPSHOT MUTATIONS
   monthlySnapshots,
   addSnapshot,
   updateSnapshot,
@@ -47,20 +65,55 @@ export default function MonthlySnapshotTab({
   activeTemplateId,
   userTemplates,
 }) {
+  // --- MOBILE SCREEN STATE ---
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // --- UI STATES ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSnapshot, setEditingSnapshot] = useState(null); // null for new, snapshot object for edit
   const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
 
   // --- FORM STATES ---
-  const [formMonth, setFormMonth] = useState("");
+  const [formMonth, setFormMonth] = useState(""); // YYYY-MM
   const [formAssetValues, setFormAssetValues] = useState({});
   const [formNotes, setFormNotes] = useState("");
+
+  // --- CUSTOM MONTH PICKER STATES ---
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerYear, setPickerYear] = useState(new Date().getFullYear());
+  const pickerRef = useRef(null);
+
+  // Close month picker popover on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setPickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Sort snapshots for calculations
   const sortedSnapshots = useMemo(() => {
     return [...monthlySnapshots].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
   }, [monthlySnapshots]);
+
+  // --- INITIAL PORTFOLIO VALUE (Month 0) ---
+  const initialPortfolioValue = useMemo(() => {
+    return Object.entries(assets).reduce((sum, [id, val]) => {
+      const cls = ASSET_CLASSES.find((c) => c.id === id);
+      if (!cls) return sum;
+      const pref = assetCurrencyPrefs[id] || (cls.isUSD ? "USD" : "IDR");
+      return sum + (pref === "USD" ? val * customUSDRate : val);
+    }, 0);
+  }, [assets, customUSDRate, assetCurrencyPrefs, ASSET_CLASSES]);
 
   // --- DERIVED METRICS ---
   
@@ -97,11 +150,19 @@ export default function MonthlySnapshotTab({
 
       // Determine previous month balances
       let prevAssets = null;
+      let prevTotalIDR = 0;
       if (idx === 0) {
         // Compare with initial plan assets
         prevAssets = assets;
+        prevTotalIDR = initialPortfolioValue;
       } else {
         prevAssets = sortedSnapshots[idx - 1].assetValues;
+        prevTotalIDR = Object.entries(prevAssets).reduce((sum, [id, val]) => {
+          const cls = ASSET_CLASSES.find((c) => c.id === id);
+          if (!cls) return sum;
+          const pref = assetCurrencyPrefs[id] || (cls.isUSD ? "USD" : "IDR");
+          return sum + (pref === "USD" ? val * customUSDRate : val);
+        }, 0);
       }
 
       // Calculate Net Inflow
@@ -122,24 +183,41 @@ export default function MonthlySnapshotTab({
         netInflow += inflowValIDR;
       });
 
+      // Calculate actual rate of return for this month:
+      // returnRate = (totalIDR - netInflow) / prevTotalIDR - 1
+      let returnRate = 0;
+      if (prevTotalIDR > 0) {
+        returnRate = (totalIDR - (idx === 0 ? totalIDR - prevTotalIDR : netInflow)) / prevTotalIDR - 1;
+      }
+
       list.push({
         ...snap,
         totalPortfolio: totalIDR,
-        netInflow: idx === 0 ? totalIDR - Object.entries(assets).reduce((s, [i, v]) => {
-          const c = ASSET_CLASSES.find(x => x.id === i);
-          if (!c) return s;
-          const p = assetCurrencyPrefs[i] || (c.isUSD ? "USD" : "IDR");
-          return s + (p === "USD" ? v * customUSDRate : v);
-        }, 0) : netInflow, // for the first snapshot, we compare actual total vs initial total
+        netInflow: idx === 0 ? totalIDR - prevTotalIDR : netInflow,
+        prevTotalPortfolio: prevTotalIDR,
+        monthlyReturnRate: returnRate,
       });
     });
 
     return list;
-  }, [sortedSnapshots, assets, customReturnOverrides, customUSDRate, assetCurrencyPrefs, ASSET_CLASSES]);
+  }, [sortedSnapshots, assets, initialPortfolioValue, customReturnOverrides, customUSDRate, assetCurrencyPrefs, ASSET_CLASSES]);
 
   // 3. Accumulative Net Inflow
   const totalNetInflow = useMemo(() => {
     return snapshotsWithMetrics.reduce((sum, snap) => sum + snap.netInflow, 0);
+  }, [snapshotsWithMetrics]);
+
+  // 4. Portfolio Growth Percentage
+  const growthPercentage = useMemo(() => {
+    if (initialPortfolioValue === 0) return 0;
+    return ((latestPortfolioValue - initialPortfolioValue) / initialPortfolioValue) * 100;
+  }, [latestPortfolioValue, initialPortfolioValue]);
+
+  // 5. Average Monthly Return Rate (Rata-rata Return Bulanan Aktual)
+  const averageMonthlyReturn = useMemo(() => {
+    if (snapshotsWithMetrics.length === 0) return 0;
+    const sumRates = snapshotsWithMetrics.reduce((sum, snap) => sum + snap.monthlyReturnRate, 0);
+    return (sumRates / snapshotsWithMetrics.length) * 100;
   }, [snapshotsWithMetrics]);
 
   // --- CHART DATA PREPARATION ---
@@ -185,12 +263,7 @@ export default function MonthlySnapshotTab({
 
       if (m === 0) {
         // Month 0 is initial assets
-        actualTotal = Object.entries(assets).reduce((sum, [id, val]) => {
-          const cls = ASSET_CLASSES.find((c) => c.id === id);
-          if (!cls) return sum;
-          const pref = assetCurrencyPrefs[id] || (cls.isUSD ? "USD" : "IDR");
-          return sum + (pref === "USD" ? val * customUSDRate : val);
-        }, 0);
+        actualTotal = initialPortfolioValue;
         isSnapshotMonth = true;
       } else if (exactSnap) {
         actualTotal = Object.entries(exactSnap.assetValues).reduce((sum, [id, val]) => {
@@ -254,7 +327,7 @@ export default function MonthlySnapshotTab({
     }
 
     return dataList;
-  }, [sortedSnapshots, assets, monthlyContribs, customReturnOverrides, showAfterTax, customUSDRate, assetCurrencyPrefs, snapshotsWithMetrics]);
+  }, [sortedSnapshots, assets, monthlyContribs, customReturnOverrides, showAfterTax, customUSDRate, assetCurrencyPrefs, snapshotsWithMetrics, initialPortfolioValue]);
 
   // --- CRUD TRIGGERS ---
   const handleOpenAddModal = () => {
@@ -272,6 +345,10 @@ export default function MonthlySnapshotTab({
     
     setFormMonth(nextMonthYM);
     
+    // Sync picker defaults
+    const [y, m] = nextMonthYM.split("-").map(Number);
+    setPickerYear(y);
+
     // Initialize form inputs with values of the latest snapshot or current assets state
     const initialValues = {};
     ASSET_CLASSES.forEach((c) => {
@@ -291,6 +368,9 @@ export default function MonthlySnapshotTab({
     setEditingSnapshot(snap);
     setFormMonth(snap.yearMonth);
     
+    const [y, m] = snap.yearMonth.split("-").map(Number);
+    setPickerYear(y);
+
     const assetVals = {};
     ASSET_CLASSES.forEach((c) => {
       assetVals[c.id] = snap.assetValues[c.id] || 0;
@@ -312,7 +392,6 @@ export default function MonthlySnapshotTab({
   };
 
   const handleAssetInputChange = (id, str) => {
-    // Format while typing & store evaluated raw number
     const evaluated = parseExpression(str);
     setFormAssetValues((prev) => ({
       ...prev,
@@ -320,28 +399,43 @@ export default function MonthlySnapshotTab({
     }));
   };
 
+  // --- IN-MODAL ASSET ADD/REMOVE TOGGLE ---
+  const handleToggleAsset = (id) => {
+    if (activeAssetIds.includes(id)) {
+      // Remove from active list
+      setActiveAssetIds((prev) => prev.filter((aid) => aid !== id));
+      // Set balance to 0 in form
+      setFormAssetValues((prev) => ({ ...prev, [id]: 0 }));
+    } else {
+      // Add to active list
+      setActiveAssetIds((prev) => [...prev, id]);
+    }
+  };
+
   const handleSaveForm = (e) => {
     e.preventDefault();
     if (!formMonth) return;
 
-    // Enforce positive validation for numbers
+    // Enforce positive validation for numbers, only save active assets
     const cleanedValues = {};
     ASSET_CLASSES.forEach((c) => {
-      cleanedValues[c.id] = Math.max(0, formAssetValues[c.id] || 0);
+      if (activeAssetIds.includes(c.id)) {
+        cleanedValues[c.id] = Math.max(0, formAssetValues[c.id] || 0);
+      } else {
+        cleanedValues[c.id] = 0;
+      }
     });
 
     if (editingSnapshot) {
-      // Edit mode
       updateSnapshot(editingSnapshot.id, cleanedValues, formNotes);
     } else {
-      // Add mode
       const success = addSnapshot({
         id: formMonth,
         yearMonth: formMonth,
         assetValues: cleanedValues,
         notes: formNotes,
       });
-      if (!success) return; // duplicate month handles inside addSnapshot
+      if (!success) return;
     }
     setIsModalOpen(false);
   };
@@ -350,9 +444,104 @@ export default function MonthlySnapshotTab({
   const formatMonthLabelLong = (ym) => {
     if (!ym) return "";
     const [y, m] = ym.split("-").map(Number);
-    const date = new Date(y, m - 1, 1);
-    return date.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+    return `${MONTHS_INDO[m - 1]} ${y}`;
   };
+
+  const formatMonthLabelShort = (ym) => {
+    if (!ym) return "";
+    const [y, m] = ym.split("-").map(Number);
+    return `${MONTHS_INDO_SHORT[m - 1]} ${String(y).substring(2)}`;
+  };
+
+  // --- PICKER ACTION ---
+  const handleSelectMonthYear = (monthIdx) => {
+    const monthStr = String(monthIdx + 1).padStart(2, "0");
+    const ym = `${pickerYear}-${monthStr}`;
+    setFormMonth(ym);
+    setPickerOpen(false);
+  };
+
+  // If no active profile, show premium onboarding screen to avoid bleed-over
+  if (!activeTemplateId) {
+    return (
+      <div
+        style={{
+          background: "var(--color-surface-card)",
+          border: "1.5px solid var(--color-border-subtle)",
+          borderRadius: 20,
+          padding: "60px 30px",
+          textAlign: "center",
+          boxShadow: tokens.shadows.medium,
+          maxWidth: 680,
+          margin: "40px auto 20px auto",
+          backdropFilter: "blur(16px)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 20,
+        }}
+      >
+        <div
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, var(--color-surface-input) 0%, rgba(30, 41, 59, 0.4) 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--color-semantic-warning)",
+            border: "1.5px solid var(--color-border-subtle)",
+            fontSize: 32,
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          🔒
+        </div>
+        <div>
+          <h2
+            style={{
+              fontSize: "var(--text-h2-size)",
+              fontWeight: "var(--text-h2-weight)",
+              color: "var(--color-text-primary)",
+              margin: "0 0 10px 0",
+            }}
+          >
+            Aktifkan Profil Anda Terlebih Dahulu
+          </h2>
+          <p
+            style={{
+              fontSize: "var(--text-body-size)",
+              color: "var(--color-text-tertiary)",
+              lineHeight: 1.6,
+              maxWidth: 480,
+              margin: "0 auto",
+            }}
+          >
+            Catatan Snapshot Bulanan memerlukan basis data rencana awal agar komparasi dan kalkulasi return bulanan aktual berjalan akurat.
+          </p>
+        </div>
+        <div
+          style={{
+            background: "var(--color-surface-input)",
+            border: "1px dashed var(--color-border-subtle)",
+            borderRadius: 12,
+            padding: "16px 20px",
+            width: "100%",
+            fontSize: "var(--text-caption-size)",
+            color: "var(--color-text-secondary)",
+            textAlign: "left",
+            lineHeight: 1.5,
+          }}
+        >
+          💡 <strong>Tips Cepat:</strong> Masuk ke tab <strong>"Input"</strong> di bagian bawah, lalu pilih profil aktif Anda di baris atas, atau buat profil baru dalam 5 detik jika Anda belum memilikinya.
+        </div>
+        <p style={{ margin: 0, fontSize: 11, color: "var(--color-text-tertiary)" }}>
+          *Setiap profil menyimpan snapshot independennya sendiri secara rapi dan otomatis.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -363,7 +552,7 @@ export default function MonthlySnapshotTab({
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: 12,
+          gap: 16,
         }}
       >
         <div>
@@ -384,24 +573,19 @@ export default function MonthlySnapshotTab({
               margin: "4px 0 0 0",
             }}
           >
-            Bandingkan perkembangan saldo aset riil Anda dengan proyeksi rencana awal.
-            {activeTemplateId ? (
-              <span style={{ color: "var(--color-semantic-brand)", marginLeft: 6 }}>
-                 Profil Aktif: {userTemplates.find((t) => t.id === activeTemplateId)?.name}
-              </span>
-            ) : (
-              <span style={{ color: "var(--color-semantic-warning)", marginLeft: 6 }}>
-                ⚠️ Mode Draft (Data tidak tersimpan permanen. Klik "Simpan Baru" di Tab Input)
-              </span>
-            )}
+            Bandingkan saldo aktual Anda dengan rencana awal.
+            <span style={{ color: "var(--color-semantic-brand)", marginLeft: 6, fontWeight: "bold" }}>
+              👤 Profil Aktif: {userTemplates.find((t) => t.id === activeTemplateId)?.name}
+            </span>
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, width: isMobile ? "100%" : "auto" }}>
           {monthlySnapshots.length > 0 && (
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={() => setIsDeleteAllOpen(true)}
               style={{
+                flex: isMobile ? 1 : "none",
                 padding: "10px 16px",
                 borderRadius: "10px",
                 border: "1.5px solid var(--color-semantic-danger)",
@@ -419,6 +603,7 @@ export default function MonthlySnapshotTab({
             whileTap={{ scale: 0.97 }}
             onClick={handleOpenAddModal}
             style={{
+              flex: isMobile ? 1.5 : "none",
               padding: "10px 20px",
               borderRadius: "10px",
               border: "none",
@@ -429,6 +614,7 @@ export default function MonthlySnapshotTab({
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: 6,
               boxShadow: "var(--shadow-glow)",
             }}
@@ -437,9 +623,9 @@ export default function MonthlySnapshotTab({
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={2}
+              strokeWidth={2.5}
               stroke="currentColor"
-              style={{ width: 16, height: 16 }}
+              style={{ width: 14, height: 14 }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
@@ -448,21 +634,21 @@ export default function MonthlySnapshotTab({
         </div>
       </div>
 
-      {/* THREE HEADER CARDS */}
+      {/* RE-ARCHITECTED DASHBOARD METRIC CARDS */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: 16,
         }}
       >
-        {/* CARD 1: TOTAL PORTFOLIO */}
+        {/* CARD 1: TOTAL PORTFOLIO ACTUAL */}
         <div
           style={{
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: "18px 20px",
             boxShadow: tokens.shadows.small,
             display: "flex",
             flexDirection: "column",
@@ -477,11 +663,12 @@ export default function MonthlySnapshotTab({
               fontSize: "var(--text-h2-size)",
               fontWeight: "var(--text-h1-weight)",
               color: "var(--color-text-primary)",
+              lineHeight: 1.2,
             }}
           >
             {formatCompact(latestPortfolioValue)}
           </div>
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)" }}>
+          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
             {latestSnapshot
               ? `Terakhir dicatat: ${formatMonthLabelLong(latestSnapshot.yearMonth)}`
               : "Belum ada catatan snapshot"}
@@ -494,7 +681,7 @@ export default function MonthlySnapshotTab({
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: "18px 20px",
             boxShadow: tokens.shadows.small,
             display: "flex",
             flexDirection: "column",
@@ -502,7 +689,7 @@ export default function MonthlySnapshotTab({
           }}
         >
           <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
-            Akumulasi Kontribusi Bersih (Net Inflow)
+            Kontribusi Bersih (Net Inflow)
           </div>
           <div
             style={{
@@ -512,23 +699,24 @@ export default function MonthlySnapshotTab({
                 totalNetInflow >= 0
                   ? "var(--color-semantic-success)"
                   : "var(--color-semantic-danger)",
+              lineHeight: 1.2,
             }}
           >
             {totalNetInflow >= 0 ? "+" : ""}
             {formatCompact(totalNetInflow)}
           </div>
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)" }}>
-            Total dana segar yang Anda tambahkan ke portofolio Anda.
+          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
+            Total dana segar yang Anda tambahkan.
           </div>
         </div>
 
-        {/* CARD 3: SNAPSHOT COUNT */}
+        {/* CARD 3: PORTFOLIO GROWTH PERCENTAGE */}
         <div
           style={{
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: "18px 20px",
             boxShadow: tokens.shadows.small,
             display: "flex",
             flexDirection: "column",
@@ -536,19 +724,59 @@ export default function MonthlySnapshotTab({
           }}
         >
           <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
-            Total Bulan Tercatat
+            Persentase Kenaikan Portofolio
           </div>
           <div
             style={{
               fontSize: "var(--text-h2-size)",
               fontWeight: "var(--text-h1-weight)",
-              color: "var(--color-semantic-brand)",
+              color:
+                growthPercentage >= 0
+                  ? "var(--color-semantic-success)"
+                  : "var(--color-semantic-danger)",
+              lineHeight: 1.2,
             }}
           >
-            {monthlySnapshots.length} Bulan
+            {growthPercentage >= 0 ? "▲ +" : "▼ "}
+            {growthPercentage.toFixed(2)}%
           </div>
-          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)" }}>
-            Catat secara rutin setiap awal bulan untuk analisis terbaik.
+          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
+            Perkembangan saldo terhadap rencana awal.
+          </div>
+        </div>
+
+        {/* CARD 4: AVERAGE ACTUAL MONTHLY RETURN */}
+        <div
+          style={{
+            background: "var(--color-surface-card)",
+            border: "1.5px solid var(--color-border-subtle)",
+            borderRadius: 16,
+            padding: "18px 20px",
+            boxShadow: tokens.shadows.small,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <div style={{ fontSize: "var(--text-caption-size)", color: "var(--color-text-tertiary)" }}>
+            Rata-rata Return Bulanan Aktual
+          </div>
+          <div
+            style={{
+              fontSize: "var(--text-h2-size)",
+              fontWeight: "var(--text-h1-weight)",
+              color:
+                averageMonthlyReturn >= 0
+                  ? "var(--color-semantic-success)"
+                  : "var(--color-semantic-danger)",
+              lineHeight: 1.2,
+            }}
+          >
+            {averageMonthlyReturn >= 0 ? "+" : ""}
+            {averageMonthlyReturn.toFixed(2)}%
+          </div>
+          <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
+            Pertumbuhan pasar bersih per bulan.
           </div>
         </div>
       </div>
@@ -559,7 +787,7 @@ export default function MonthlySnapshotTab({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
               gap: 20,
             }}
           >
@@ -569,7 +797,7 @@ export default function MonthlySnapshotTab({
                 background: "var(--color-surface-card)",
                 border: "1.5px solid var(--color-border-subtle)",
                 borderRadius: 16,
-                padding: "20px",
+                padding: isMobile ? "14px" : "20px",
                 boxShadow: tokens.shadows.small,
               }}
             >
@@ -583,14 +811,14 @@ export default function MonthlySnapshotTab({
               >
                 Komparasi Portofolio: Aktual vs Rencana
               </h3>
-              <div style={{ width: "100%", height: 260 }}>
+              <div style={{ width: "100%", height: isMobile ? 200 : 260 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <ComposedChart data={chartData} margin={{ top: 10, right: 5, left: -22, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
-                    <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={10} tickLine={false} />
                     <YAxis
                       stroke="var(--color-text-tertiary)"
-                      fontSize={11}
+                      fontSize={10}
                       tickLine={false}
                       tickFormatter={(val) => formatCompact(val).replace("Rp ", "")}
                     />
@@ -600,33 +828,34 @@ export default function MonthlySnapshotTab({
                         border: "1.5px solid var(--color-border-subtle)",
                         borderRadius: "8px",
                         color: "var(--color-text-primary)",
+                        fontSize: 12,
                       }}
                       formatter={(value) => [formatIDR(value), ""]}
                     />
-                    <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+                    <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
                     <Line
                       type="monotone"
                       name="Rencana (Plan)"
                       dataKey="Plan"
                       stroke="var(--color-semantic-brand)"
-                      strokeWidth={2}
+                      strokeWidth={1.5}
                       dot={false}
                     />
                     <Line
                       type="monotone"
-                      name="Aktual (Realisasi)"
+                      name="Aktual"
                       dataKey="Aktual"
                       stroke="var(--color-semantic-success)"
-                      strokeWidth={3}
-                      dot={{ r: 3, fill: "var(--color-semantic-success)", strokeWidth: 1 }}
+                      strokeWidth={2.5}
+                      dot={{ r: 2.5, fill: "var(--color-semantic-success)", strokeWidth: 1 }}
                     />
                     <Line
                       type="monotone"
-                      name="Proyeksi dari Aktual"
+                      name="Proyeksi Aktual"
                       dataKey="ProyeksiAktual"
                       stroke="var(--color-semantic-success)"
-                      strokeDasharray="4 4"
-                      strokeWidth={2}
+                      strokeDasharray="3 3"
+                      strokeWidth={1.5}
                       dot={false}
                     />
                   </ComposedChart>
@@ -634,13 +863,13 @@ export default function MonthlySnapshotTab({
               </div>
               <p
                 style={{
-                  fontSize: 10,
+                  fontSize: 9,
                   color: "var(--color-text-tertiary)",
                   textAlign: "center",
                   margin: "8px 0 0 0",
                 }}
               >
-                Catatan: Nilai historis aset USD dikonversi menggunakan kurs saat ini ($1 = {formatIDR(customUSDRate)}).
+                Catatan: Aset USD dikonversi menggunakan kurs saat ini ({formatIDR(customUSDRate)}).
               </p>
             </div>
 
@@ -650,7 +879,7 @@ export default function MonthlySnapshotTab({
                 background: "var(--color-surface-card)",
                 border: "1.5px solid var(--color-border-subtle)",
                 borderRadius: 16,
-                padding: "20px",
+                padding: isMobile ? "14px" : "20px",
                 boxShadow: tokens.shadows.small,
               }}
             >
@@ -664,14 +893,14 @@ export default function MonthlySnapshotTab({
               >
                 Kontribusi Bersih (Net Inflow) per Bulan
               </h3>
-              <div style={{ width: "100%", height: 260 }}>
+              <div style={{ width: "100%", height: isMobile ? 200 : 260 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <ComposedChart data={chartData} margin={{ top: 10, right: 5, left: -22, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
-                    <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={11} tickLine={false} />
+                    <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={10} tickLine={false} />
                     <YAxis
                       stroke="var(--color-text-tertiary)"
-                      fontSize={11}
+                      fontSize={10}
                       tickLine={false}
                       tickFormatter={(val) => formatCompact(val).replace("Rp ", "")}
                     />
@@ -681,32 +910,33 @@ export default function MonthlySnapshotTab({
                         border: "1.5px solid var(--color-border-subtle)",
                         borderRadius: "8px",
                         color: "var(--color-text-primary)",
+                        fontSize: 12,
                       }}
                       formatter={(value) => [formatIDR(value), "Inflow"]}
                     />
                     <Bar
-                      name="Dana Segar Ditambahkan (Net Inflow)"
+                      name="Net Inflow"
                       dataKey="Net Inflow"
                       fill="var(--color-semantic-success)"
-                      radius={[4, 4, 0, 0]}
+                      radius={[3, 3, 0, 0]}
                     />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
               <p
                 style={{
-                  fontSize: 10,
+                  fontSize: 9,
                   color: "var(--color-text-tertiary)",
                   textAlign: "center",
                   margin: "8px 0 0 0",
                 }}
               >
-                Kolom hijau menunjukkan suntikan dana segar (Inflow). Kolom merah/minus berarti penarikan dana (Outflow).
+                Kolom hijau berarti menambah modal, kolom merah/minus berarti penarikan modal.
               </p>
             </div>
           </div>
 
-          {/* TABLE LIST OF MONTHS */}
+          {/* HISTORY CONTAINER */}
           <div
             style={{
               background: "var(--color-surface-card)",
@@ -730,91 +960,171 @@ export default function MonthlySnapshotTab({
               </h3>
             </div>
             
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
-                <thead>
-                  <tr style={{ borderBottom: "1.5px solid var(--color-border-subtle)", background: "var(--color-surface-app)" }}>
-                    <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Bulan</th>
-                    <th style={{ padding: "12px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Total Saldo Aktual</th>
-                    <th style={{ padding: "12px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Net Inflow</th>
-                    <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Catatan</th>
-                    <th style={{ padding: "12px 20px", textAlign: "center", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold", width: 100 }}>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...snapshotsWithMetrics].reverse().map((snap) => (
-                    <tr
-                      key={snap.id}
-                      style={{
-                        borderBottom: "1px solid var(--color-border-subtle)",
-                        transition: "background-color 0.2s",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-surface-input)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                    >
-                      <td style={{ padding: "14px 20px", fontSize: "var(--text-body-size)", color: "var(--color-text-primary)", fontWeight: "bold" }}>
-                        {formatMonthLabelLong(snap.yearMonth)}
-                      </td>
-                      <td style={{ padding: "14px 20px", textAlign: "right", fontSize: "var(--text-body-size)", color: "var(--color-text-primary)" }}>
+            {/* CONDITIONAL RENDER: PREMIUM MOBILE CARD-LIST OR DESKTOP TABLE */}
+            {isMobile ? (
+              <div style={{ display: "flex", flexDirection: "column", padding: 12, gap: 10 }}>
+                {[...snapshotsWithMetrics].reverse().map((snap) => (
+                  <div
+                    key={snap.id}
+                    style={{
+                      background: "var(--color-surface-input)",
+                      border: "1px solid var(--color-border-subtle)",
+                      borderRadius: 12,
+                      padding: 14,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 14, fontWeight: "bold", color: "var(--color-text-primary)" }}>
+                        {formatMonthLabelShort(snap.yearMonth)}
+                      </span>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <button
+                          onClick={() => handleOpenEditModal(snap)}
+                          style={{ border: "none", background: "transparent", color: "var(--color-text-secondary)", cursor: "pointer" }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => deleteSnapshot(snap.id)}
+                          style={{ border: "none", background: "transparent", color: "var(--color-semantic-danger)", cursor: "pointer" }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                      <span style={{ color: "var(--color-text-tertiary)" }}>Saldo Aktual:</span>
+                      <span style={{ color: "var(--color-text-primary)", fontWeight: "500" }}>
                         {formatIDR(snap.totalPortfolio)}
-                      </td>
-                      <td
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                      <span style={{ color: "var(--color-text-tertiary)" }}>Net Inflow:</span>
+                      <span
                         style={{
-                          padding: "14px 20px",
-                          textAlign: "right",
-                          fontSize: "var(--text-body-size)",
-                          fontWeight: "var(--text-body-bold-weight)",
-                          color:
-                            snap.netInflow >= 0
-                              ? "var(--color-semantic-success)"
-                              : "var(--color-semantic-danger)",
+                          fontWeight: "bold",
+                          color: snap.netInflow >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
                         }}
                       >
                         {snap.netInflow >= 0 ? "+" : ""}
                         {formatIDR(snap.netInflow)}
-                      </td>
-                      <td style={{ padding: "14px 20px", fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)" }}>
-                        {snap.notes || <span style={{ color: "var(--color-text-tertiary)" }}>-</span>}
-                      </td>
-                      <td style={{ padding: "14px 20px", textAlign: "center" }}>
-                        <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-                          <button
-                            onClick={() => handleOpenEditModal(snap)}
-                            style={{
-                              border: "none",
-                              background: "transparent",
-                              color: "var(--color-text-secondary)",
-                              cursor: "pointer",
-                              padding: 4,
-                            }}
-                            title="Edit"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => deleteSnapshot(snap.id)}
-                            style={{
-                              border: "none",
-                              background: "transparent",
-                              color: "var(--color-semantic-danger)",
-                              cursor: "pointer",
-                              padding: 4,
-                            }}
-                            title="Hapus"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
+                      </span>
+                    </div>
+
+                    {snap.notes && (
+                      <div
+                        style={{
+                          marginTop: 4,
+                          fontSize: 11,
+                          color: "var(--color-text-secondary)",
+                          padding: "6px 8px",
+                          background: "var(--color-surface-card)",
+                          borderRadius: 6,
+                          borderLeft: "2px solid var(--color-border-subtle)",
+                        }}
+                      >
+                        📝 {snap.notes}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1.5px solid var(--color-border-subtle)", background: "var(--color-surface-app)" }}>
+                      <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Bulan</th>
+                      <th style={{ padding: "12px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Total Saldo Aktual</th>
+                      <th style={{ padding: "12px 20px", textAlign: "right", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Net Inflow</th>
+                      <th style={{ padding: "12px 20px", textAlign: "left", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold" }}>Catatan</th>
+                      <th style={{ padding: "12px 20px", textAlign: "center", fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: "bold", width: 100 }}>Aksi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {[...snapshotsWithMetrics].reverse().map((snap) => (
+                      <tr
+                        key={snap.id}
+                        style={{
+                          borderBottom: "1px solid var(--color-border-subtle)",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-surface-input)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                      >
+                        <td style={{ padding: "14px 20px", fontSize: "var(--text-body-size)", color: "var(--color-text-primary)", fontWeight: "bold" }}>
+                          {formatMonthLabelLong(snap.yearMonth)}
+                        </td>
+                        <td style={{ padding: "14px 20px", textAlign: "right", fontSize: "var(--text-body-size)", color: "var(--color-text-primary)" }}>
+                          {formatIDR(snap.totalPortfolio)}
+                        </td>
+                        <td
+                          style={{
+                            padding: "14px 20px",
+                            textAlign: "right",
+                            fontSize: "var(--text-body-size)",
+                            fontWeight: "var(--text-body-bold-weight)",
+                            color:
+                              snap.netInflow >= 0
+                                ? "var(--color-semantic-success)"
+                                : "var(--color-semantic-danger)",
+                          }}
+                        >
+                          {snap.netInflow >= 0 ? "+" : ""}
+                          {formatIDR(snap.netInflow)}
+                        </td>
+                        <td style={{ padding: "14px 20px", fontSize: "var(--text-caption-size)", color: "var(--color-text-secondary)" }}>
+                          {snap.notes || <span style={{ color: "var(--color-text-tertiary)" }}>-</span>}
+                        </td>
+                        <td style={{ padding: "14px 20px", textAlign: "center" }}>
+                          <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+                            <button
+                              onClick={() => handleOpenEditModal(snap)}
+                              style={{
+                                border: "none",
+                                background: "transparent",
+                                color: "var(--color-text-secondary)",
+                                cursor: "pointer",
+                                padding: 4,
+                              }}
+                              title="Edit"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => deleteSnapshot(snap.id)}
+                              style={{
+                                border: "none",
+                                background: "transparent",
+                                color: "var(--color-semantic-danger)",
+                                cursor: "pointer",
+                                padding: 4,
+                              }}
+                              title="Hapus"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </>
       ) : (
@@ -920,7 +1230,7 @@ export default function MonthlySnapshotTab({
                 boxShadow: "var(--shadow-xl)",
                 width: "100%",
                 maxWidth: 620,
-                maxHeight: "85vh",
+                maxHeight: "90vh",
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden",
@@ -987,8 +1297,8 @@ export default function MonthlySnapshotTab({
                   flex: 1,
                 }}
               >
-                {/* Select Month Row */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {/* Custom Month Picker */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, position: "relative" }} ref={pickerRef}>
                   <label
                     style={{
                       fontSize: 12,
@@ -999,30 +1309,38 @@ export default function MonthlySnapshotTab({
                     Pilih Bulan Pencatatan
                   </label>
                   <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                    <input
-                      type="month"
-                      value={formMonth}
-                      onChange={(e) => setFormMonth(e.target.value)}
-                      disabled={!!editingSnapshot} // month cannot be changed on edit mode
-                      required
+                    {/* Custom Month Picker Trigger */}
+                    <div
+                      onClick={() => !editingSnapshot && setPickerOpen(!pickerOpen)}
                       style={{
-                        padding: "10px 14px",
+                        padding: "11px 14px",
                         borderRadius: "8px",
                         border: "1.5px solid var(--color-border-subtle)",
                         background: "var(--color-surface-input)",
                         color: "var(--color-text-primary)",
                         fontSize: "var(--text-body-size)",
-                        fontFamily: tokens.typography.fontFamily,
+                        fontWeight: "500",
                         flex: 1,
                         cursor: editingSnapshot ? "not-allowed" : "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        userSelect: "none"
                       }}
-                    />
+                    >
+                      <span>📅</span>
+                      <span style={{ flex: 1 }}>{formatMonthLabelLong(formMonth) || "Pilih Bulan"}</span>
+                      {!editingSnapshot && (
+                        <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>▼</span>
+                      )}
+                    </div>
+                    
                     {!editingSnapshot && sortedSnapshots.length > 0 && (
                       <button
                         type="button"
                         onClick={handleCopyFromLast}
                         style={{
-                          padding: "10px 14px",
+                          padding: "11px 14px",
                           borderRadius: "8px",
                           border: "1.5px solid var(--color-semantic-brand)",
                           background: "transparent",
@@ -1037,9 +1355,88 @@ export default function MonthlySnapshotTab({
                       </button>
                     )}
                   </div>
+
+                  {/* CUSTOM PICKER POPOVER ELEMENT */}
+                  <AnimatePresence>
+                    {pickerOpen && (
+                      <motion.div
+                        variants={popoverVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={{ duration: 0.15 }}
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 6px)",
+                          left: 0,
+                          right: 0,
+                          background: "var(--color-surface-card)",
+                          border: "1.5px solid var(--color-border-subtle)",
+                          borderRadius: 12,
+                          padding: 14,
+                          zIndex: 9999,
+                          boxShadow: "var(--shadow-xl)",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 12
+                        }}
+                      >
+                        {/* Popover Header */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => setPickerYear(prev => prev - 1)}
+                            style={{
+                              width: 28, height: 28, borderRadius: "50%", border: "1.5px solid var(--color-border-subtle)",
+                              background: "var(--color-surface-input)", color: "var(--color-text-primary)", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12
+                            }}
+                          >
+                            ◀
+                          </button>
+                          <span style={{ fontWeight: "bold", fontSize: 15, color: "var(--color-text-primary)" }}>{pickerYear}</span>
+                          <button
+                            type="button"
+                            onClick={() => setPickerYear(prev => prev + 1)}
+                            style={{
+                              width: 28, height: 28, borderRadius: "50%", border: "1.5px solid var(--color-border-subtle)",
+                              background: "var(--color-surface-input)", color: "var(--color-text-primary)", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12
+                            }}
+                          >
+                            ▶
+                          </button>
+                        </div>
+                        
+                        {/* Month Grid */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+                          {MONTHS_INDO_SHORT.map((mShort, idx) => {
+                            const currentFormMonth = String(idx + 1).padStart(2, "0");
+                            const isSelected = formMonth === `${pickerYear}-${currentFormMonth}`;
+                            return (
+                              <motion.div
+                                key={idx}
+                                onClick={() => handleSelectMonthYear(idx)}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                style={{
+                                  padding: "10px 0", borderRadius: 8, textAlign: "center", fontSize: 12, fontWeight: "500",
+                                  cursor: "pointer", transition: "all 0.15s",
+                                  background: isSelected ? "var(--color-semantic-brand)" : "var(--color-surface-input)",
+                                  color: isSelected ? "var(--color-white)" : "var(--color-text-primary)"
+                                }}
+                              >
+                                {mShort}
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* Grid 16 Asset Inputs */}
+                {/* Grid 16 Asset Inputs (Equipped with interactive Add/Remove Card Controls) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <label
                     style={{
@@ -1055,7 +1452,7 @@ export default function MonthlySnapshotTab({
                       display: "flex",
                       flexDirection: "column",
                       gap: 10,
-                      maxHeight: "350px",
+                      maxHeight: "300px",
                       overflowY: "auto",
                       paddingRight: 6,
                     }}
@@ -1064,10 +1461,7 @@ export default function MonthlySnapshotTab({
                       const currencyPref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? "USD" : "IDR");
                       const placeholder = currencyPref === "USD" ? "$ 0" : "Rp 0";
                       
-                      // Calculate active state indicator
                       const isActive = activeAssetIds.includes(cls.id);
-                      
-                      // Format evaluated visual
                       const val = formAssetValues[cls.id] || 0;
                       
                       return (
@@ -1079,14 +1473,30 @@ export default function MonthlySnapshotTab({
                             justifyContent: "space-between",
                             gap: 12,
                             padding: "10px 12px",
-                            background: isActive ? "transparent" : "var(--color-surface-input)",
+                            background: isActive ? "transparent" : "rgba(30, 41, 59, 0.25)",
                             borderRadius: "10px",
                             border: `1.5px solid ${
                               isActive ? "var(--color-border-subtle)" : "transparent"
                             }`,
-                            opacity: isActive ? 1 : 0.75,
+                            opacity: isActive ? 1 : 0.45,
+                            transition: "all 0.25s ease-in-out",
                           }}
                         >
+                          {/* Toggle active / inactive control button */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleAsset(cls.id)}
+                            style={{
+                              width: 24, height: 24, borderRadius: "50%", border: "none",
+                              background: isActive ? "var(--color-semantic-danger-light, rgba(239, 68, 68, 0.1))" : "var(--color-semantic-success-light, rgba(16, 185, 129, 0.1))",
+                              color: isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)",
+                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: "bold"
+                            }}
+                            title={isActive ? "Hapus dari Portofolio" : "Tambah ke Portofolio"}
+                          >
+                            {isActive ? "✕" : "＋"}
+                          </button>
+
                           <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
                             <div
                               style={{
@@ -1120,22 +1530,24 @@ export default function MonthlySnapshotTab({
                               <input
                                 type="text"
                                 placeholder={placeholder}
-                                defaultValue={val > 0 ? (currencyPref === "USD" ? val.toLocaleString("en-US") : formatWhileTyping(val.toString())) : ""}
-                                onBlur={(e) => handleAssetInputChange(cls.id, e.target.value)}
+                                disabled={!isActive}
+                                value={isActive && val > 0 ? (currencyPref === "USD" ? val.toLocaleString("en-US") : formatWhileTyping(val.toString())) : ""}
+                                onChange={(e) => handleAssetInputChange(cls.id, e.target.value)}
                                 style={{
                                   padding: "6px 10px",
                                   borderRadius: "6px",
                                   border: "1.5px solid var(--color-border-subtle)",
-                                  background: "var(--color-surface-input)",
+                                  background: isActive ? "var(--color-surface-input)" : "rgba(30, 41, 59, 0.05)",
                                   color: "var(--color-text-primary)",
                                   fontSize: 13,
                                   textAlign: "right",
-                                  width: 140,
+                                  width: 130,
                                   fontFamily: tokens.typography.fontFamily,
+                                  cursor: isActive ? "text" : "not-allowed"
                                 }}
                               />
                             </div>
-                            {currencyPref === "USD" && val > 0 && (
+                            {isActive && currencyPref === "USD" && val > 0 && (
                               <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
                                 ≈ {formatCompact(val * customUSDRate)}
                               </span>
@@ -1181,7 +1593,7 @@ export default function MonthlySnapshotTab({
                   style={{
                     display: "flex",
                     gap: 12,
-                    marginTop: 10,
+                    marginTop: 6,
                     borderTop: "1.5px solid var(--color-border-subtle)",
                     paddingTop: 16,
                   }}
