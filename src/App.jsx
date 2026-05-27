@@ -1188,6 +1188,12 @@ export default function WealthTracker() {
                 </div>
               ))}
             </div>
+          </>
+        )}
+
+        {activeTab !== "trial_invest" && (
+          <>
+
 
             {/* ── PROFIL ALOKASI KAMU (naked, selalu tampil) ── */}
             <div style={{ marginBottom: 12 }}>

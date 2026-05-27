@@ -503,10 +503,9 @@ export default function MonthlySnapshotTab({
           borderRadius: 20,
           padding: "60px 30px",
           textAlign: "center",
-          boxShadow: tokens.shadows.medium,
-          maxWidth: 680,
+          boxShadow: tokens.shadows.small,
+          maxWidth: 600,
           margin: "40px auto 20px auto",
-          backdropFilter: "blur(16px)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -515,20 +514,21 @@ export default function MonthlySnapshotTab({
       >
         <div
           style={{
-            width: 72,
-            height: 72,
+            width: 64,
+            height: 64,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, var(--color-surface-input) 0%, rgba(30, 41, 59, 0.4) 100%)",
+            background: "var(--color-surface-input)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "var(--color-semantic-warning)",
+            color: "var(--color-semantic-brand)",
             border: "1.5px solid var(--color-border-subtle)",
-            fontSize: 32,
             boxShadow: "var(--shadow-sm)",
           }}
         >
-          ⚠️
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 28, height: 28 }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
         </div>
         <div>
           <h2
@@ -537,20 +537,21 @@ export default function MonthlySnapshotTab({
               fontWeight: "var(--text-h2-weight)",
               color: "var(--color-text-primary)",
               margin: "0 0 10px 0",
+              letterSpacing: "-0.5px",
             }}
           >
-            Pilih Profil Anda Terlebih Dahulu
+            Pilih Profil Terlebih Dahulu
           </h2>
           <p
             style={{
               fontSize: "var(--text-body-size)",
-              color: "var(--color-text-tertiary)",
+              color: "var(--color-text-secondary)",
               lineHeight: 1.6,
-              maxWidth: 480,
+              maxWidth: 460,
               margin: "0 auto",
             }}
           >
-            Catatan Snapshot Bulanan memerlukan basis data rencana awal agar komparasi dan kalkulasi return bulanan aktual berjalan akurat.
+            Pilih salah satu profil alokasi Anda di bagian atas untuk memuat data rencana awal, kurva perkembangan portofolio aktual, serta laporan pergeseran alokasi aset.
           </p>
         </div>
         <p style={{ margin: 0, fontSize: 11, color: "var(--color-text-tertiary)" }}>
@@ -560,7 +561,7 @@ export default function MonthlySnapshotTab({
     );
   }
 
-  return (
+    return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* HEADER ACTION CONTROLS */}
       <div
