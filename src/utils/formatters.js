@@ -52,3 +52,26 @@ export const afterTaxReturn = (cls, overrideReturn) => {
   if (cls.taxRate === 0) return r;
   return r * (1 - cls.taxRate);
 };
+
+
+// --- UTILITIES FOR MONTHLY SNAPSHOTS & ALIGNMENT ---
+
+// Parse "YYYY-MM" into total absolute months
+export const parseYearMonth = (ym) => {
+  if (!ym || typeof ym !== "string") return 0;
+  const [year, month] = ym.split("-").map(Number);
+  return year * 12 + (month - 1);
+};
+
+// Format absolute months into "YYYY-MM"
+export const formatYearMonth = (totalMonths) => {
+  const year = Math.floor(totalMonths / 12);
+  const month = (totalMonths % 12) + 1;
+  return `${year}-${String(month).padStart(2, "0")}`;
+};
+
+// Calculate monthly net return based on annual interest percent
+export const calculateMonthlyNetReturn = (cls, overrideReturn) => {
+  const annualReturn = afterTaxReturn(cls, overrideReturn) / 100;
+  return Math.pow(1 + annualReturn, 1 / 12) - 1;
+};

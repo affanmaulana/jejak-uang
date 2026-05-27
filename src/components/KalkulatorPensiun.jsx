@@ -55,6 +55,7 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
   const [mode, setMode] = useState("manual"); // "manual" | "template"
   const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [useLatestSnapshot, setUseLatestSnapshot] = useState(true); // TOGGLE SNAPSHOT
 
   // Manual inputs (String states to allow fluent editing, empty strings, and backspace)
   const [currentAgeInput, setCurrentAgeInput] = useState("25");
@@ -83,30 +84,62 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
     const t = (userTemplates || []).find(x => x.id === selectedTemplateId);
     if (!t) return null;
     const DEFAULT_USD_RATE = 17600;
+
+    // Check if snapshot is preferred and available
+    const hasSnapshots = t.monthlySnapshots && t.monthlySnapshots.length > 0;
     let totalAsset = 0;
+
+    if (hasSnapshots && useLatestSnapshot) {
+      // Sort snapshots to get the latest
+      const sorted = [...t.monthlySnapshots].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+      const latest = sorted[sorted.length - 1];
+      totalAsset = Object.entries(latest.assetValues).reduce((sum, [id, val]) => {
+        const cls = ASSET_CLASSES.find((c) => c.id === id);
+        if (!cls) return sum;
+        const pref = (t.assetCurrencyPrefs || {})[id] || (cls.isUSD ? 'USD' : 'IDR');
+        return sum + (pref === 'USD' ? val * (t.customUSDRate || DEFAULT_USD_RATE) : val);
+      }, 0);
+    } else {
+      // Use original assets
+      (ASSET_CLASSES || []).forEach(cls => {
+        const pref = (t.assetCurrencyPrefs || {})[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+        const raw = (t.assets || {})[cls.id] || 0;
+        totalAsset += pref === 'USD' ? raw * (t.customUSDRate || DEFAULT_USD_RATE) : raw;
+      });
+    }
+
     let totalContrib = 0;
     let weightedReturn = 0;
     let totalWeight = 0;
     (ASSET_CLASSES || []).forEach(cls => {
       const pref = (t.assetCurrencyPrefs || {})[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
-      const raw = (t.assets || {})[cls.id] || 0;
-      const idr = pref === 'USD' ? raw * (t.customUSDRate || DEFAULT_USD_RATE) : raw;
       const mc = (t.contribs || {})[cls.id] || 0;
       const mcIdr = pref === 'USD' ? mc * (t.customUSDRate || DEFAULT_USD_RATE) : mc;
-      totalAsset += idr;
       totalContrib += mcIdr;
+
+      // For weighted return, we use the balances of the assets that actually exist
+      const raw = hasSnapshots && useLatestSnapshot
+        ? (() => {
+            const sorted = [...t.monthlySnapshots].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+            const latest = sorted[sorted.length - 1];
+            return latest.assetValues[cls.id] || 0;
+          })()
+        : (t.assets || {})[cls.id] || 0;
+      const idr = pref === 'USD' ? raw * (t.customUSDRate || DEFAULT_USD_RATE) : raw;
       if (idr > 0) {
         const r = (t.customReturns || {})[cls.id] !== undefined ? (t.customReturns || {})[cls.id] : cls.return;
         weightedReturn += r * idr;
         totalWeight += idr;
       }
     });
+
     return {
       initialAmount: totalAsset,
       monthlyContrib: totalContrib,
       annualReturn: totalWeight > 0 ? parseFloat((weightedReturn / totalWeight).toFixed(2)) : 8,
+      hasSnapshots,
     };
-  }, [mode, selectedTemplateId, userTemplates, ASSET_CLASSES]);
+  }, [mode, selectedTemplateId, userTemplates, ASSET_CLASSES, useLatestSnapshot]);
 
   const effectiveInitial = mode === "template" && templateData ? templateData.initialAmount : initialAmount;
   const effectiveMonthly = mode === "template" && templateData ? templateData.monthlyContrib : monthlyContrib;
@@ -407,6 +440,35 @@ export default function KalkulatorPensiun({ userTemplates, ASSET_CLASSES, tokens
                         </>
                       )}
                     </AnimatePresence>
+                  </div>
+                )}
+                
+                {/* Snapshot toggle if template has snapshots */}
+                {mode === "template" && templateData?.hasSnapshots && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
+                    <input
+                      type="checkbox"
+                      id="useLatestSnapshot"
+                      checked={useLatestSnapshot}
+                      onChange={(e) => setUseLatestSnapshot(e.target.checked)}
+                      style={{
+                        width: 15,
+                        height: 15,
+                        cursor: "pointer",
+                        accentColor: "var(--color-semantic-success)"
+                      }}
+                    />
+                    <label
+                      htmlFor="useLatestSnapshot"
+                      style={{
+                        fontSize: 11,
+                        color: "var(--color-text-secondary)",
+                        cursor: "pointer",
+                        userSelect: "none"
+                      }}
+                    >
+                      Gunakan saldo aktual terakhir dari Catatan Bulanan
+                    </label>
                   </div>
                 )}
               </div>

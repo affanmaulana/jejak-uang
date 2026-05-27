@@ -380,26 +380,36 @@ export default function ProjectionTab({
 
           {/* Legend Row */}
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
-            {[
-              { label: "Portofolio Nominal", color: "var(--color-semantic-success)", dashed: false },
-              { label: "Nilai Riil", color: "var(--color-semantic-brand)", dashed: false },
-              { label: "Garis Inflasi", color: "var(--color-semantic-danger)", dashed: true },
-            ].map((leg, idx) => (
-              <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div
-                  style={{
-                    width: 24,
-                    height: leg.dashed ? 0 : 3,
-                    borderRadius: 3,
-                    background: leg.dashed ? "transparent" : leg.color,
-                    borderTop: leg.dashed ? `2.5px dashed ${leg.color}` : "none",
-                  }}
-                />
-                <span style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
-                  {leg.label}
-                </span>
-              </div>
-            ))}
+            {(() => {
+              const hasActual = chartData.some(d => d.actualPortfolio !== undefined);
+              const items = hasActual ? [
+                { label: "Portofolio Rencana", color: "var(--color-semantic-success)", dashed: true },
+                { label: "Portofolio Aktual", color: "var(--color-semantic-success)", dashed: false },
+                { label: "Nilai Riil Rencana", color: "var(--color-semantic-brand)", dashed: true },
+                { label: "Nilai Riil Aktual", color: "var(--color-semantic-brand)", dashed: false },
+                { label: "Garis Inflasi", color: "var(--color-semantic-danger)", dashed: true },
+              ] : [
+                { label: "Portofolio Nominal", color: "var(--color-semantic-success)", dashed: false },
+                { label: "Nilai Riil", color: "var(--color-semantic-brand)", dashed: false },
+                { label: "Garis Inflasi", color: "var(--color-semantic-danger)", dashed: true },
+              ];
+              return items.map((leg, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div
+                    style={{
+                      width: 24,
+                      height: leg.dashed ? 0 : 3,
+                      borderRadius: 3,
+                      background: leg.dashed ? "transparent" : leg.color,
+                      borderTop: leg.dashed ? `2.5px dashed ${leg.color}` : "none",
+                    }}
+                  />
+                  <span style={{ fontSize: "var(--text-eyebrow-size)", fontWeight: "var(--text-subtitle-weight)", color: "var(--color-text-secondary)" }}>
+                    {leg.label}
+                  </span>
+                </div>
+              ));
+            })()}
           </div>
         </div>
 
@@ -431,8 +441,19 @@ export default function ProjectionTab({
               }}
               labelStyle={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-eyebrow-size)" }}
             />
-            <Area type="monotone" dataKey="portfolio" name="Portofolio Nominal" stroke={"var(--color-semantic-success)"} strokeWidth={2.5} fill="url(#lg_portfolio)" />
-            <Line type="monotone" dataKey="real" name="Nilai Riil (Daya Beli)" stroke={"var(--color-semantic-brand)"} strokeWidth={3} dot={false} />
+            {chartData.some(d => d.actualPortfolio !== undefined) ? (
+              <>
+                <Line type="monotone" dataKey="portfolio" name="Portofolio Rencana (Nominal)" stroke={"var(--color-semantic-success)"} strokeWidth={2.5} strokeDasharray="4 4" dot={false} />
+                <Line type="monotone" dataKey="actualPortfolio" name="Portofolio Aktual (Nominal)" stroke={"var(--color-semantic-success)"} strokeWidth={3.5} dot={{ r: 4, fill: "var(--color-semantic-success)" }} />
+                <Line type="monotone" dataKey="real" name="Nilai Riil Rencana" stroke={"var(--color-semantic-brand)"} strokeWidth={2} strokeDasharray="4 4" dot={false} />
+                <Line type="monotone" dataKey="actualReal" name="Nilai Riil Aktual" stroke={"var(--color-semantic-brand)"} strokeWidth={3} dot={false} />
+              </>
+            ) : (
+              <>
+                <Area type="monotone" dataKey="portfolio" name="Portofolio Nominal" stroke={"var(--color-semantic-success)"} strokeWidth={2.5} fill="url(#lg_portfolio)" />
+                <Line type="monotone" dataKey="real" name="Nilai Riil (Daya Beli)" stroke={"var(--color-semantic-brand)"} strokeWidth={3} dot={false} />
+              </>
+            )}
             <Line type="monotone" dataKey="inflation" name="Garis Inflasi" stroke={"var(--color-semantic-danger)"} strokeWidth={2} strokeDasharray="4 4" dot={false} />
             <ReferenceLine
               y={fireTarget}

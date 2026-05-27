@@ -15,14 +15,17 @@ import {
   formatCompact, 
   parseExpression, 
   formatWhileTyping, 
-  afterTaxReturn 
+  afterTaxReturn,
+  parseYearMonth,
+  formatYearMonth
 } from "./utils/formatters";
+import MonthlySnapshotTab from "./components/MonthlySnapshotTab";
 
 // Styles
 import "./styles/tokens.css";
 
 // ─── DATA MIGRATION PIPELINE ──────────────────────────────────────────────────
-const CURRENT_SCHEMA_VERSION = 1;
+const CURRENT_SCHEMA_VERSION = 2;
 
 const migrateTemplates = (templates) => {
   return templates.map((t) => {
@@ -36,6 +39,11 @@ const migrateTemplates = (templates) => {
       updated.version = 1;
     }
 
+    if (updated.version < 2) {
+      updated.monthlySnapshots = updated.monthlySnapshots ?? [];
+      updated.version = 2;
+    }
+
     return updated;
   });
 };
@@ -45,31 +53,25 @@ const migrateTemplates = (templates) => {
 export default function WealthTracker() {
   const [customUSDRate, setCustomUSDRate] = useState(DEFAULT_USD_RATE);
   const [assetCurrencyPrefs, setAssetCurrencyPrefs] = useState({});
-  const [assets, setAssets] = useState({
-    cash: 0,
-    bankDigital: 0,
-    rdpu: 0,
-    rdo: 0,
-    saham: 0,
-    sp500: 0,
-    usd: 0,
-    gold: 0,
-    rdSaham: 0,
+  const [assets, setAssets] = useState(() => {
+    const initial = {};
+    ASSET_CLASSES.forEach((c) => {
+      initial[c.id] = 0;
+    });
+    return initial;
   });
+
+  const [monthlySnapshots, setMonthlySnapshots] = useState([]); // STATE SNAPSHOT BARU
 
   const [fireTarget, setFireTarget] = useState(1000000000); // Default 5 Miliar
 
-  // Per-aset kontribusi bulanan (gambar B — diisi di kartu masing-masing)
-  const [monthlyContribs, setMonthlyContribs] = useState({
-    cash: 0,
-    bankDigital: 0,
-    rdpu: 0,
-    rdo: 0,
-    saham: 0,
-    sp500: 0,
-    usd: 0,
-    gold: 0,
-    rdSaham: 0,
+  // Per-aset kontribusi bulanan
+  const [monthlyContribs, setMonthlyContribs] = useState(() => {
+    const initial = {};
+    ASSET_CLASSES.forEach((c) => {
+      initial[c.id] = 0;
+    });
+    return initial;
   });
 
   const [customReturnOverrides, setCustomReturnOverrides] = useState({});
@@ -243,6 +245,7 @@ export default function WealthTracker() {
       monthlyExpense: monthlyExpense,
       targetMonths: targetMonths,
       includeEmergencyInTotal: includeEmergencyInTotal,
+      monthlySnapshots: [...monthlySnapshots], // VERSI 2
       version: CURRENT_SCHEMA_VERSION, // INJEKSI VERSI BARU
       updatedAt: new Date().toISOString(),
     };
@@ -262,8 +265,20 @@ export default function WealthTracker() {
   };
 
   const loadUserTemplate = (t) => {
-    setAssets((prev) => ({ ...prev, ...t.assets }));
-    setMonthlyContribs((prev) => ({ ...prev, ...(t.contribs || {}) }));
+    setAssets((prev) => {
+      const initial = {};
+      ASSET_CLASSES.forEach((c) => {
+        initial[c.id] = 0;
+      });
+      return { ...initial, ...t.assets };
+    });
+    setMonthlyContribs((prev) => {
+      const initial = {};
+      ASSET_CLASSES.forEach((c) => {
+        initial[c.id] = 0;
+      });
+      return { ...initial, ...(t.contribs || {}) };
+    });
     setCustomReturnOverrides(t.customReturns || {});
     setCustomDrawdowns(t.customDrawdowns || {});
     // Fallback: jika profil lama tidak punya activeIds, derive dari nilai aset > 0
@@ -277,7 +292,106 @@ export default function WealthTracker() {
     setIncludeEmergencyInTotal(t.includeEmergencyInTotal);
     setCustomUSDRate(t.customUSDRate ?? DEFAULT_USD_RATE);
     setAssetCurrencyPrefs(t.assetCurrencyPrefs ?? {});
+    setMonthlySnapshots(t.monthlySnapshots || []); // LOAD SNAPSHOTS STATE
     setActiveTemplateId(t.id);
+  };
+
+  // --- CRUD MONTHLY SNAPSHOTS ---
+  const addSnapshot = (snapshot) => {
+    if (monthlySnapshots.some(s => s.yearMonth === snapshot.yearMonth)) {
+      showToast("Snapshot untuk bulan tersebut sudah ada!", "error");
+      return false;
+    }
+    
+    const updatedSnapshots = [...monthlySnapshots, snapshot].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+    setMonthlySnapshots(updatedSnapshots);
+    
+    if (activeTemplateId) {
+      setUserTemplates((prev) =>
+        prev.map((t) => {
+          if (t.id === activeTemplateId) {
+            return {
+              ...t,
+              monthlySnapshots: updatedSnapshots,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return t;
+        })
+      );
+    }
+    showToast("Snapshot berhasil ditambahkan!");
+    return true;
+  };
+
+  const updateSnapshot = (monthId, newAssetValues, notes) => {
+    const updatedSnapshots = monthlySnapshots.map((s) => {
+      if (s.id === monthId) {
+        return {
+          ...s,
+          assetValues: newAssetValues,
+          notes: notes,
+        };
+      }
+      return s;
+    });
+    setMonthlySnapshots(updatedSnapshots);
+    
+    if (activeTemplateId) {
+      setUserTemplates((prev) =>
+        prev.map((t) => {
+          if (t.id === activeTemplateId) {
+            return {
+              ...t,
+              monthlySnapshots: updatedSnapshots,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return t;
+        })
+      );
+    }
+    showToast("Snapshot berhasil diperbarui!");
+  };
+
+  const deleteSnapshot = (monthId) => {
+    const updatedSnapshots = monthlySnapshots.filter((s) => s.id !== monthId);
+    setMonthlySnapshots(updatedSnapshots);
+    
+    if (activeTemplateId) {
+      setUserTemplates((prev) =>
+        prev.map((t) => {
+          if (t.id === activeTemplateId) {
+            return {
+              ...t,
+              monthlySnapshots: updatedSnapshots,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return t;
+        })
+      );
+    }
+    showToast("Snapshot berhasil dihapus!");
+  };
+
+  const deleteAllSnapshots = () => {
+    setMonthlySnapshots([]);
+    if (activeTemplateId) {
+      setUserTemplates((prev) =>
+        prev.map((t) => {
+          if (t.id === activeTemplateId) {
+            return {
+              ...t,
+              monthlySnapshots: [],
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return t;
+        })
+      );
+    }
+    showToast("Semua snapshot berhasil dihapus!");
   };
 
   const deleteTemplate = (id, e) => {
@@ -418,38 +532,109 @@ export default function WealthTracker() {
     };
   }, [effectiveAssets, totalAssets, inflationRate, showAfterTax, customReturnOverrides, customUSDRate, assetCurrencyPrefs]); // <-- UBAH DI SINI
 
-  // Proyeksi: setiap aset dihitung terpisah (FV dengan kontribusi per aset)
+  // Proyeksi: setiap aset dihitung terpisah (mendukung snapshot aktual)
   const chartData = useMemo(() => {
     const inf = inflationRate / 100;
-    let infBase = totalAssets;
+    
+    // Urutkan snapshot bulanan
+    const sortedSnapshots = [...monthlySnapshots].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+    
+    // Tentukan bulan basis (Bulan 0)
+    let baseMonths = null;
+    if (sortedSnapshots.length > 0) {
+      const earliestMonths = parseYearMonth(sortedSnapshots[0].yearMonth);
+      baseMonths = earliestMonths - 1;
+    }
+    
     const data = [];
-
+    let planInfBase = totalAssets;
+    
+    // Hitung untuk setiap tahun y dari 0 ke 10
     for (let y = 0; y <= PROJECTION_YEARS; y++) {
-      let portTotal = 0;
+      const m = y * 12; // Bulan ke-m
+      
+      // 1. Jalur Rencana (Rencana Awal)
+      let planTotal = 0;
       ASSET_CLASSES.forEach((cls) => {
         const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
         const init = pref === 'USD'
-          ? (effectiveAssets[cls.id] || 0) * customUSDRate // <-- UBAH DI SINI
-          : effectiveAssets[cls.id] || 0; // <-- UBAH DI SINI
+          ? (effectiveAssets[cls.id] || 0) * customUSDRate
+          : effectiveAssets[cls.id] || 0;
         const mc = pref === 'USD'
           ? (monthlyContribs[cls.id] || 0) * customUSDRate
           : monthlyContribs[cls.id] || 0;
         const baseR = customReturnOverrides[cls.id] !== undefined ? customReturnOverrides[cls.id] : cls.return;
         const r = (showAfterTax ? afterTaxReturn(cls, baseR) : baseR) / 100;
-        const fvInit = init * Math.pow(1 + r, y);
-        const fvMC =
-          r > 0 ? (mc * 12 * (Math.pow(1 + r, y) - 1)) / r : mc * 12 * y;
-        portTotal += fvInit + fvMC;
+        const rMonthly = Math.pow(1 + r, 1 / 12) - 1;
+        
+        let val = init;
+        for (let i = 0; i < m; i++) {
+          val = val * (1 + rMonthly) + mc;
+        }
+        planTotal += val;
       });
-
+      
+      // 2. Jalur Aktual (Berbasis Snapshot)
+      let actualTotal = 0;
+      let hasSnapshotsBeforeOrAtM = false;
+      
+      if (sortedSnapshots.length > 0 && baseMonths !== null) {
+        // Cari snapshot terakhir pada atau sebelum bulan m
+        let latestSnap = null;
+        let latestSnapM = -1;
+        
+        sortedSnapshots.forEach((snap) => {
+          const snapMonths = parseYearMonth(snap.yearMonth);
+          const snapRelM = snapMonths - baseMonths;
+          if (snapRelM <= m) {
+            latestSnap = snap;
+            latestSnapM = snapRelM;
+            hasSnapshotsBeforeOrAtM = true;
+          }
+        });
+        
+        ASSET_CLASSES.forEach((cls) => {
+          const pref = assetCurrencyPrefs[cls.id] || (cls.isUSD ? 'USD' : 'IDR');
+          const baseR = customReturnOverrides[cls.id] !== undefined ? customReturnOverrides[cls.id] : cls.return;
+          const r = (showAfterTax ? afterTaxReturn(cls, baseR) : baseR) / 100;
+          const rMonthly = Math.pow(1 + r, 1 / 12) - 1;
+          const mc = pref === 'USD'
+            ? (monthlyContribs[cls.id] || 0) * customUSDRate
+            : monthlyContribs[cls.id] || 0;
+            
+          let startVal = 0;
+          let monthsToProject = 0;
+          
+          if (latestSnap !== null) {
+            const rawSnapVal = latestSnap.assetValues[cls.id] ?? 0;
+            startVal = pref === 'USD' ? rawSnapVal * customUSDRate : rawSnapVal;
+            monthsToProject = m - latestSnapM;
+          } else {
+            const rawInit = effectiveAssets[cls.id] || 0;
+            startVal = pref === 'USD' ? rawInit * customUSDRate : rawInit;
+            monthsToProject = m;
+          }
+          
+          let val = startVal;
+          for (let i = 0; i < monthsToProject; i++) {
+            val = val * (1 + rMonthly) + mc;
+          }
+          actualTotal += val;
+        });
+      } else {
+        actualTotal = planTotal;
+      }
+      
       data.push({
         year: `Thn ${y}`,
-        portfolio: Math.round(portTotal),
-        inflation: Math.round(infBase),
-        real: Math.round(portTotal / Math.pow(1 + inf, y)),
+        portfolio: Math.round(planTotal), // Rencana
+        actualPortfolio: hasSnapshotsBeforeOrAtM || sortedSnapshots.length > 0 ? Math.round(actualTotal) : undefined, // Aktual
+        inflation: Math.round(planInfBase),
+        real: Math.round(planTotal / Math.pow(1 + inf, y)),
+        actualReal: hasSnapshotsBeforeOrAtM || sortedSnapshots.length > 0 ? Math.round(actualTotal / Math.pow(1 + inf, y)) : undefined,
       });
-
-      infBase *= 1 + inf;
+      
+      planInfBase *= 1 + inf;
     }
     return data;
   }, [
@@ -460,8 +645,9 @@ export default function WealthTracker() {
     totalAssets,
     customUSDRate,
     assetCurrencyPrefs,
-    customReturnOverrides
-  ]); // <-- UBAH DI SINI
+    customReturnOverrides,
+    monthlySnapshots
+  ]);
 
   const allocData = useMemo(
     () =>
@@ -1207,6 +1393,33 @@ export default function WealthTracker() {
             </PageTransition>
           )}
 
+          {/* TAB: SNAPSHOT BULANAN */}
+          {activeTab === "snapshot" && (
+            <PageTransition key="snapshot">
+              <MonthlySnapshotTab
+                tokens={tokens}
+                ASSET_CLASSES={ASSET_CLASSES}
+                customUSDRate={customUSDRate}
+                assetCurrencyPrefs={assetCurrencyPrefs}
+                activeAssetIds={activeAssetIds}
+                monthlySnapshots={monthlySnapshots}
+                addSnapshot={addSnapshot}
+                updateSnapshot={updateSnapshot}
+                deleteSnapshot={deleteSnapshot}
+                deleteAllSnapshots={deleteAllSnapshots}
+                assets={assets}
+                customReturnOverrides={customReturnOverrides}
+                showAfterTax={showAfterTax}
+                formatIDR={formatIDR}
+                formatCompact={formatCompact}
+                parseExpression={parseExpression}
+                formatWhileTyping={formatWhileTyping}
+                activeTemplateId={activeTemplateId}
+                userTemplates={userTemplates}
+              />
+            </PageTransition>
+          )}
+
           {/* ══════════════════════════════════════════════
               TAB: PROYEKSI & ALOKASI
           ══════════════════════════════════════════════ */}
@@ -1264,6 +1477,7 @@ export default function WealthTracker() {
           <div style={{ display: "flex", gap: 4, flex: 1 }}>
             {[
               ["input", "Input"],
+              ["snapshot", "Snapshot"],
               ["projection", "Proyeksi"],
             ].map(([id, lbl]) => (
               <motion.button
@@ -1466,7 +1680,10 @@ export default function WealthTracker() {
                         onClick={() => {
                           if (modalAction.type === "delete") {
                             setUserTemplates((prev) => prev.filter((t) => t.id !== modalAction.targetId));
-                            if (activeTemplateId === modalAction.targetId) setActiveTemplateId(null);
+                            if (activeTemplateId === modalAction.targetId) {
+                              setActiveTemplateId(null);
+                              setMonthlySnapshots([]); // CLEAR SNAPSHOTS
+                            }
                           } else if (modalAction.type === "update") {
                             setUserTemplates((prev) =>
                               prev.map((t) => {
@@ -1478,7 +1695,9 @@ export default function WealthTracker() {
                                     customUSDRate: customUSDRate,
                                     assetCurrencyPrefs: { ...assetCurrencyPrefs },
                                     activeIds: [...activeAssetIds], fireTarget, monthlyExpense,
-                                    targetMonths, includeEmergencyInTotal, updatedAt: new Date().toISOString(),
+                                    targetMonths, includeEmergencyInTotal,
+                                    monthlySnapshots: [...monthlySnapshots], // PERSIST SNAPSHOTS ON UPDATE
+                                    updatedAt: new Date().toISOString(),
                                   };
                                 }
                                 return t;
