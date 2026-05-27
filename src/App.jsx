@@ -81,6 +81,14 @@ export default function WealthTracker() {
   const [showAfterTax, setShowAfterTax] = useState(true);
   const [activeTab, setActiveTab] = useState("input");
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Reset scroll to top when changing tabs (deferred to ensure DOM has updated)
   useEffect(() => {
     const handleScrollReset = () => {
@@ -992,7 +1000,9 @@ export default function WealthTracker() {
 
       <Container style={{ padding: 0 }}>
         {/* ── HEADER ── */}
-        <div style={{ marginBottom: 20 }}>
+        {/* Header */}
+        {!(isMobile && (activeTab === "snapshot" || activeTab === "projection")) && (
+          <div style={{ marginBottom: 20 }}>
           <h1
             className="header-title"
             style={{
@@ -1017,8 +1027,9 @@ export default function WealthTracker() {
             Return riil · Pajak · Kontribusi per aset · Stress test
           </p>
         </div>
+        )}
 
-        {activeTab !== "trial_invest" && (
+        {activeTab !== "trial_invest" && !(isMobile && (activeTab === "snapshot" || activeTab === "projection")) && (
           <>
             {/* ── GLOBAL DASHBOARD CONTROLLER ── */}
             <div
@@ -1188,7 +1199,7 @@ export default function WealthTracker() {
                   marginBottom: 12,
                 }}
               >
-                Simpan Profil Alokasi
+                {userTemplates && userTemplates.length > 0 ? "Profil Alokasi" : "Simpan Profil Alokasi"}
               </div>
               <div className="profile-row">
                 {userTemplates.map((t) => (
