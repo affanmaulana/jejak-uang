@@ -726,12 +726,26 @@ export default function MonthlySnapshotTab({
         <>
           {/* STRIPE-LIKE 4 EQUAL CARDS FINTECH DASHBOARD GRID - STRICTLY NO GRADIENTS */}
           <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(4, 1fr)",
-          gap: 16,
-        }}
-      >
+            className={isMobile ? "stat-strip" : ""}
+            style={
+              isMobile
+                ? {
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 8,
+                    overflowX: "auto",
+                    margin: "-4px -16px 8px -16px",
+                    padding: "4px 16px 8px 16px",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                  }
+                : {
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: 16,
+                  }
+            }
+          >
         {/* CARD 1: TOTAL PORTFOLIO */}
         <motion.div
           whileHover={{ y: -4, borderColor: "var(--color-semantic-brand)", boxShadow: "0 12px 30px rgba(0,0,0,0.05)" }}
@@ -739,13 +753,15 @@ export default function MonthlySnapshotTab({
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: isMobile ? "14px 16px" : "20px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             gap: 12,
             transition: "border-color 0.2s, box-shadow 0.2s",
             boxShadow: "var(--shadow-sm)",
+            flexShrink: isMobile ? 0 : 1,
+            minWidth: isMobile ? "180px" : "auto",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -788,13 +804,15 @@ export default function MonthlySnapshotTab({
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: isMobile ? "14px 16px" : "20px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             gap: 12,
             transition: "border-color 0.2s, box-shadow 0.2s",
             boxShadow: "var(--shadow-sm)",
+            flexShrink: isMobile ? 0 : 1,
+            minWidth: isMobile ? "180px" : "auto",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -832,13 +850,15 @@ export default function MonthlySnapshotTab({
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: isMobile ? "14px 16px" : "20px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             gap: 12,
             transition: "border-color 0.2s, box-shadow 0.2s",
             boxShadow: "var(--shadow-sm)",
+            flexShrink: isMobile ? 0 : 1,
+            minWidth: isMobile ? "180px" : "auto",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -876,13 +896,15 @@ export default function MonthlySnapshotTab({
             background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
-            padding: "20px",
+            padding: isMobile ? "14px 16px" : "20px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             gap: 12,
             transition: "border-color 0.2s, box-shadow 0.2s",
             boxShadow: "var(--shadow-sm)",
+            flexShrink: isMobile ? 0 : 1,
+            minWidth: isMobile ? "180px" : "auto",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1074,86 +1096,7 @@ export default function MonthlySnapshotTab({
             )}
           </div>
           
-          {/* CONDITIONAL RENDER: PREMIUM MOBILE CARD-LIST OR DESKTOP TABLE */}
-          {isMobile ? (
-            <div style={{ display: "flex", flexDirection: "column", padding: 12, gap: 10 }}>
-              {[...snapshotsWithMetrics].reverse().map((snap) => (
-                <div
-                  key={snap.id}
-                  style={{
-                    background: "var(--color-surface-input)",
-                    border: "1px solid var(--color-border-subtle)",
-                    borderRadius: 12,
-                    padding: 14,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 14, fontWeight: "bold", color: "var(--color-text-primary)" }}>
-                      {formatMonthLabelLong(snap.yearMonth)}
-                    </span>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <button
-                        onClick={() => handleOpenEditModal(snap)}
-                        style={{ border: "none", background: "transparent", color: "var(--color-text-secondary)", cursor: "pointer" }}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => setSnapshotToDelete(snap)}
-                        style={{ border: "none", background: "transparent", color: "var(--color-semantic-danger)", cursor: "pointer" }}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 16, height: 16 }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                    <span style={{ color: "var(--color-text-tertiary)" }}>Saldo Aktual:</span>
-                    <span style={{ color: "var(--color-text-primary)", fontWeight: "500" }}>
-                      {formatIDR(snap.totalPortfolio)}
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                    <span style={{ color: "var(--color-text-tertiary)" }}>Net Inflow:</span>
-                    <span
-                      style={{
-                        fontWeight: "bold",
-                        color: snap.netInflow >= 0 ? "var(--color-semantic-success)" : "var(--color-semantic-danger)",
-                      }}
-                    >
-                      {snap.netInflow >= 0 ? "+" : ""}
-                      {formatIDR(snap.netInflow)}
-                    </span>
-                  </div>
-
-                  {snap.notes && (
-                    <div
-                      style={{
-                        marginTop: 4,
-                        fontSize: 11,
-                        color: "var(--color-text-secondary)",
-                        padding: "6px 8px",
-                        background: "var(--color-surface-card)",
-                        borderRadius: 6,
-                        borderLeft: "2px solid var(--color-border-subtle)",
-                      }}
-                    >
-                      📝 {snap.notes}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
+          <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
                 <thead>
                   <tr style={{ borderBottom: "1.5px solid var(--color-border-subtle)", background: "var(--color-surface-app)" }}>
@@ -1249,7 +1192,6 @@ export default function MonthlySnapshotTab({
                 </tbody>
               </table>
             </div>
-          )}
         </div>
       </div>
 
