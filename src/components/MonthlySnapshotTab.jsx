@@ -632,8 +632,100 @@ export default function MonthlySnapshotTab({
         </div>
       </div>
 
-      {/* STRIPE-LIKE 4 EQUAL CARDS FINTECH DASHBOARD GRID - STRICTLY NO GRADIENTS */}
-      <div
+      {snapshotsWithMetrics.length === 0 ? (
+        <div
+          style={{
+            background: "var(--color-surface-card)",
+            border: "1.5px solid var(--color-border-subtle)",
+            borderRadius: 20,
+            padding: "80px 30px",
+            textAlign: "center",
+            boxShadow: tokens.shadows.small,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 20,
+            marginTop: 8,
+          }}
+        >
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: "50%",
+              background: "var(--color-surface-input)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--color-text-tertiary)",
+              border: "1.5px solid var(--color-border-subtle)",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 32, height: 32 }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+            </svg>
+          </div>
+          <div>
+            <h2
+              style={{
+                fontSize: "var(--text-h2-size)",
+                fontWeight: "var(--text-h2-weight)",
+                color: "var(--color-text-primary)",
+                margin: "0 0 10px 0",
+              }}
+            >
+              Belum Ada Snapshot Bulanan
+            </h2>
+            <p
+              style={{
+                fontSize: "var(--text-body-size)",
+                color: "var(--color-text-tertiary)",
+                lineHeight: 1.6,
+                maxWidth: 480,
+                margin: "0 auto",
+              }}
+            >
+              Catatan Snapshot Bulanan memerlukan basis data rencana awal agar komparasi dan kalkulasi return bulanan aktual berjalan akurat. Mulai catat perkembangan saldo riil Anda untuk melihat analisis pergeseran alokasi dan grafik perkembangan.
+            </p>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={handleOpenAddModal}
+            style={{
+              padding: "12px 24px",
+              borderRadius: "10px",
+              border: "none",
+              background: "var(--color-semantic-brand)",
+              color: "var(--color-white)",
+              fontWeight: "var(--text-body-bold-weight)",
+              fontSize: "var(--text-body-size)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              boxShadow: "var(--shadow-glow)",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              style={{ width: 16, height: 16 }}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Catat Snapshot Pertama Anda
+          </motion.button>
+        </div>
+      ) : (
+        <>
+          {/* STRIPE-LIKE 4 EQUAL CARDS FINTECH DASHBOARD GRID - STRICTLY NO GRADIENTS */}
+          <div
         style={{
           display: "grid",
           gridTemplateColumns: isMobile ? "1fr" : "repeat(4, 1fr)",
@@ -983,44 +1075,7 @@ export default function MonthlySnapshotTab({
           </div>
           
           {/* CONDITIONAL RENDER: PREMIUM MOBILE CARD-LIST OR DESKTOP TABLE */}
-          {snapshotsWithMetrics.length === 0 ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "48px 24px",
-                textAlign: "center",
-                background: "var(--color-surface-card)",
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "50%",
-                  background: "var(--color-surface-input)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--color-text-tertiary)",
-                  marginBottom: 16,
-                  border: "1px solid var(--color-border-subtle)",
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 22, height: 22 }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-                </svg>
-              </div>
-              <h4 style={{ fontSize: 15, fontWeight: "bold", color: "var(--color-text-primary)", margin: "0 0 6px 0" }}>
-                Belum Ada Snapshot Bulanan
-              </h4>
-              <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: 0, maxWidth: 360, lineHeight: 1.5 }}>
-                Mulai catat perkembangan saldo riil Anda di atas untuk melacak pergeseran alokasi aset secara otomatis.
-              </p>
-            </div>
-          ) : isMobile ? (
+          {isMobile ? (
             <div style={{ display: "flex", flexDirection: "column", padding: 12, gap: 10 }}>
               {[...snapshotsWithMetrics].reverse().map((snap) => (
                 <div
@@ -1335,6 +1390,8 @@ export default function MonthlySnapshotTab({
             </table>
           </div>
         </div>
+      )}
+        </>
       )}
 
       {/* FORM MODAL FOR RECORDING SNAPSHOT */}
