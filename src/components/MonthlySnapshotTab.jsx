@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ResponsiveContainer,
   ComposedChart,
-  Area,
   Line,
   XAxis,
   YAxis,
@@ -301,11 +300,14 @@ export default function MonthlySnapshotTab({
       );
       const label = date.toLocaleDateString("id-ID", { month: "short", year: "2-digit" });
 
+      // Connected data logic:
+      // - Aktual ends exactly at index (latestMonths - baseMonths)
+      // - ProyeksiAktual starts exactly at index (latestMonths - baseMonths)
       dataList.push({
         label,
         Plan: Math.round(planTotal),
         Aktual: m <= latestMonths - baseMonths ? Math.round(actualTotal) : undefined,
-        ProyeksiAktual: m > latestMonths - baseMonths ? Math.round(actualTotal) : undefined,
+        ProyeksiAktual: m >= latestMonths - baseMonths ? Math.round(actualTotal) : undefined,
       });
     }
 
@@ -490,7 +492,7 @@ export default function MonthlySnapshotTab({
               margin: "0 0 10px 0",
             }}
           >
-            Aktifkan Profil Anda Terlebih Dahulu
+            Pilih Profil Anda Terlebih Dahulu
           </h2>
           <p
             style={{
@@ -503,21 +505,6 @@ export default function MonthlySnapshotTab({
           >
             Catatan Snapshot Bulanan memerlukan basis data rencana awal agar komparasi dan kalkulasi return bulanan aktual berjalan akurat.
           </p>
-        </div>
-        <div
-          style={{
-            background: "var(--color-surface-input)",
-            border: "1px dashed var(--color-border-subtle)",
-            borderRadius: 12,
-            padding: "16px 20px",
-            width: "100%",
-            fontSize: "var(--text-caption-size)",
-            color: "var(--color-text-secondary)",
-            textAlign: "left",
-            lineHeight: 1.5,
-          }}
-        >
-          💡 <strong>Tips Cepat:</strong> Masuk ke tab <strong>"Input"</strong> di bagian bawah, lalu pilih profil aktif Anda di baris atas, atau buat profil baru dalam 5 detik jika Anda belum memilikinya.
         </div>
         <p style={{ margin: 0, fontSize: 11, color: "var(--color-text-tertiary)" }}>
           *Setiap profil menyimpan snapshot independennya sendiri secara rapi dan otomatis.
@@ -617,7 +604,7 @@ export default function MonthlySnapshotTab({
         </div>
       </div>
 
-      {/* STRIPE-LIKE 4 EQUAL CARDS FINTECH DASHBOARD GRID */}
+      {/* STRIPE-LIKE 4 EQUAL CARDS FINTECH DASHBOARD GRID - STRICTLY NO GRADIENTS */}
       <div
         style={{
           display: "grid",
@@ -629,7 +616,7 @@ export default function MonthlySnapshotTab({
         <motion.div
           whileHover={{ y: -4, borderColor: "var(--color-semantic-brand)", boxShadow: "0 12px 30px rgba(0,0,0,0.05)" }}
           style={{
-            background: "linear-gradient(180deg, var(--color-surface-card) 0%, rgba(30, 41, 59, 0.15) 100%)",
+            background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
             padding: "20px",
@@ -648,7 +635,7 @@ export default function MonthlySnapshotTab({
             <div
               style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: "rgba(16, 185, 129, 0.1)",
+                background: "var(--color-surface-input)",
                 color: "var(--color-semantic-success)",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}
@@ -665,7 +652,7 @@ export default function MonthlySnapshotTab({
               {formatCompact(latestPortfolioValue)}
             </div>
             <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 4, display: "flex", alignItems: "center", gap: 4 }}>
-              {/* Clean Custom SVG Calendar replacing Emoji */}
+              {/* Clean Custom SVG Calendar */}
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 10, height: 10, color: "var(--color-text-tertiary)" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
               </svg>
@@ -678,7 +665,7 @@ export default function MonthlySnapshotTab({
         <motion.div
           whileHover={{ y: -4, borderColor: "var(--color-semantic-brand)", boxShadow: "0 12px 30px rgba(0,0,0,0.05)" }}
           style={{
-            background: "linear-gradient(180deg, var(--color-surface-card) 0%, rgba(30, 41, 59, 0.15) 100%)",
+            background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
             padding: "20px",
@@ -697,8 +684,8 @@ export default function MonthlySnapshotTab({
             <div
               style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: "rgba(99, 102, 241, 0.1)",
-                color: "rgb(99, 102, 241)",
+                background: "var(--color-surface-input)",
+                color: "var(--color-semantic-brand)",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}
             >
@@ -722,7 +709,7 @@ export default function MonthlySnapshotTab({
         <motion.div
           whileHover={{ y: -4, borderColor: "var(--color-semantic-brand)", boxShadow: "0 12px 30px rgba(0,0,0,0.05)" }}
           style={{
-            background: "linear-gradient(180deg, var(--color-surface-card) 0%, rgba(30, 41, 59, 0.15) 100%)",
+            background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
             padding: "20px",
@@ -741,7 +728,7 @@ export default function MonthlySnapshotTab({
             <div
               style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: "rgba(16, 185, 129, 0.1)",
+                background: "var(--color-surface-input)",
                 color: "var(--color-semantic-success)",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}
@@ -766,7 +753,7 @@ export default function MonthlySnapshotTab({
         <motion.div
           whileHover={{ y: -4, borderColor: "var(--color-semantic-brand)", boxShadow: "0 12px 30px rgba(0,0,0,0.05)" }}
           style={{
-            background: "linear-gradient(180deg, var(--color-surface-card) 0%, rgba(30, 41, 59, 0.15) 100%)",
+            background: "var(--color-surface-card)",
             border: "1.5px solid var(--color-border-subtle)",
             borderRadius: 16,
             padding: "20px",
@@ -785,8 +772,8 @@ export default function MonthlySnapshotTab({
             <div
               style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: "rgba(139, 92, 246, 0.1)",
-                color: "rgb(139, 92, 246)",
+                background: "var(--color-surface-input)",
+                color: "var(--color-semantic-warning)",
                 display: "flex", alignItems: "center", justifyContent: "center"
               }}
             >
@@ -808,8 +795,8 @@ export default function MonthlySnapshotTab({
       </div>
 
       {/* GRAPH CONTAINER & SNAPSHOT HISTORY */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr", gap: 24 }}>
-        {/* GRAPH SECTION */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        {/* GRAPH SECTION - 100% GRADIENT FREE */}
         <div style={{ width: "100%" }}>
           <div
             style={{
@@ -859,12 +846,6 @@ export default function MonthlySnapshotTab({
             <div style={{ width: "100%", height: isMobile ? 220 : 320 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={chartData} margin={{ top: 10, right: 5, left: -22, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-semantic-success)" stopOpacity={0.08} />
-                      <stop offset="95%" stopColor="var(--color-semantic-success)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.02)" vertical={false} />
                   <XAxis dataKey="label" stroke="var(--color-text-tertiary)" fontSize={10} tickLine={false} />
                   <YAxis
@@ -875,7 +856,7 @@ export default function MonthlySnapshotTab({
                   />
                   <Tooltip
                     contentStyle={{
-                      background: "rgba(15, 23, 42, 0.95)",
+                      background: "var(--color-surface-card)",
                       border: "1.5px solid var(--color-border-subtle)",
                       borderRadius: "12px",
                       color: "var(--color-text-primary)",
@@ -885,28 +866,27 @@ export default function MonthlySnapshotTab({
                     }}
                     formatter={(value, name) => [formatIDR(value), name]}
                   />
-                  {/* Sleek Dashed Curve for Plan (No muddy Area Fill) */}
+                  {/* Sleek Dashed Curve for Plan - 100% Gradient-Free */}
                   <Line
                     type="monotone"
-                    name="Rencana (Plan)"
+                    name="Rencana"
                     dataKey="Plan"
                     stroke="var(--color-semantic-brand)"
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     dot={false}
                   />
-                  {/* Glowing Area Curve for Actual */}
-                  <Area
+                  {/* Thick Glowing Solid Curve for Actual - 100% Gradient-Free (No Area fills!) */}
+                  <Line
                     type="monotone"
                     name="Aktual"
                     dataKey="Aktual"
                     stroke="var(--color-semantic-success)"
                     strokeWidth={3}
-                    fill="url(#colorActual)"
                     dot={{ r: 4, fill: "var(--color-semantic-success)", stroke: "var(--color-surface-card)", strokeWidth: 2 }}
                     activeDot={{ r: 6, strokeWidth: 0 }}
                   />
-                  {/* Projected Actual Line */}
+                  {/* Seamless Connected Projected Actual Line */}
                   <Line
                     type="monotone"
                     name="Proyeksi dari Aktual"
@@ -1398,7 +1378,7 @@ export default function MonthlySnapshotTab({
                   </AnimatePresence>
                 </div>
 
-                {/* Grid 16 Asset Inputs (Solid prominent buttons, no dimming, internal USD/IDR badges) */}
+                {/* Grid 16 Asset Inputs - ELEGANT CARDS SYNCED 100% WITH INPUT TAB (NO GRADIENTS, NO DASHED BORDERS, NO LEFT ACTION BTN) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <label
                     style={{
@@ -1432,114 +1412,114 @@ export default function MonthlySnapshotTab({
                             alignItems: "center",
                             justifyContent: "space-between",
                             gap: 12,
-                            padding: "12px 14px",
-                            background: isActive ? "var(--color-surface-card)" : "var(--color-surface-input)",
-                            borderRadius: "12px",
+                            padding: "16px 16px",
+                            background: "var(--color-surface-card)",
+                            borderRadius: 16,
                             border: isActive 
                               ? "1.5px solid var(--color-semantic-success)" 
-                              : "1.5px dashed var(--color-border-subtle)",
+                              : "1.5px solid var(--color-border-subtle)",
                             opacity: 1, // Absolutely NO dimming on the card container
                             transition: "all 0.2s ease-in-out",
-                            boxShadow: isActive ? "0 4px 16px rgba(16, 185, 129, 0.04)" : "none",
+                            boxShadow: "var(--shadow-sm)",
                           }}
                         >
-                          {/* Prominent solid red/green toggle buttons */}
-                          <button
-                            type="button"
-                            onClick={() => handleToggleAsset(cls.id)}
-                            style={{
-                              width: 24, height: 24, borderRadius: "50%", border: "none",
-                              background: isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)",
-                              color: "var(--color-white)",
-                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: "black",
-                              boxShadow: "var(--shadow-sm)",
-                              transition: "all 0.15s"
-                            }}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            title={isActive ? "Hapus dari Portofolio" : "Tambah ke Portofolio"}
-                          >
-                            {isActive ? "✕" : "＋"}
-                          </button>
-
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+                          {/* SISI KIRI (Informasi Aset) - Identik 100% dengan InputTab.jsx */}
+                          <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                             <div
                               style={{
-                                width: 8,
-                                height: 8,
+                                width: 10,
+                                height: 10,
                                 borderRadius: "50%",
                                 background: cls.color,
                                 flexShrink: 0,
                               }}
                             />
-                            <div>
-                              <div
+                            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                              <span
                                 style={{
-                                  fontSize: "var(--text-body-bold-size)",
-                                  fontWeight: "bold",
+                                  fontSize: "var(--text-body-size)",
+                                  fontWeight: "var(--text-subtitle-weight)",
                                   color: "var(--color-text-primary)",
                                   lineHeight: 1.2,
                                 }}
                               >
                                 {cls.name}
-                              </div>
-                              <span style={{ fontSize: 9, color: "var(--color-text-tertiary)" }}>
+                              </span>
+                              <span style={{ fontSize: "var(--text-eyebrow-size)", color: "var(--color-text-tertiary)" }}>
                                 {cls.risk}
                               </span>
                             </div>
                           </div>
 
-                          {/* Value Input Box with currency code inside */}
-                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                background: isActive ? "var(--color-surface-input)" : "rgba(255, 255, 255, 0.02)",
-                                border: isActive ? "1.5px solid var(--color-semantic-success)" : "1.5px solid var(--color-border-subtle)",
-                                borderRadius: "8px",
-                                padding: "0 10px",
-                                width: 145,
-                                transition: "border-color 0.2s"
-                              }}
-                            >
-                              {/* Internal USD or IDR uppercase text prefix badge */}
-                              <span
+                          {/* SISI KANAN (Aksi & Input) - Rapi & Sangat Fungsional */}
+                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            {/* Jika instrumen aktif, tampilkan input field */}
+                            {isActive && (
+                              <div
                                 style={{
-                                  fontSize: 10,
-                                  fontWeight: "900",
-                                  color: isActive ? "var(--color-text-secondary)" : "var(--color-text-tertiary)",
-                                  userSelect: "none",
-                                  marginRight: 2
+                                  display: "flex",
+                                  alignItems: "center",
+                                  background: "var(--color-surface-input)",
+                                  border: "1.5px solid var(--color-border-subtle)",
+                                  borderRadius: "10px",
+                                  padding: "0 12px",
+                                  width: 150,
+                                  transition: "border-color 0.2s"
                                 }}
                               >
-                                {currencyPref}
-                              </span>
-                              <input
-                                type="text"
-                                placeholder="0"
-                                disabled={!isActive}
-                                value={isActive && val > 0 ? (currencyPref === "USD" ? val.toLocaleString("en-US") : formatWhileTyping(val.toString())) : ""}
-                                onChange={(e) => handleAssetInputChange(cls.id, e.target.value)}
-                                style={{
-                                  border: "none",
-                                  background: "transparent",
-                                  padding: "8px 0 8px 6px",
-                                  textAlign: "right",
-                                  width: "100%",
-                                  color: "var(--color-text-primary)",
-                                  fontSize: 13,
-                                  fontFamily: tokens.typography.fontFamily,
-                                  outline: "none",
-                                  cursor: isActive ? "text" : "not-allowed"
-                                }}
-                              />
-                            </div>
-                            {isActive && currencyPref === "USD" && val > 0 && (
-                              <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
-                                ≈ {formatCompact(val * customUSDRate)}
-                              </span>
+                                {/* Tag Kode Mata Uang Kapital Tebal */}
+                                <span
+                                  style={{
+                                    fontSize: 10,
+                                    fontWeight: "900",
+                                    color: "var(--color-text-secondary)",
+                                    userSelect: "none",
+                                    marginRight: 2
+                                  }}
+                                >
+                                  {currencyPref}
+                                </span>
+                                <input
+                                  type="text"
+                                  placeholder="0"
+                                  value={val > 0 ? (currencyPref === "USD" ? val.toLocaleString("en-US") : formatWhileTyping(val.toString())) : ""}
+                                  onChange={(e) => handleAssetInputChange(cls.id, e.target.value)}
+                                  style={{
+                                    border: "none",
+                                    background: "transparent",
+                                    padding: "10px 0 10px 6px",
+                                    textAlign: "right",
+                                    width: "100%",
+                                    color: "var(--color-text-primary)",
+                                    fontSize: 13,
+                                    fontFamily: tokens.typography.fontFamily,
+                                    outline: "none",
+                                  }}
+                                />
+                              </div>
                             )}
+
+                            {/* Tombol Aksi Bulat Solid Premium di Far Right */}
+                            <motion.button
+                              type="button"
+                              onClick={() => handleToggleAsset(cls.id)}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              style={{
+                                width: 32, height: 32,
+                                borderRadius: "10px",
+                                border: "none",
+                                background: isActive ? "var(--color-semantic-danger)" : "var(--color-semantic-success)",
+                                color: "var(--color-white)",
+                                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: isActive ? 12 : 14, fontWeight: "bold",
+                                boxShadow: "var(--shadow-sm)",
+                                transition: "all 0.15s"
+                              }}
+                              title={isActive ? "Hapus dari Portofolio" : "Tambah ke Portofolio"}
+                            >
+                              {isActive ? "✕" : "＋"}
+                            </motion.button>
                           </div>
                         </div>
                       );
