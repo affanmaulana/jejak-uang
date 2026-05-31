@@ -375,15 +375,7 @@ export default function MonthlySnapshotTab({
       nextMonthYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     }
     
-    // Check if next month is in the future
-    const now = new Date();
-    const currentYMInt = now.getFullYear() * 12 + now.getMonth();
-    const [ny, nm] = nextMonthYM.split("-").map(Number);
-    
-    if (ny * 12 + (nm - 1) > currentYMInt) {
-      nextMonthYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    }
-
+    // Allow next month to be any month including future
     setFormMonth(nextMonthYM);
     
     const [y] = nextMonthYM.split("-").map(Number);
@@ -1537,9 +1529,7 @@ export default function MonthlySnapshotTab({
                             type="button"
                             onClick={() => {
                               const now = new Date();
-                              if (pickerYear < now.getFullYear() + 2) {
-                                setPickerYear(prev => prev + 1);
-                              }
+                              setPickerYear(prev => prev + 1);
                             }}
                             style={{
                               width: 28, height: 28, borderRadius: "50%", border: "1.5px solid var(--color-border-subtle)",
@@ -1568,7 +1558,7 @@ export default function MonthlySnapshotTab({
                             const isAlreadyRecorded = monthlySnapshots.some(s => s.yearMonth === targetYM);
 
                             // Disabled state
-                            const isDisabled = isFuture || isPast || (isAlreadyRecorded && (!editingSnapshot || editingSnapshot.yearMonth !== targetYM));
+                            const isDisabled = isAlreadyRecorded && (!editingSnapshot || editingSnapshot.yearMonth !== targetYM);
 
                             return (
                               <motion.button
